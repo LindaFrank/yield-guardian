@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
+const FMP_BASE = 'https://financialmodelingprep.com/stable';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -36,29 +36,37 @@ serve(async (req) => {
       .slice(0, 20);
 
     if (action === 'quote') {
-      // Batch quote endpoint
-      const symbols = cleanTickers.join(',');
-      const res = await fetch(`${FMP_BASE}/quote/${symbols}?apikey=${apiKey}`);
-      if (!res.ok) {
-        throw new Error(`FMP quote API failed [${res.status}]: ${await res.text()}`);
-      }
-      const data = await res.json();
-      return new Response(JSON.stringify(data), {
+      // Fetch quotes individually (stable API uses ?symbol= param)
+      const quotes = await Promise.all(
+        cleanTickers.map(async (ticker: string) => {
+          const res = await fetch(`${FMP_BASE}/quote?symbol=${ticker}&apikey=${apiKey}`);
+          if (!res.ok) {
+            console.error(`FMP quote failed for ${ticker}: ${res.status}`);
+            return null;
+          }
+          const data = await res.json();
+          // stable API returns an array
+          return Array.isArray(data) ? data[0] : data;
+        })
+      );
+      const validQuotes = quotes.filter(Boolean);
+      return new Response(JSON.stringify(validQuotes), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (action === 'dividends') {
-      // Fetch dividend history for each ticker
+      // Fetch dividend history for each ticker using stable endpoint
       const results: Record<string, any[]> = {};
       await Promise.all(
         cleanTickers.map(async (ticker: string) => {
           const res = await fetch(
-            `${FMP_BASE}/historical-price-full/stock_dividend/${ticker}?apikey=${apiKey}`
+            `${FMP_BASE}/dividends?symbol=${ticker}&apikey=${apiKey}`
           );
           if (res.ok) {
             const data = await res.json();
-            results[ticker] = data.historical?.slice(0, 20) || [];
+            // stable endpoint returns array directly
+            results[ticker] = (Array.isArray(data) ? data : []).slice(0, 20);
           } else {
             results[ticker] = [];
           }
@@ -72,7 +80,7 @@ serve(async (req) => {
     if (action === 'search') {
       const query = cleanTickers[0]; // use first element as search query
       const res = await fetch(
-        `${FMP_BASE}/search?query=${encodeURIComponent(query)}&limit=10&apikey=${apiKey}`
+        `${FMP_BASE}/search-symbol?query=${encodeURIComponent(query)}&limit=10&apikey=${apiKey}`
       );
       if (!res.ok) {
         throw new Error(`FMP search API failed [${res.status}]: ${await res.text()}`);
