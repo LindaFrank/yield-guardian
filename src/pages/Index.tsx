@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Stock } from '@/types/portfolio';
-import { defaultPortfolio, marketStocks } from '@/data/mockData';
+import { defaultPortfolio, marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
   analyzeStock, 
   scanPortfolioForUnderperformers, 
@@ -13,11 +13,47 @@ import { StockCard } from '@/components/StockCard';
 import { UnderperformersList } from '@/components/UnderperformersList';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { AddStockModal } from '@/components/AddStockModal';
+import { useStockQuotes } from '@/hooks/useStockData';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
+  const [tickers, setTickers] = useState<string[]>(
+    defaultPortfolio.stocks.map((s) => s.ticker)
+  );
   const [stocks, setStocks] = useState<Stock[]>(defaultPortfolio.stocks);
   const [targetYield, setTargetYield] = useState(defaultPortfolio.targetMinYield);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
+  const { toast } = useToast();
+
+  // Fetch live data for portfolio tickers
+  const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
+
+  // Update stocks when live data arrives
+  useEffect(() => {
+    if (liveStocks && liveStocks.length > 0) {
+      // Merge live data with existing sector info from mock data
+      const merged = liveStocks.map((live) => {
+        const mock = defaultPortfolio.stocks.find((m) => m.ticker === live.ticker) ||
+          mockMarketStocks.find((m) => m.ticker === live.ticker);
+        return {
+          ...live,
+          sector: live.sector || mock?.sector || 'Unknown',
+        };
+      });
+      setStocks(merged);
+    }
+  }, [liveStocks]);
+
+  // Show error toast
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: 'Live data unavailable',
+        description: 'Using cached data. Will retry automatically.',
+        variant: 'destructive',
+      });
+    }
+  }, [error]);
 
   // Analyze all stocks
   const stockAnalyses = useMemo(
@@ -36,7 +72,7 @@ const Index = () => {
     if (!selectedUnderperformer) return [];
     return suggestReplacements(
       selectedUnderperformer,
-      marketStocks,
+      mockMarketStocks,
       targetYield,
       stocks.map((s) => s.ticker)
     );
@@ -44,6 +80,7 @@ const Index = () => {
 
   const handleRemoveStock = (ticker: string) => {
     setStocks((prev) => prev.filter((s) => s.ticker !== ticker));
+    setTickers((prev) => prev.filter((t) => t !== ticker));
     if (selectedUnderperformer?.ticker === ticker) {
       setSelectedUnderperformer(null);
     }
@@ -52,6 +89,7 @@ const Index = () => {
   const handleAddStock = (stock: Stock) => {
     if (!stocks.find((s) => s.ticker === stock.ticker)) {
       setStocks((prev) => [...prev, stock]);
+      setTickers((prev) => [...prev, stock.ticker]);
     }
   };
 
@@ -66,6 +104,20 @@ const Index = () => {
       <Header />
       
       <main className="container mx-auto px-6 py-8">
+        {/* Live Data Status */}
+        {isLoading && (
+          <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />
+            Fetching live market data…
+          </div>
+        )}
+        {!isLoading && liveStocks && liveStocks.length > 0 && (
+          <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+            Live data · Refreshes every 5 min
+          </div>
+        )}
+
         {/* Stats Overview */}
         <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
           <PortfolioStats
@@ -88,7 +140,7 @@ const Index = () => {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 <AddStockModal
-                  marketStocks={marketStocks}
+                  marketStocks={mockMarketStocks}
                   existingTickers={stocks.map((s) => s.ticker)}
                   onAddStock={handleAddStock}
                 />
