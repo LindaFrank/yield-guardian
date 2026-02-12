@@ -36,42 +36,43 @@ serve(async (req) => {
       .slice(0, 20);
 
     if (action === 'quote') {
-      // Fetch quotes individually (stable API uses ?symbol= param)
-      const quotes = await Promise.all(
-        cleanTickers.map(async (ticker: string) => {
-          const res = await fetch(`${FMP_BASE}/quote?symbol=${ticker}&apikey=${apiKey}`);
-          if (!res.ok) {
-            console.error(`FMP quote failed for ${ticker}: ${res.status}`);
-            return null;
-          }
-          const data = await res.json();
-          // stable API returns an array
-          return Array.isArray(data) ? data[0] : data;
-        })
-      );
-      const validQuotes = quotes.filter(Boolean);
-      return new Response(JSON.stringify(validQuotes), {
+      // Batch all tickers in a single request using comma-separated symbols
+      const symbols = cleanTickers.join(',');
+      const res = await fetch(`${FMP_BASE}/quote?symbol=${symbols}&apikey=${apiKey}`);
+      if (!res.ok) {
+        console.error(`FMP batch quote failed: ${res.status}`);
+        return new Response(JSON.stringify([]), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const data = await res.json();
+      const quotes = Array.isArray(data) ? data : [data];
+      return new Response(JSON.stringify(quotes), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (action === 'dividends') {
-      // Fetch dividend history for each ticker using stable endpoint
+      // Batch all tickers in a single request
+      const symbols = cleanTickers.join(',');
+      const res = await fetch(`${FMP_BASE}/dividends?symbol=${symbols}&apikey=${apiKey}`);
       const results: Record<string, any[]> = {};
-      await Promise.all(
-        cleanTickers.map(async (ticker: string) => {
-          const res = await fetch(
-            `${FMP_BASE}/dividends?symbol=${ticker}&apikey=${apiKey}`
-          );
-          if (res.ok) {
-            const data = await res.json();
-            // stable endpoint returns array directly
-            results[ticker] = (Array.isArray(data) ? data : []).slice(0, 20);
-          } else {
-            results[ticker] = [];
+      if (res.ok) {
+        const data = await res.json();
+        const allDivs = Array.isArray(data) ? data : [];
+        // Group dividends by symbol
+        for (const div of allDivs) {
+          const sym = div.symbol || div.ticker;
+          if (sym) {
+            if (!results[sym]) results[sym] = [];
+            if (results[sym].length < 20) results[sym].push(div);
           }
-        })
-      );
+        }
+      }
+      // Ensure every requested ticker has an entry
+      for (const t of cleanTickers) {
+        if (!results[t]) results[t] = [];
+      }
       return new Response(JSON.stringify(results), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
