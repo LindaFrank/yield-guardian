@@ -5,7 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const FMP_BASE = 'https://financialmodelingprep.com/stable';
+// FMP v3 is available on the free tier
+const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -36,11 +37,11 @@ serve(async (req) => {
       .slice(0, 20);
 
     if (action === 'quote') {
-      // Batch all tickers in a single request using comma-separated symbols
+      // v3 batch quote: /api/v3/quote/AAPL,MSFT,GOOG
       const symbols = cleanTickers.join(',');
-      const res = await fetch(`${FMP_BASE}/quote?symbol=${symbols}&apikey=${apiKey}`);
+      const res = await fetch(`${FMP_BASE}/quote/${symbols}?apikey=${apiKey}`);
       if (!res.ok) {
-        console.error(`FMP batch quote failed: ${res.status}`);
+        console.error(`FMP v3 batch quote failed: ${res.status} ${await res.text()}`);
         return new Response(JSON.stringify([]), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -53,35 +54,32 @@ serve(async (req) => {
     }
 
     if (action === 'dividends') {
-      // Batch all tickers in a single request
-      const symbols = cleanTickers.join(',');
-      const res = await fetch(`${FMP_BASE}/dividends?symbol=${symbols}&apikey=${apiKey}`);
+      // v3 dividend history is per-ticker: /api/v3/historical-price-full/stock_dividend/AAPL
       const results: Record<string, any[]> = {};
-      if (res.ok) {
-        const data = await res.json();
-        const allDivs = Array.isArray(data) ? data : [];
-        // Group dividends by symbol
-        for (const div of allDivs) {
-          const sym = div.symbol || div.ticker;
-          if (sym) {
-            if (!results[sym]) results[sym] = [];
-            if (results[sym].length < 20) results[sym].push(div);
+      await Promise.all(
+        cleanTickers.map(async (ticker: string) => {
+          const res = await fetch(
+            `${FMP_BASE}/historical-price-full/stock_dividend/${ticker}?apikey=${apiKey}`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            // v3 returns { symbol, historical: [...] }
+            const historical = Array.isArray(data?.historical) ? data.historical : [];
+            results[ticker] = historical.slice(0, 20);
+          } else {
+            results[ticker] = [];
           }
-        }
-      }
-      // Ensure every requested ticker has an entry
-      for (const t of cleanTickers) {
-        if (!results[t]) results[t] = [];
-      }
+        })
+      );
       return new Response(JSON.stringify(results), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (action === 'search') {
-      const query = cleanTickers[0]; // use first element as search query
+      const query = cleanTickers[0];
       const res = await fetch(
-        `${FMP_BASE}/search-symbol?query=${encodeURIComponent(query)}&limit=10&apikey=${apiKey}`
+        `${FMP_BASE}/search?query=${encodeURIComponent(query)}&limit=10&apikey=${apiKey}`
       );
       if (!res.ok) {
         throw new Error(`FMP search API failed [${res.status}]: ${await res.text()}`);
