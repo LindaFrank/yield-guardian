@@ -6,7 +6,7 @@ interface FMPQuote {
   symbol: string;
   name: string;
   price: number;
-  changePercentage: number;
+  changesPercentage: number; // v3 field name
   change: number;
   yearHigh: number;
   yearLow: number;
