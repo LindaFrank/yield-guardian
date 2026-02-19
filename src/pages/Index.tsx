@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Stock } from '@/types/portfolio';
 import { defaultPortfolio, marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
@@ -41,6 +41,25 @@ const Index = () => {
         };
       });
       setStocks(merged);
+    }
+  }, [liveStocks]);
+
+  // Track whether we've already notified the user that the feed went live
+  const feedNotifiedRef = useRef(false);
+
+  // Show toast when FMP feed first becomes active (returns real quote data)
+  useEffect(() => {
+    if (
+      !feedNotifiedRef.current &&
+      liveStocks &&
+      liveStocks.length > 0 &&
+      liveStocks.some((s) => s.currentPrice > 0)
+    ) {
+      feedNotifiedRef.current = true;
+      toast({
+        title: '📡 Live feed active!',
+        description: 'Real-time quotes from FMP are now flowing. Data refreshes every 5 min.',
+      });
     }
   }, [liveStocks]);
 
@@ -107,14 +126,20 @@ const Index = () => {
         {/* Live Data Status */}
         {isLoading && (
           <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />
+            <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
             Fetching live market data…
           </div>
         )}
-        {!isLoading && liveStocks && liveStocks.length > 0 && (
+        {!isLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
           <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
             Live data · Refreshes every 5 min
+          </div>
+        )}
+        {!isLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
+          <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
+            Waiting for live feed…
           </div>
         )}
 
