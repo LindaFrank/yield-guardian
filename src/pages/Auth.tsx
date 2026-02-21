@@ -33,13 +33,46 @@ export default function Auth() {
         });
 
         if (signUpError) {
-          toast({
-            title: 'Error',
-            description: signUpError.message,
-            variant: 'destructive',
-          });
-          setLoading(false);
-          return;
+          // Existing user with different password — reset and retry
+          if (signUpError.message.includes('already registered')) {
+            const { error: resetError } = await supabase.functions.invoke('reset-password', {
+              body: { email, password: APP_PASSWORD },
+            });
+
+            if (resetError) {
+              toast({
+                title: 'Error',
+                description: 'Unable to sign in. Please try again.',
+                variant: 'destructive',
+              });
+              setLoading(false);
+              return;
+            }
+
+            // Retry sign-in after password reset
+            const { error: retryError } = await supabase.auth.signInWithPassword({
+              email,
+              password: APP_PASSWORD,
+            });
+
+            if (retryError) {
+              toast({
+                title: 'Error',
+                description: 'Unable to sign in. Please try again.',
+                variant: 'destructive',
+              });
+              setLoading(false);
+              return;
+            }
+          } else {
+            toast({
+              title: 'Error',
+              description: signUpError.message,
+              variant: 'destructive',
+            });
+            setLoading(false);
+            return;
+          }
         }
       }
 
