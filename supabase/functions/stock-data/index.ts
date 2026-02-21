@@ -35,18 +35,27 @@ serve(async (req) => {
       .slice(0, 20);
 
     if (action === 'quote') {
-      // Stable API: /stable/quote?symbol=AAPL,MSFT
-      const symbols = cleanTickers.join(',');
-      const res = await fetch(`${FMP_BASE}/quote?symbol=${symbols}&apikey=${apiKey}`);
-      if (!res.ok) {
-        console.error(`FMP stable quote failed: ${res.status} ${await res.text()}`);
-        return new Response(JSON.stringify([]), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      const data = await res.json();
-      const quotes = Array.isArray(data) ? data : [data];
-      return new Response(JSON.stringify(quotes), {
+      // Stable API: fetch each ticker individually, then combine
+      const allQuotes: any[] = [];
+      await Promise.all(
+        cleanTickers.map(async (ticker: string) => {
+          const url = `${FMP_BASE}/quote?symbol=${ticker}&apikey=${apiKey}`;
+          console.log(`Fetching quote: ${url.replace(apiKey, '***')}`);
+          const res = await fetch(url);
+          if (!res.ok) {
+            const body = await res.text();
+            console.error(`FMP quote failed for ${ticker}: ${res.status} ${body}`);
+            return;
+          }
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            allQuotes.push(...data);
+          } else if (data && typeof data === 'object') {
+            allQuotes.push(data);
+          }
+        })
+      );
+      return new Response(JSON.stringify(allQuotes), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
