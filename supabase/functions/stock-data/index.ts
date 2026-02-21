@@ -5,8 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-// FMP v3 is available on the free tier
-const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
+const FMP_BASE = 'https://financialmodelingprep.com/stable';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -31,17 +30,16 @@ serve(async (req) => {
       });
     }
 
-    // Sanitize tickers
     const cleanTickers = tickers
       .map((t: string) => t.toUpperCase().replace(/[^A-Z0-9.-]/g, ''))
       .slice(0, 20);
 
     if (action === 'quote') {
-      // v3 batch quote: /api/v3/quote/AAPL,MSFT,GOOG
+      // Stable API: /stable/quote?symbol=AAPL,MSFT
       const symbols = cleanTickers.join(',');
-      const res = await fetch(`${FMP_BASE}/quote/${symbols}?apikey=${apiKey}`);
+      const res = await fetch(`${FMP_BASE}/quote?symbol=${symbols}&apikey=${apiKey}`);
       if (!res.ok) {
-        console.error(`FMP v3 batch quote failed: ${res.status} ${await res.text()}`);
+        console.error(`FMP stable quote failed: ${res.status} ${await res.text()}`);
         return new Response(JSON.stringify([]), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -54,17 +52,16 @@ serve(async (req) => {
     }
 
     if (action === 'dividends') {
-      // v3 dividend history is per-ticker: /api/v3/historical-price-full/stock_dividend/AAPL
+      // Stable API: /stable/dividends?symbol=AAPL
       const results: Record<string, any[]> = {};
       await Promise.all(
         cleanTickers.map(async (ticker: string) => {
           const res = await fetch(
-            `${FMP_BASE}/historical-price-full/stock_dividend/${ticker}?apikey=${apiKey}`
+            `${FMP_BASE}/dividends?symbol=${ticker}&apikey=${apiKey}`
           );
           if (res.ok) {
             const data = await res.json();
-            // v3 returns { symbol, historical: [...] }
-            const historical = Array.isArray(data?.historical) ? data.historical : [];
+            const historical = Array.isArray(data) ? data : [];
             results[ticker] = historical.slice(0, 20);
           } else {
             results[ticker] = [];
@@ -78,8 +75,9 @@ serve(async (req) => {
 
     if (action === 'search') {
       const query = cleanTickers[0];
+      // Stable API: /stable/search-symbol?query=AAPL
       const res = await fetch(
-        `${FMP_BASE}/search?query=${encodeURIComponent(query)}&limit=10&apikey=${apiKey}`
+        `${FMP_BASE}/search-symbol?query=${encodeURIComponent(query)}&apikey=${apiKey}`
       );
       if (!res.ok) {
         throw new Error(`FMP search API failed [${res.status}]: ${await res.text()}`);
