@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { TrendingUp, ArrowRight, Loader2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,10 +9,41 @@ import { useToast } from '@/hooks/use-toast';
 const APP_PASSWORD = 'dividend-tracker-auto-2024';
 
 export default function Auth() {
+  const [searchParams] = useSearchParams();
+  const adminKey = searchParams.get('key');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [autoLogging, setAutoLogging] = useState(!!adminKey);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!adminKey) return;
+    
+    const autoLogin = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('admin-login', {
+          body: { key: adminKey },
+        });
+
+        if (error || !data?.access_token) {
+          console.error('Admin login failed:', error);
+          setAutoLogging(false);
+          return;
+        }
+
+        await supabase.auth.setSession({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        });
+      } catch (err) {
+        console.error('Auto-login error:', err);
+        setAutoLogging(false);
+      }
+    };
+
+    autoLogin();
+  }, [adminKey]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +125,13 @@ export default function Auth() {
     }
     setLoading(false);
   };
+  if (autoLogging) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
