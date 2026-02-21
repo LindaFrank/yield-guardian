@@ -25,12 +25,22 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Find user by email
-    const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-    if (listError) throw listError;
+    // Find user by email (case-insensitive)
+    const emailLower = email.toLowerCase();
+    let foundUser = null;
+    let page = 1;
+    const perPage = 100;
 
-    const user = users.find((u) => u.email === email);
-    if (!user) {
+    while (!foundUser) {
+      const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
+      if (listError) throw listError;
+      if (!users || users.length === 0) break;
+      foundUser = users.find((u) => u.email?.toLowerCase() === emailLower);
+      if (users.length < perPage) break;
+      page++;
+    }
+
+    if (!foundUser) {
       return new Response(JSON.stringify({ error: "User not found" }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -38,7 +48,7 @@ Deno.serve(async (req) => {
     }
 
     // Update password
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(foundUser.id, {
       password,
     });
     if (updateError) throw updateError;
