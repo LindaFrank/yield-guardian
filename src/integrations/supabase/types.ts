@@ -41,6 +41,48 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_cache: {
+        Row: {
+          cached_at: string
+          dividends_data: Json | null
+          quote_data: Json | null
+          ticker: string
+        }
+        Insert: {
+          cached_at?: string
+          dividends_data?: Json | null
+          quote_data?: Json | null
+          ticker: string
+        }
+        Update: {
+          cached_at?: string
+          dividends_data?: Json | null
+          quote_data?: Json | null
+          ticker?: string
+        }
+        Relationships: []
+      }
+      user_stocks: {
+        Row: {
+          added_at: string
+          id: string
+          ticker: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          ticker: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          ticker?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

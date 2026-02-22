@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Stock } from '@/types/portfolio';
-import { defaultPortfolio, marketStocks as mockMarketStocks } from '@/data/mockData';
+import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
   analyzeStock, 
   scanPortfolioForUnderperformers, 
@@ -14,14 +14,27 @@ import { UnderperformersList } from '@/components/UnderperformersList';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { AddStockModal } from '@/components/AddStockModal';
 import { useStockQuotes } from '@/hooks/useStockData';
+import { useUserTickers, useAddTicker, useRemoveTicker } from '@/hooks/usePortfolio';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
+const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
+
 const Index = () => {
-  const [tickers, setTickers] = useState<string[]>(
-    defaultPortfolio.stocks.map((s) => s.ticker)
-  );
-  const [stocks, setStocks] = useState<Stock[]>(defaultPortfolio.stocks);
-  const [targetYield, setTargetYield] = useState(defaultPortfolio.targetMinYield);
+  const { user } = useAuth();
+  const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
+  const addTicker = useAddTicker();
+  const removeTicker = useRemoveTicker();
+
+  // Use saved tickers if logged in and loaded, otherwise defaults
+  const tickers = useMemo(() => {
+    if (!user) return DEFAULT_TICKERS;
+    if (tickersLoading) return [];
+    return savedTickers && savedTickers.length > 0 ? savedTickers : DEFAULT_TICKERS;
+  }, [user, tickersLoading, savedTickers]);
+
+  const [stocks, setStocks] = useState<Stock[]>([]);
+  const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
   const { toast } = useToast();
 
@@ -31,10 +44,8 @@ const Index = () => {
   // Update stocks when live data arrives
   useEffect(() => {
     if (liveStocks && liveStocks.length > 0) {
-      // Merge live data with existing sector info from mock data
       const merged = liveStocks.map((live) => {
-        const mock = defaultPortfolio.stocks.find((m) => m.ticker === live.ticker) ||
-          mockMarketStocks.find((m) => m.ticker === live.ticker);
+        const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
         return {
           ...live,
           sector: live.sector || mock?.sector || 'Unknown',
@@ -47,7 +58,6 @@ const Index = () => {
   // Track whether we've already notified the user that the feed went live
   const feedNotifiedRef = useRef(false);
 
-  // Show toast when FMP feed first becomes active (returns real quote data)
   useEffect(() => {
     if (
       !feedNotifiedRef.current &&
@@ -63,7 +73,6 @@ const Index = () => {
     }
   }, [liveStocks]);
 
-  // Show error toast
   useEffect(() => {
     if (error) {
       toast({
@@ -74,19 +83,16 @@ const Index = () => {
     }
   }, [error]);
 
-  // Analyze all stocks
   const stockAnalyses = useMemo(
     () => stocks.map((stock) => analyzeStock(stock, targetYield)),
     [stocks, targetYield]
   );
 
-  // Find underperformers
   const underperformers = useMemo(
     () => scanPortfolioForUnderperformers(stocks, targetYield),
     [stocks, targetYield]
   );
 
-  // Get replacement suggestions for selected stock
   const replacements = useMemo(() => {
     if (!selectedUnderperformer) return [];
     return suggestReplacements(
@@ -99,16 +105,20 @@ const Index = () => {
 
   const handleRemoveStock = (ticker: string) => {
     setStocks((prev) => prev.filter((s) => s.ticker !== ticker));
-    setTickers((prev) => prev.filter((t) => t !== ticker));
     if (selectedUnderperformer?.ticker === ticker) {
       setSelectedUnderperformer(null);
+    }
+    if (user) {
+      removeTicker.mutate(ticker);
     }
   };
 
   const handleAddStock = (stock: Stock) => {
     if (!stocks.find((s) => s.ticker === stock.ticker)) {
       setStocks((prev) => [...prev, stock]);
-      setTickers((prev) => [...prev, stock.ticker]);
+      if (user) {
+        addTicker.mutate(stock.ticker);
+      }
     }
   };
 
@@ -124,19 +134,19 @@ const Index = () => {
       
       <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}
-        {isLoading && (
+        {(isLoading || tickersLoading) && (
           <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
             Fetching live market data…
           </div>
         )}
-        {!isLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
+        {!isLoading && !tickersLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
           <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
             Live data · Refreshes every 5 min
           </div>
         )}
-        {!isLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
+        {!isLoading && !tickersLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
           <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
             Waiting for live feed…
@@ -155,12 +165,10 @@ const Index = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Target Yield Control */}
             <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
             </section>
 
-            {/* Portfolio Grid */}
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Your Portfolio</h2>
@@ -171,7 +179,7 @@ const Index = () => {
                 />
               </div>
               
-              {stocks.length === 0 ? (
+              {stocks.length === 0 && !isLoading && !tickersLoading ? (
                 <div className="p-12 rounded-xl gradient-card shadow-card border border-border/50 text-center">
                   <p className="text-muted-foreground">
                     No stocks in portfolio. Add some to get started!
@@ -196,7 +204,7 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Sidebar - Analysis & Suggestions */}
+          {/* Sidebar */}
           <aside className="space-y-6">
             <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
               <UnderperformersList
