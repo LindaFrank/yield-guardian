@@ -173,7 +173,6 @@ const Index = () => {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 <AddStockModal
-                  marketStocks={mockMarketStocks}
                   existingTickers={stocks.map((s) => s.ticker)}
                   onAddStock={handleAddStock}
                 />

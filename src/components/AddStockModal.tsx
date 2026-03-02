@@ -1,29 +1,39 @@
 import { useState } from 'react';
 import { Stock } from '@/types/portfolio';
-import { formatCurrency, formatPercentage, calculateDividendYield } from '@/lib/portfolioUtils';
+import { useStockSearch, SearchResult } from '@/hooks/useStockData';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Plus, Search, Loader2 } from 'lucide-react';
 
 interface AddStockModalProps {
-  marketStocks: Stock[];
   existingTickers: string[];
   onAddStock: (stock: Stock) => void;
+  marketStocks?: Stock[]; // kept for backwards compat but no longer required
 }
 
-export function AddStockModal({ marketStocks, existingTickers, onAddStock }: AddStockModalProps) {
+export function AddStockModal({ existingTickers, onAddStock }: AddStockModalProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
-  const availableStocks = marketStocks.filter(
-    (s) => !existingTickers.includes(s.ticker) &&
-    (s.ticker.toLowerCase().includes(search.toLowerCase()) ||
-     s.name.toLowerCase().includes(search.toLowerCase()))
+  const { data: results, isLoading } = useStockSearch(search);
+
+  // Filter out stocks already in the portfolio
+  const filtered = (results ?? []).filter(
+    (r) => !existingTickers.includes(r.symbol.toUpperCase())
   );
 
-  const handleAddStock = (stock: Stock) => {
+  const handleAdd = (result: SearchResult) => {
+    // Create a minimal Stock object — live data will be fetched once added to portfolio
+    const stock: Stock = {
+      ticker: result.symbol.toUpperCase(),
+      name: result.name,
+      sector: '',
+      currentPrice: 0,
+      annualDividend: 0,
+      dividendHistory: [],
+      currentYield: 0,
+    };
     onAddStock(stock);
     setOpen(false);
     setSearch('');
@@ -41,53 +51,56 @@ export function AddStockModal({ marketStocks, existingTickers, onAddStock }: Add
         <DialogHeader>
           <DialogTitle>Add Stock to Portfolio</DialogTitle>
         </DialogHeader>
-        
+
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search by ticker or name..."
+            placeholder="Search any ticker or company…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
+            autoFocus
           />
         </div>
 
         <div className="max-h-80 overflow-y-auto space-y-2 mt-2">
-          {availableStocks.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              No stocks available
+          {search.length === 0 && (
+            <p className="text-center text-muted-foreground py-8 text-sm">
+              Type a ticker or company name to search
             </p>
-          ) : (
-            availableStocks.map((stock) => {
-              const yieldValue = calculateDividendYield(stock);
-              return (
-                <button
-                  key={stock.ticker}
-                  onClick={() => handleAddStock(stock)}
-                  className="w-full flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border/30 hover:border-primary/30 hover:bg-secondary/50 transition-colors text-left"
-                >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-medium">{stock.ticker}</span>
-                      <span className="text-xs text-muted-foreground px-2 py-0.5 rounded bg-secondary">
-                        {stock.sector}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-0.5">{stock.name}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className={cn(
-                      'font-mono font-medium',
-                      yieldValue >= 5 ? 'text-yield-positive' : 'text-yield-warning'
-                    )}>
-                      {formatPercentage(yieldValue)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{formatCurrency(stock.currentPrice)}</p>
-                  </div>
-                </button>
-              );
-            })
           )}
+
+          {search.length > 0 && isLoading && (
+            <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground text-sm">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Searching…
+            </div>
+          )}
+
+          {search.length > 0 && !isLoading && filtered.length === 0 && (
+            <p className="text-center text-muted-foreground py-8 text-sm">
+              No results found
+            </p>
+          )}
+
+          {filtered.map((result) => (
+            <button
+              key={result.symbol}
+              onClick={() => handleAdd(result)}
+              className="w-full flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border/30 hover:border-primary/30 hover:bg-secondary/50 transition-colors text-left"
+            >
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-medium">{result.symbol}</span>
+                  <span className="text-xs text-muted-foreground px-2 py-0.5 rounded bg-secondary">
+                    {result.stockExchange}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-0.5">{result.name}</p>
+              </div>
+              <Plus className="w-4 h-4 text-muted-foreground" />
+            </button>
+          ))}
         </div>
       </DialogContent>
     </Dialog>
