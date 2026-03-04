@@ -48,7 +48,7 @@ export function PortfolioStats({ stocks, targetYield, underperformerCount }: Por
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="p-4 rounded-xl gradient-card shadow-card border border-border/50 transition-all hover:border-border"
+          className="p-4 rounded-xl gradient-card shadow-card border border-muted-foreground/40 transition-all hover:border-muted-foreground/60"
         >
           <div className="flex items-center gap-3 mb-3">
             <div className={cn('p-2 rounded-lg bg-secondary/50', stat.color)}>
