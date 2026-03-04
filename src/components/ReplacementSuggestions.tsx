@@ -17,7 +17,7 @@ export function ReplacementSuggestions({
 }: ReplacementSuggestionsProps) {
   if (!removedStock || candidates.length === 0) {
     return (
-      <div className="p-8 rounded-xl gradient-card shadow-card border border-border/50 text-center">
+      <div className="p-8 rounded-xl gradient-card shadow-card border border-muted-foreground/40 text-center">
         <Sparkles className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
         <p className="text-muted-foreground">
           Select an underperforming stock to see replacement suggestions
@@ -27,7 +27,7 @@ export function ReplacementSuggestions({
   }
 
   return (
-    <div className="p-5 rounded-xl gradient-card shadow-card border border-border/50">
+    <div className="p-5 rounded-xl gradient-card shadow-card border border-muted-foreground/40">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-primary" />
         <span className="font-medium">Replacement Suggestions</span>

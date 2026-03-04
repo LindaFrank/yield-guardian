@@ -179,7 +179,7 @@ const Index = () => {
               </div>
               
               {stocks.length === 0 && !isLoading && !tickersLoading ? (
-                <div className="p-12 rounded-xl gradient-card shadow-card border border-border/50 text-center">
+                <div className="p-12 rounded-xl gradient-card shadow-card border border-muted-foreground/40 text-center">
                   <p className="text-muted-foreground">
                     No stocks in portfolio. Add some to get started!
                   </p>
