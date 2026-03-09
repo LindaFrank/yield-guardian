@@ -48,7 +48,6 @@ export function HelpTooltip({ text, children, side = 'top' }: HelpTooltipProps) 
         break;
     }
 
-    // Clamp to viewport
     left = Math.max(12, Math.min(left, window.innerWidth - tw - 12));
     top = Math.max(12, top);
 
@@ -61,7 +60,7 @@ export function HelpTooltip({ text, children, side = 'top' }: HelpTooltipProps) 
   if (!enabled) return <>{children}</>;
 
   const arrowClass = cn(
-    'absolute w-3 h-3 rotate-45 bg-card-elevated border border-muted-foreground/30',
+    'absolute w-3 h-3 rotate-45 border border-muted-foreground/30',
     side === 'top' && 'bottom-[-7px] left-1/2 -translate-x-1/2 border-t-0 border-l-0',
     side === 'bottom' && 'top-[-7px] left-1/2 -translate-x-1/2 border-b-0 border-r-0',
     side === 'left' && 'right-[-7px] top-1/2 -translate-y-1/2 border-l-0 border-b-0',
@@ -76,7 +75,6 @@ export function HelpTooltip({ text, children, side = 'top' }: HelpTooltipProps) 
         onMouseLeave={onLeave}
         className="relative"
       >
-        {/* Subtle highlight ring when wizard is on */}
         <div className="absolute inset-0 rounded-xl ring-1 ring-primary/25 pointer-events-none z-10" />
         {children}
       </div>
@@ -85,10 +83,7 @@ export function HelpTooltip({ text, children, side = 'top' }: HelpTooltipProps) 
         createPortal(
           <div
             ref={tooltipRef}
-            style={{ top: coords.top, left: coords.left }}
             className="fixed z-[9999] max-w-[280px] px-4 py-3 rounded-lg text-sm leading-relaxed border border-muted-foreground/30 animate-fade-in"
-            // Using inline style for the gradient bg to match app's card-elevated token
-            // while keeping the dark theme look with soft shadow
             style={{
               top: coords.top,
               left: coords.left,
@@ -97,7 +92,10 @@ export function HelpTooltip({ text, children, side = 'top' }: HelpTooltipProps) 
               color: 'hsl(210 40% 96%)',
             }}
           >
-            <span className={arrowClass} />
+            <span
+              className={arrowClass}
+              style={{ background: 'hsl(222 47% 12%)' }}
+            />
             {text}
           </div>,
           document.body
