@@ -225,7 +225,7 @@ const Index = () => {
               </section>
             </HelpTooltip>
 
-            <HelpTooltip text="This is used to display instructions or messages." side="left">
+            <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
               <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
                 <ReplacementSuggestions
                   removedStock={selectedUnderperformer}
