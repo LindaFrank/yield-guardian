@@ -34,16 +34,19 @@ export function Header() {
               <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
           </div>
-          {user && (
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground hidden sm:inline">
-                {profile?.display_name || user.email}
-              </span>
-              <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">
-                <LogOut className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            <HelpIconToggle />
+            {user && (
+              <>
+                <span className="text-xs text-muted-foreground hidden sm:inline">
+                  {profile?.display_name || user.email}
+                </span>
+                <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
