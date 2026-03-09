@@ -168,9 +168,11 @@ const Index = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
-            <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-              <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
-            </section>
+            <HelpTooltip text="Set your minimum acceptable dividend yield. Stocks below this threshold are flagged as underperformers." side="bottom">
+              <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+                <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
+              </section>
+            </HelpTooltip>
 
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
