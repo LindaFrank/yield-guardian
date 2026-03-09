@@ -154,16 +154,14 @@ const Index = () => {
           </div>
         )}
 
-        {/* Stats Overview */}
-        <HelpTooltip text="Overview of your portfolio's total value, annual dividends, average yield, and how many stocks are below your target." side="bottom">
-          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
-            <PortfolioStats
-              stocks={stocks}
-              targetYield={targetYield}
-              underperformerCount={underperformers.length}
-            />
-          </section>
-        </HelpTooltip>
+        {/* Stats Overview — individual panel tooltips handled inside PortfolioStats */}
+        <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
+          <PortfolioStats
+            stocks={stocks}
+            targetYield={targetYield}
+            underperformerCount={underperformers.length}
+          />
+        </section>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Portfolio Section */}
