@@ -13,6 +13,7 @@ import { StockCard } from '@/components/StockCard';
 import { UnderperformersList } from '@/components/UnderperformersList';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { AddStockModal } from '@/components/AddStockModal';
+import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useAddTicker, useRemoveTicker } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
@@ -154,20 +155,24 @@ const Index = () => {
         )}
 
         {/* Stats Overview */}
-        <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
-          <PortfolioStats
-            stocks={stocks}
-            targetYield={targetYield}
-            underperformerCount={underperformers.length}
-          />
-        </section>
+        <HelpTooltip text="Overview of your portfolio's total value, annual dividends, average yield, and how many stocks are below your target." side="bottom">
+          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
+            <PortfolioStats
+              stocks={stocks}
+              targetYield={targetYield}
+              underperformerCount={underperformers.length}
+            />
+          </section>
+        </HelpTooltip>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
-            <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-              <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
-            </section>
+            <HelpTooltip text="Set your minimum acceptable dividend yield. Stocks below this threshold are flagged as underperformers." side="bottom">
+              <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+                <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
+              </section>
+            </HelpTooltip>
 
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
@@ -205,22 +210,26 @@ const Index = () => {
 
           {/* Sidebar */}
           <aside className="space-y-6">
-            <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-              <UnderperformersList
-                underperformers={underperformers}
-                selectedStock={selectedUnderperformer}
-                onSelectStock={handleSelectUnderperformer}
-                targetYield={targetYield}
-              />
-            </section>
+            <HelpTooltip text="Stocks in your portfolio yielding below your target. Click one to see replacement ideas." side="left">
+              <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+                <UnderperformersList
+                  underperformers={underperformers}
+                  selectedStock={selectedUnderperformer}
+                  onSelectStock={handleSelectUnderperformer}
+                  targetYield={targetYield}
+                />
+              </section>
+            </HelpTooltip>
 
-            <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
-              <ReplacementSuggestions
-                removedStock={selectedUnderperformer}
-                candidates={replacements}
-                onAddStock={handleAddStock}
-              />
-            </section>
+            <HelpTooltip text="Higher-yield alternatives for the selected underperformer. Click + to add one to your portfolio." side="left">
+              <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+                <ReplacementSuggestions
+                  removedStock={selectedUnderperformer}
+                  candidates={replacements}
+                  onAddStock={handleAddStock}
+                />
+              </section>
+            </HelpTooltip>
           </aside>
         </div>
       </main>
