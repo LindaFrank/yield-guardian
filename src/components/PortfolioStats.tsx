@@ -25,7 +25,7 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
     side: 'bottom',
   },
   'Underperformers': {
-    text: 'This is the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here.',
+    text: 'Shows the current number of underperforming stocks.',
     side: 'bottom',
   },
 };
