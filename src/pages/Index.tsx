@@ -210,14 +210,16 @@ const Index = () => {
 
           {/* Sidebar */}
           <aside className="space-y-6">
-            <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-              <UnderperformersList
-                underperformers={underperformers}
-                selectedStock={selectedUnderperformer}
-                onSelectStock={handleSelectUnderperformer}
-                targetYield={targetYield}
-              />
-            </section>
+            <HelpTooltip text="Stocks in your portfolio yielding below your target. Click one to see replacement ideas." side="left">
+              <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+                <UnderperformersList
+                  underperformers={underperformers}
+                  selectedStock={selectedUnderperformer}
+                  onSelectStock={handleSelectUnderperformer}
+                  targetYield={targetYield}
+                />
+              </section>
+            </HelpTooltip>
 
             <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
               <ReplacementSuggestions
