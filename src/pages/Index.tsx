@@ -221,13 +221,15 @@ const Index = () => {
               </section>
             </HelpTooltip>
 
-            <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
-              <ReplacementSuggestions
-                removedStock={selectedUnderperformer}
-                candidates={replacements}
-                onAddStock={handleAddStock}
-              />
-            </section>
+            <HelpTooltip text="Higher-yield alternatives for the selected underperformer. Click + to add one to your portfolio." side="left">
+              <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+                <ReplacementSuggestions
+                  removedStock={selectedUnderperformer}
+                  candidates={replacements}
+                  onAddStock={handleAddStock}
+                />
+              </section>
+            </HelpTooltip>
           </aside>
         </div>
       </main>
