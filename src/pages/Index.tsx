@@ -135,24 +135,28 @@ const Index = () => {
       
       <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}
-        {(isLoading || tickersLoading) && (
-          <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-            Fetching live market data…
+        <HelpTooltip text="This is used to display instructions or messages." side="bottom">
+          <div className="mb-4">
+            {(isLoading || tickersLoading) && (
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                Fetching live market data…
+              </div>
+            )}
+            {!isLoading && !tickersLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                Live data · Refreshes every 5 min
+              </div>
+            )}
+            {!isLoading && !tickersLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
+                Waiting for live feed…
+              </div>
+            )}
           </div>
-        )}
-        {!isLoading && !tickersLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
-          <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-            Live data · Refreshes every 5 min
-          </div>
-        )}
-        {!isLoading && !tickersLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
-          <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
-            Waiting for live feed…
-          </div>
-        )}
+        </HelpTooltip>
 
         {/* Stats Overview — individual panel tooltips handled inside PortfolioStats */}
         <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
