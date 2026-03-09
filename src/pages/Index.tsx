@@ -13,6 +13,7 @@ import { StockCard } from '@/components/StockCard';
 import { UnderperformersList } from '@/components/UnderperformersList';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { AddStockModal } from '@/components/AddStockModal';
+import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useAddTicker, useRemoveTicker } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
