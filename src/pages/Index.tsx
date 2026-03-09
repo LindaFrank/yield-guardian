@@ -178,7 +178,9 @@ const Index = () => {
 
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Your Portfolio</h2>
+                <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
+                  <h2 className="text-lg font-semibold">Your Portfolio</h2>
+                </HelpTooltip>
                 <AddStockModal
                   existingTickers={stocks.map((s) => s.ticker)}
                   onAddStock={handleAddStock}
