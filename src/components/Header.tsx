@@ -34,17 +34,17 @@ export function Header() {
               <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <HelpIconToggle />
             {user && (
-              <>
+              <div className="flex items-center gap-3 ml-[100px]">
                 <span className="text-xs text-muted-foreground hidden sm:inline">
                   {profile?.display_name || user.email}
                 </span>
                 <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">
                   <LogOut className="w-4 h-4" />
                 </Button>
-              </>
+              </div>
             )}
           </div>
         </div>

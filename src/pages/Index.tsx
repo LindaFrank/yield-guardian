@@ -135,40 +135,42 @@ const Index = () => {
       
       <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}
-        {(isLoading || tickersLoading) && (
-          <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-            Fetching live market data…
+        <HelpTooltip text="This is used to display instructions or messages." side="bottom">
+          <div className="mb-4">
+            {(isLoading || tickersLoading) && (
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                Fetching live market data…
+              </div>
+            )}
+            {!isLoading && !tickersLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                Live data · Refreshes every 5 min
+              </div>
+            )}
+            {!isLoading && !tickersLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
+                Waiting for live feed…
+              </div>
+            )}
           </div>
-        )}
-        {!isLoading && !tickersLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
-          <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-            Live data · Refreshes every 5 min
-          </div>
-        )}
-        {!isLoading && !tickersLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
-          <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
-            Waiting for live feed…
-          </div>
-        )}
-
-        {/* Stats Overview */}
-        <HelpTooltip text="Overview of your portfolio's total value, annual dividends, average yield, and how many stocks are below your target." side="bottom">
-          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
-            <PortfolioStats
-              stocks={stocks}
-              targetYield={targetYield}
-              underperformerCount={underperformers.length}
-            />
-          </section>
         </HelpTooltip>
+
+        {/* Stats Overview — individual panel tooltips handled inside PortfolioStats */}
+        <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
+          <PortfolioStats
+            stocks={stocks}
+            targetYield={targetYield}
+            underperformerCount={underperformers.length}
+          />
+        </section>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
-            <HelpTooltip text="Set your minimum acceptable dividend yield. Stocks below this threshold are flagged as underperformers." side="bottom">
+            <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
               <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
               </section>
@@ -176,7 +178,9 @@ const Index = () => {
 
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Your Portfolio</h2>
+                <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
+                  <h2 className="text-lg font-semibold">Your Portfolio</h2>
+                </HelpTooltip>
                 <AddStockModal
                   existingTickers={stocks.map((s) => s.ticker)}
                   onAddStock={handleAddStock}
@@ -210,7 +214,7 @@ const Index = () => {
 
           {/* Sidebar */}
           <aside className="space-y-6">
-            <HelpTooltip text="Stocks in your portfolio yielding below your target. Click one to see replacement ideas." side="left">
+            <HelpTooltip text="This is the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
               <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
                 <UnderperformersList
                   underperformers={underperformers}
@@ -221,7 +225,7 @@ const Index = () => {
               </section>
             </HelpTooltip>
 
-            <HelpTooltip text="Higher-yield alternatives for the selected underperformer. Click + to add one to your portfolio." side="left">
+            <HelpTooltip text="This is used to display instructions or messages." side="left">
               <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
                 <ReplacementSuggestions
                   removedStock={selectedUnderperformer}
