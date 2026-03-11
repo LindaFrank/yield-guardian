@@ -214,7 +214,7 @@ const Index = () => {
 
           {/* Sidebar */}
           <aside className="space-y-6">
-            <HelpTooltip text="This is the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
+            <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
               <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
                 <UnderperformersList
                   underperformers={underperformers}
