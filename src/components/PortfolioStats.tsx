@@ -17,7 +17,7 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
     side: 'bottom',
   },
   'Annual Dividends': {
-    text: 'These are the total amount of dividend income the portfolio investment pays over one year.',
+    text: 'This is the total amount of dividend income the portfolio investment pays over one year.',
     side: 'bottom',
   },
   'Average Yield': {
