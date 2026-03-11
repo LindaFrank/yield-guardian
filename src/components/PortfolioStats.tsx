@@ -13,7 +13,7 @@ interface PortfolioStatsProps {
 
 const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' | 'right' }> = {
   'Portfolio Value': {
-    text: 'This is the total market value of all investments in the portfolio at a given time.',
+    text: 'These are the total market value of all investments in the portfolio at a given time.',
     side: 'bottom',
   },
   'Annual Dividends': {
