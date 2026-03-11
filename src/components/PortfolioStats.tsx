@@ -13,15 +13,15 @@ interface PortfolioStatsProps {
 
 const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' | 'right' }> = {
   'Portfolio Value': {
-    text: 'This is the total market value of all investments in the portfolio at a given time.',
+    text: 'These are the total market value of all investments in the portfolio at a given time.',
     side: 'bottom',
   },
   'Annual Dividends': {
-    text: 'This is the total amount of dividend income the portfolio investment pays over one year.',
+    text: 'These are the total amount of dividend income the portfolio investment pays over one year.',
     side: 'bottom',
   },
   'Average Yield': {
-    text: 'This is the percentage of annual dividend income the portfolio generates relative to its cost or market value.',
+    text: 'These are the percentage of annual dividend income the portfolio generates relative to its cost or market value.',
     side: 'bottom',
   },
   'Underperformers': {
