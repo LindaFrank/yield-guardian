@@ -17,11 +17,11 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
     side: 'bottom',
   },
   'Annual Dividends': {
-    text: 'These are the total amount of dividend income the portfolio investment pays over one year.',
+    text: 'This is the total amount of dividend income the portfolio investment pays over one year.',
     side: 'bottom',
   },
   'Average Yield': {
-    text: 'These are the percentage of annual dividend income the portfolio generates relative to its cost or market value.',
+    text: 'This is the percentage of annual dividend income the portfolio generates relative to its cost or market value.',
     side: 'bottom',
   },
   'Underperformers': {

@@ -170,7 +170,7 @@ const Index = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
-            <HelpTooltip text="These are the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
+            <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
               <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
               </section>
@@ -178,7 +178,7 @@ const Index = () => {
 
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
-                <HelpTooltip text="These are the collection of stocks (investments) represented below." side="bottom">
+                <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
                 <AddStockModal
@@ -214,7 +214,7 @@ const Index = () => {
 
           {/* Sidebar */}
           <aside className="space-y-6">
-            <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
+            <HelpTooltip text="This is the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
               <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
                 <UnderperformersList
                   underperformers={underperformers}
