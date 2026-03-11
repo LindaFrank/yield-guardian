@@ -21,7 +21,7 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
     side: 'bottom',
   },
   'Average Yield': {
-    text: 'These are the percentage of annual dividend income the portfolio generates relative to its cost or market value.',
+    text: 'This is the percentage of annual dividend income the portfolio generates relative to its cost or market value.',
     side: 'bottom',
   },
   'Underperformers': {
