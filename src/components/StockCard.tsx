@@ -49,7 +49,7 @@ export function StockCard({ analysis, onRemove, onSelect, isSelected }: StockCar
     <div
       onClick={() => onSelect?.(stock)}
       className={cn(
-        'group relative p-5 rounded-xl gradient-card shadow-card border border-border/50',
+        'group relative p-5 rounded-xl gradient-card shadow-card border border-muted-foreground/40',
         'transition-all duration-300 ease-out',
         'hover:shadow-elevated hover:border-primary/20 hover:-translate-y-0.5',
         isSelected && 'ring-2 ring-primary border-primary/40',
