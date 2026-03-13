@@ -18,6 +18,7 @@ import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useAddTicker, useRemoveTicker } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { GettingStartedModal } from '@/components/GettingStartedModal';
 
 const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
 
