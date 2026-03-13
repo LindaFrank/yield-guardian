@@ -132,6 +132,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <GettingStartedModal />
       <Header />
       
       <main className="container mx-auto px-6 py-8">
