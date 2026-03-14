@@ -164,7 +164,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                       </div>
                       <p className="text-sm text-muted-foreground mt-0.5">{result.name}</p>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
