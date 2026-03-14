@@ -26,11 +26,11 @@ export function useAddTicker() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (ticker: string) => {
+    mutationFn: async ({ ticker, shares }: { ticker: string; shares?: number }) => {
       if (!user) throw new Error('Not authenticated');
       const { error } = await supabase
         .from('user_stocks')
-        .insert({ user_id: user.id, ticker });
+        .insert({ user_id: user.id, ticker, shares_owned: shares ?? null });
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['user-stocks'] }),
