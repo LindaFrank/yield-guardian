@@ -6,6 +6,7 @@ import { HelpTooltip } from '@/components/HelpTooltip';
 
 interface PortfolioStatsProps {
   stocks: Stock[];
+  sharesMap?: Record<string, number | null>;
   targetYield: number;
   underperformerCount: number;
   helpEnabled?: boolean;
