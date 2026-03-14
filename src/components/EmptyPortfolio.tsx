@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
-import { TrendingUp, DollarSign, Target, ChevronRight, Plus, Check, X, Hash } from 'lucide-react';
+import { TrendingUp, DollarSign, Target, ChevronRight, Plus, Check, X, Hash, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Stock } from '@/types/portfolio';
 import { marketStocks } from '@/data/mockData';
-import { calculateDividendYield } from '@/lib/portfolioUtils';
+import { useStockQuotes } from '@/hooks/useStockData';
 
 interface AddedStockInfo {
   stock: Stock;
