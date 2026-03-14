@@ -40,8 +40,8 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
     const shares = sharesMap[s.ticker] ?? 1;
     return sum + s.annualDividend * shares;
   }, 0);
-  const avgYield = stocks.length > 0 
-    ? stocks.reduce((sum, s) => sum + calculateDividendYield(s), 0) / stocks.length 
+  const avgYield = totalValue > 0
+    ? (totalDividends / totalValue) * 100
     : 0;
 
   const stats = [
