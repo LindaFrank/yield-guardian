@@ -187,6 +187,8 @@ const Index = () => {
                 <AddStockModal
                   existingTickers={stocks.map((s) => s.ticker)}
                   onAddStock={handleAddStock}
+                  open={addStockOpen}
+                  onOpenChange={setAddStockOpen}
                 />
               </div>
               
