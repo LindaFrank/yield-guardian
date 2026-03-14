@@ -29,6 +29,8 @@ const Index = () => {
   const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
   const addTicker = useAddTicker();
   const removeTicker = useRemoveTicker();
+  const updateShares = useUpdateShares();
+  const { data: stocksWithShares } = useUserStocksWithShares();
 
   // Use saved tickers if logged in and loaded, otherwise defaults
   const tickers = useMemo(() => {
