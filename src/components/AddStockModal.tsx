@@ -9,11 +9,15 @@ import { Plus, Search, Loader2 } from 'lucide-react';
 interface AddStockModalProps {
   existingTickers: string[];
   onAddStock: (stock: Stock) => void;
-  marketStocks?: Stock[]; // kept for backwards compat but no longer required
+  marketStocks?: Stock[];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function AddStockModal({ existingTickers, onAddStock }: AddStockModalProps) {
-  const [open, setOpen] = useState(false);
+export function AddStockModal({ existingTickers, onAddStock, open: controlledOpen, onOpenChange }: AddStockModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
   const [search, setSearch] = useState('');
 
   const { data: results, isLoading } = useStockSearch(search);

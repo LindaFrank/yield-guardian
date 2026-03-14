@@ -13,6 +13,7 @@ import { StockCard } from '@/components/StockCard';
 import { UnderperformersList } from '@/components/UnderperformersList';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { AddStockModal } from '@/components/AddStockModal';
+import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useAddTicker, useRemoveTicker } from '@/hooks/usePortfolio';
@@ -37,6 +38,8 @@ const Index = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
+  const [addStockOpen, setAddStockOpen] = useState(false);
+  const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
 
   // Fetch live data for portfolio tickers
@@ -171,7 +174,7 @@ const Index = () => {
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
             <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
-              <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+              <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
               </section>
             </HelpTooltip>
@@ -184,15 +187,16 @@ const Index = () => {
                 <AddStockModal
                   existingTickers={stocks.map((s) => s.ticker)}
                   onAddStock={handleAddStock}
+                  open={addStockOpen}
+                  onOpenChange={setAddStockOpen}
                 />
               </div>
               
               {stocks.length === 0 && !isLoading && !tickersLoading ? (
-                <div className="p-12 rounded-xl gradient-card shadow-card border border-muted-foreground/40 text-center">
-                  <p className="text-muted-foreground">
-                    No stocks in portfolio. Add some to get started!
-                  </p>
-                </div>
+                <EmptyPortfolio
+                  onSelectStocks={() => setAddStockOpen(true)}
+                  onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
                   {stockAnalyses.map((analysis, index) => (
