@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { Target } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
+import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
   analyzeStock, 
