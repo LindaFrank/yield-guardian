@@ -21,8 +21,8 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
     text: 'This is the total amount of dividend income the portfolio investment pays over one year.',
     side: 'bottom',
   },
-  'Average Yield': {
-    text: 'This is the percentage of annual dividend income the portfolio generates relative to its cost or market value.',
+  'Weighted Avg Yield': {
+    text: 'Weighted Average (total dividends ÷ portfolio value × 100). This reflects the true portfolio yield based on position sizes.',
     side: 'bottom',
   },
   'Underperformers': {
@@ -40,8 +40,8 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
     const shares = sharesMap[s.ticker] ?? 1;
     return sum + s.annualDividend * shares;
   }, 0);
-  const avgYield = stocks.length > 0 
-    ? stocks.reduce((sum, s) => sum + calculateDividendYield(s), 0) / stocks.length 
+  const avgYield = totalValue > 0
+    ? (totalDividends / totalValue) * 100
     : 0;
 
   const stats = [
@@ -58,7 +58,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
       color: 'text-yield-positive',
     },
     {
-      label: 'Average Yield',
+      label: 'Weighted Avg Yield',
       value: formatPercentage(avgYield),
       icon: Target,
       color: avgYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
