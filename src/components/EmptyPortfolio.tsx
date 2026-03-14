@@ -19,9 +19,10 @@ interface EmptyPortfolioProps {
   onAddStock?: (stock: Stock, shares: number) => void;
   onYieldChange?: (value: number) => void;
   currentYield?: number;
+  onDone?: () => void;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0 }: EmptyPortfolioProps) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone }: EmptyPortfolioProps) {
   const [step, setStep] = useState(0);
   const [localYield, setLocalYield] = useState(currentYield);
   const [addedStocks, setAddedStocks] = useState<Map<string, AddedStockInfo>>(new Map());
