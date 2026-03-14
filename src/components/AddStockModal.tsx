@@ -184,7 +184,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
             </p>
 
             <div className="max-h-72 overflow-y-auto space-y-3 mt-2">
-              {Array.from(selected.values()).map((result) => {
+              {Array.from(selected.values()).map((result, idx) => {
                 const val = sharesMap[result.symbol] || '';
                 const numVal = parseFloat(val);
                 const isInvalid = submitted && (!numVal || numVal <= 0);
@@ -202,7 +202,8 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                         placeholder="Shares"
                         value={val}
                         onChange={(e) => setSharesMap((prev) => ({ ...prev, [result.symbol]: e.target.value }))}
-                        className="w-24"
+                        className="w-28"
+                        autoFocus={idx === 0}
                       />
                     </div>
                   </Card>
