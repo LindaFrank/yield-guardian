@@ -163,8 +163,11 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             </div>
             <h2 className="text-xl font-semibold">Stocks Matching {localYield.toFixed(1)}%+ Yield</h2>
             <p className="text-sm text-muted-foreground">
-              {matchingStocks.length} stock{matchingStocks.length !== 1 ? 's' : ''} found — select a stock then enter how many shares
+              {livePricesLoading ? 'Loading live prices…' : `${matchingStocks.length} stock${matchingStocks.length !== 1 ? 's' : ''} found — select a stock then enter how many shares`}
             </p>
+            {livePricesLoading && (
+              <Loader2 className="w-5 h-5 animate-spin text-primary mx-auto mt-2" />
+            )}
           </div>
 
           {/* Shares input prompt */}
