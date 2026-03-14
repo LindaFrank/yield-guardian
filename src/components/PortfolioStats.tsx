@@ -58,7 +58,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
       color: 'text-yield-positive',
     },
     {
-      label: 'Average Yield',
+      label: 'Weighted Avg Yield',
       value: formatPercentage(avgYield),
       icon: Target,
       color: avgYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
