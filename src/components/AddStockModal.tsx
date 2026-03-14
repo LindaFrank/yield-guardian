@@ -136,11 +136,15 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
               {filtered.map((result) => {
                 const isChecked = selected.has(result.symbol);
                 return (
-                  <button
+                  <div
                     key={result.symbol}
                     onClick={() => toggleSelect(result)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                    role="button"
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left cursor-pointer ${
                       isChecked
+                        ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20'
+                        : 'bg-secondary/30 border-border/30 hover:border-primary/30 hover:bg-secondary/50'
+                    }`}
                         ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20'
                         : 'bg-secondary/30 border-border/30 hover:border-primary/30 hover:bg-secondary/50'
                     }`}
