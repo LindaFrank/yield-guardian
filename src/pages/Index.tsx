@@ -174,7 +174,7 @@ const Index = () => {
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
             <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
-              <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+              <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
               </section>
             </HelpTooltip>
