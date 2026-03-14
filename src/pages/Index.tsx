@@ -38,6 +38,7 @@ const Index = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
+  const [wizardDone, setWizardDone] = useState(false);
   const [addStockOpen, setAddStockOpen] = useState(false);
   const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
@@ -199,13 +200,14 @@ const Index = () => {
                 />
               </div>
               
-              {stocks.length === 0 && !isLoading && !tickersLoading ? (
+              {!wizardDone && !isLoading && !tickersLoading && (!savedTickers || savedTickers.length === 0) ? (
                 <EmptyPortfolio
                   onSelectStocks={() => setAddStockOpen(true)}
                   onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                   onAddStock={handleAddStock}
                   onYieldChange={setTargetYield}
                   currentYield={targetYield}
+                  onDone={() => setWizardDone(true)}
                 />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">

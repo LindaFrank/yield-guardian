@@ -19,9 +19,10 @@ interface EmptyPortfolioProps {
   onAddStock?: (stock: Stock, shares: number) => void;
   onYieldChange?: (value: number) => void;
   currentYield?: number;
+  onDone?: () => void;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0 }: EmptyPortfolioProps) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone }: EmptyPortfolioProps) {
   const [step, setStep] = useState(0);
   const [localYield, setLocalYield] = useState(currentYield);
   const [addedStocks, setAddedStocks] = useState<Map<string, AddedStockInfo>>(new Map());
@@ -261,9 +262,9 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               Search Other Stocks
             </Button>
             {addedStocks.size > 0 && (
-              <Button className="gap-2">
+              <Button className="gap-2" onClick={onDone}>
                 <Check className="w-4 h-4" />
-                {addedStocks.size} Stock{addedStocks.size !== 1 ? 's' : ''} Added
+                Done — View Portfolio
               </Button>
             )}
           </div>
