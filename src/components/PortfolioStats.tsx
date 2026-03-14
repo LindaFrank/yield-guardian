@@ -59,6 +59,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
     },
     {
       label: 'Weighted Avg Yield',
+      subtitle: 'total dividends ÷ portfolio value × 100',
       value: formatPercentage(avgYield),
       icon: Target,
       color: avgYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
