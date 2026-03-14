@@ -32,7 +32,7 @@ const Index = () => {
   const tickers = useMemo(() => {
     if (!user) return DEFAULT_TICKERS;
     if (tickersLoading) return [];
-    return savedTickers && savedTickers.length > 0 ? savedTickers : DEFAULT_TICKERS;
+    return savedTickers && savedTickers.length > 0 ? savedTickers : [];
   }, [user, tickersLoading, savedTickers]);
 
   const [stocks, setStocks] = useState<Stock[]>([]);
