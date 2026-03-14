@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
-import { Plus, Search, Loader2, ChevronRight, Check, Hash } from 'lucide-react';
+import { Plus, Search, Loader2, ChevronRight, Check } from 'lucide-react';
 
 interface AddStockModalProps {
   existingTickers: string[];
@@ -144,6 +144,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                       isChecked
                         ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20'
                         : 'bg-secondary/30 border-border/30 hover:border-primary/30 hover:bg-secondary/50'
+                    }`}
                   >
                     <Checkbox
                       checked={isChecked}
