@@ -42,15 +42,11 @@ const Index = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
-  const [wizardDone, setWizardDone] = useState(false);
   const [addStockOpen, setAddStockOpen] = useState(false);
 
-  // Auto-skip wizard if user already has stocks in their portfolio
-  useEffect(() => {
-    if (!tickersLoading && tickers.length > 0) {
-      setWizardDone(true);
-    }
-  }, [tickersLoading, tickers]);
+  // Wizard is done if user has saved tickers OR has already dismissed it this session
+  const [wizardDismissed, setWizardDismissed] = useState(false);
+  const wizardDone = wizardDismissed || (!tickersLoading && tickers.length > 0);
   const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
 
@@ -205,7 +201,7 @@ const Index = () => {
                 </HelpTooltip>
                 <div className="flex items-center gap-2">
                   {wizardDone && (
-                    <Button variant="outline" size="sm" onClick={() => setWizardDone(false)} className="gap-1.5">
+                    <Button variant="outline" size="sm" onClick={() => setWizardDismissed(false)} className="gap-1.5">
                       <Target className="w-3.5 h-3.5" />
                       Find Stocks
                     </Button>
@@ -226,7 +222,7 @@ const Index = () => {
                   onAddStock={handleAddStock}
                   onYieldChange={setTargetYield}
                   currentYield={targetYield}
-                  onDone={() => setWizardDone(true)}
+                  onDone={() => setWizardDismissed(true)}
                 />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
