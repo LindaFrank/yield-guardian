@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { Target } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
+import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
   analyzeStock, 
@@ -192,12 +194,20 @@ const Index = () => {
                 <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
-                <AddStockModal
-                  existingTickers={stocks.map((s) => s.ticker)}
-                  onAddStock={handleAddStock}
-                  open={addStockOpen}
-                  onOpenChange={setAddStockOpen}
-                />
+                <div className="flex items-center gap-2">
+                  {wizardDone && (
+                    <Button variant="outline" size="sm" onClick={() => setWizardDone(false)} className="gap-1.5">
+                      <Target className="w-3.5 h-3.5" />
+                      Find Stocks
+                    </Button>
+                  )}
+                  <AddStockModal
+                    existingTickers={stocks.map((s) => s.ticker)}
+                    onAddStock={handleAddStock}
+                    open={addStockOpen}
+                    onOpenChange={setAddStockOpen}
+                  />
+                </div>
               </div>
               
               {!wizardDone && !isLoading && !tickersLoading && (!savedTickers || savedTickers.length === 0) ? (
