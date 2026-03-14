@@ -42,6 +42,13 @@ const Index = () => {
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
   const [wizardDone, setWizardDone] = useState(false);
   const [addStockOpen, setAddStockOpen] = useState(false);
+
+  // Auto-skip wizard if user already has stocks in their portfolio
+  useEffect(() => {
+    if (!tickersLoading && tickers.length > 0) {
+      setWizardDone(true);
+    }
+  }, [tickersLoading, tickers]);
   const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
 
