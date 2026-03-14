@@ -191,11 +191,10 @@ const Index = () => {
               </div>
               
               {stocks.length === 0 && !isLoading && !tickersLoading ? (
-                <div className="p-12 rounded-xl gradient-card shadow-card border border-muted-foreground/40 text-center">
-                  <p className="text-muted-foreground">
-                    No stocks in portfolio. Add some to get started!
-                  </p>
-                </div>
+                <EmptyPortfolio
+                  onSelectStocks={() => setAddStockOpen(true)}
+                  onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
                   {stockAnalyses.map((analysis, index) => (
