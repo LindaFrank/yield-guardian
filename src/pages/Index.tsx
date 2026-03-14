@@ -124,11 +124,11 @@ const Index = () => {
     }
   };
 
-  const handleAddStock = (stock: Stock) => {
+  const handleAddStock = (stock: Stock, shares?: number) => {
     if (!stocks.find((s) => s.ticker === stock.ticker)) {
       setStocks((prev) => [...prev, stock]);
       if (user) {
-        addTicker.mutate(stock.ticker);
+        addTicker.mutate({ ticker: stock.ticker, shares });
       }
     }
   };
