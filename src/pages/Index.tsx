@@ -18,7 +18,7 @@ import { AddStockModal } from '@/components/AddStockModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
-import { useUserTickers, useAddTicker, useRemoveTicker } from '@/hooks/usePortfolio';
+import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -29,6 +29,8 @@ const Index = () => {
   const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
   const addTicker = useAddTicker();
   const removeTicker = useRemoveTicker();
+  const updateShares = useUpdateShares();
+  const { data: stocksWithShares } = useUserStocksWithShares();
 
   // Use saved tickers if logged in and loaded, otherwise defaults
   const tickers = useMemo(() => {
@@ -236,7 +238,11 @@ const Index = () => {
                     >
                       <StockCard
                         analysis={analysis}
+                        sharesOwned={stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
                         onRemove={handleRemoveStock}
+                        onUpdateShares={(ticker, shares) => {
+                          if (user) updateShares.mutate({ ticker, shares });
+                        }}
                       />
                     </div>
                   ))}
