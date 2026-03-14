@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { Target } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
+import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
   analyzeStock, 
@@ -13,9 +15,10 @@ import { StockCard } from '@/components/StockCard';
 import { UnderperformersList } from '@/components/UnderperformersList';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { AddStockModal } from '@/components/AddStockModal';
+import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
-import { useUserTickers, useAddTicker, useRemoveTicker } from '@/hooks/usePortfolio';
+import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { GettingStartedModal } from '@/components/GettingStartedModal';
@@ -27,24 +30,39 @@ const Index = () => {
   const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
   const addTicker = useAddTicker();
   const removeTicker = useRemoveTicker();
+  const updateShares = useUpdateShares();
+  const { data: stocksWithShares } = useUserStocksWithShares();
 
   // Use saved tickers if logged in and loaded, otherwise defaults
   const tickers = useMemo(() => {
     if (!user) return DEFAULT_TICKERS;
     if (tickersLoading) return [];
-    return savedTickers && savedTickers.length > 0 ? savedTickers : DEFAULT_TICKERS;
+    return savedTickers && savedTickers.length > 0 ? savedTickers : [];
   }, [user, tickersLoading, savedTickers]);
 
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
+  const [addStockOpen, setAddStockOpen] = useState(false);
+
+  // Wizard is done if user has saved tickers OR has already dismissed it this session
+  const [wizardDismissed, setWizardDismissed] = useState(false);
+  const wizardDone = wizardDismissed || (!tickersLoading && tickers.length > 0);
+  const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
 
   // Fetch live data for portfolio tickers
   const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
 
-  // Update stocks when live data arrives
+  // Keep local portfolio state in sync when user/account tickers change
   useEffect(() => {
+    // Critical for new accounts: never keep stale stocks from a previous session/user
+    if (tickers.length === 0) {
+      setStocks([]);
+      setSelectedUnderperformer(null);
+      return;
+    }
+
     if (liveStocks && liveStocks.length > 0) {
       const merged = liveStocks.map((live) => {
         const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
@@ -55,7 +73,7 @@ const Index = () => {
       });
       setStocks(merged);
     }
-  }, [liveStocks]);
+  }, [tickers, liveStocks]);
 
   // Track whether we've already notified the user that the feed went live
   const feedNotifiedRef = useRef(false);
@@ -115,11 +133,11 @@ const Index = () => {
     }
   };
 
-  const handleAddStock = (stock: Stock) => {
+  const handleAddStock = (stock: Stock, shares?: number) => {
     if (!stocks.find((s) => s.ticker === stock.ticker)) {
       setStocks((prev) => [...prev, stock]);
       if (user) {
-        addTicker.mutate(stock.ticker);
+        addTicker.mutate({ ticker: stock.ticker, shares });
       }
     }
   };
@@ -164,16 +182,19 @@ const Index = () => {
         <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
           <PortfolioStats
             stocks={stocks}
+            sharesMap={Object.fromEntries(
+              (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+            )}
             targetYield={targetYield}
             underperformerCount={underperformers.length}
           />
         </section>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className={`grid ${wizardDone ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-8`}>
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
             <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
-              <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+              <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
               </section>
             </HelpTooltip>
@@ -183,18 +204,31 @@ const Index = () => {
                 <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
-                <AddStockModal
-                  existingTickers={stocks.map((s) => s.ticker)}
-                  onAddStock={handleAddStock}
-                />
+                <div className="flex items-center gap-2">
+                  {wizardDone && (
+                    <Button variant="outline" size="sm" onClick={() => setWizardDismissed(false)} className="gap-1.5">
+                      <Target className="w-3.5 h-3.5" />
+                      Find Stocks
+                    </Button>
+                  )}
+                  <AddStockModal
+                    existingTickers={stocks.map((s) => s.ticker)}
+                    onAddStock={handleAddStock}
+                    open={addStockOpen}
+                    onOpenChange={setAddStockOpen}
+                  />
+                </div>
               </div>
               
-              {stocks.length === 0 && !isLoading && !tickersLoading ? (
-                <div className="p-12 rounded-xl gradient-card shadow-card border border-muted-foreground/40 text-center">
-                  <p className="text-muted-foreground">
-                    No stocks in portfolio. Add some to get started!
-                  </p>
-                </div>
+              {!wizardDone && !isLoading && !tickersLoading ? (
+                <EmptyPortfolio
+                  onSelectStocks={() => setAddStockOpen(true)}
+                  onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                  onAddStock={handleAddStock}
+                  onYieldChange={setTargetYield}
+                  currentYield={targetYield}
+                  onDone={() => setWizardDismissed(true)}
+                />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
                   {stockAnalyses.map((analysis, index) => (
@@ -205,7 +239,11 @@ const Index = () => {
                     >
                       <StockCard
                         analysis={analysis}
+                        sharesOwned={stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
                         onRemove={handleRemoveStock}
+                        onUpdateShares={(ticker, shares) => {
+                          if (user) updateShares.mutate({ ticker, shares });
+                        }}
                       />
                     </div>
                   ))}
@@ -214,29 +252,31 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Sidebar */}
-          <aside className="space-y-6">
-            <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
-              <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <UnderperformersList
-                  underperformers={underperformers}
-                  selectedStock={selectedUnderperformer}
-                  onSelectStock={handleSelectUnderperformer}
-                  targetYield={targetYield}
-                />
-              </section>
-            </HelpTooltip>
+          {/* Sidebar — hidden during wizard */}
+          {wizardDone && (
+            <aside className="space-y-6">
+              <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
+                <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+                  <UnderperformersList
+                    underperformers={underperformers}
+                    selectedStock={selectedUnderperformer}
+                    onSelectStock={handleSelectUnderperformer}
+                    targetYield={targetYield}
+                  />
+                </section>
+              </HelpTooltip>
 
-            <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
-              <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
-                <ReplacementSuggestions
-                  removedStock={selectedUnderperformer}
-                  candidates={replacements}
-                  onAddStock={handleAddStock}
-                />
-              </section>
-            </HelpTooltip>
-          </aside>
+              <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
+                <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+                  <ReplacementSuggestions
+                    removedStock={selectedUnderperformer}
+                    candidates={replacements}
+                    onAddStock={handleAddStock}
+                  />
+                </section>
+              </HelpTooltip>
+            </aside>
+          )}
         </div>
       </main>
     </div>
