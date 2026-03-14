@@ -31,15 +31,31 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   const [pendingStock, setPendingStock] = useState<(Stock & { computedYield: number }) | null>(null);
   const [sharesInput, setSharesInput] = useState('');
 
+  // Fetch live quotes for the catalog stocks
+  const catalogTickers = useMemo(() => marketStocks.map((s) => s.ticker), []);
+  const { data: liveStocks, isLoading: livePricesLoading } = useStockQuotes(catalogTickers);
+
   const matchingStocks = useMemo(() => {
-    return marketStocks
-      .map((stock) => ({
-        ...stock,
-        computedYield: calculateDividendYield(stock),
-      }))
+    // Merge live data with mock catalog (for sector info)
+    const stocksToUse = marketStocks.map((mock) => {
+      const live = liveStocks?.find((l) => l.ticker === mock.ticker);
+      if (live && live.currentPrice > 0) {
+        return {
+          ...live,
+          sector: live.sector || mock.sector,
+          computedYield: live.currentYield,
+        };
+      }
+      return {
+        ...mock,
+        computedYield: mock.currentYield,
+      };
+    });
+
+    return stocksToUse
       .filter((s) => s.computedYield >= localYield)
       .sort((a, b) => b.computedYield - a.computedYield);
-  }, [localYield]);
+  }, [localYield, liveStocks]);
 
   const handleYieldConfirm = () => {
     onYieldChange?.(localYield);
