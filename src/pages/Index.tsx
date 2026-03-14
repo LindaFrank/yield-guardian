@@ -196,6 +196,9 @@ const Index = () => {
                 <EmptyPortfolio
                   onSelectStocks={() => setAddStockOpen(true)}
                   onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                  onAddStock={handleAddStock}
+                  onYieldChange={setTargetYield}
+                  currentYield={targetYield}
                 />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
