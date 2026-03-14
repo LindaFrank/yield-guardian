@@ -210,7 +210,7 @@ const Index = () => {
                 </div>
               </div>
               
-              {!wizardDone && !isLoading && !tickersLoading && (!savedTickers || savedTickers.length === 0) ? (
+              {!wizardDone && !isLoading && !tickersLoading ? (
                 <EmptyPortfolio
                   onSelectStocks={() => setAddStockOpen(true)}
                   onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
