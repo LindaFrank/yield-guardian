@@ -187,7 +187,7 @@ const Index = () => {
           />
         </section>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className={`grid ${wizardDone ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-8`}>
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
             <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
