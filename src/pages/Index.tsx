@@ -238,7 +238,11 @@ const Index = () => {
                     >
                       <StockCard
                         analysis={analysis}
+                        sharesOwned={stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
                         onRemove={handleRemoveStock}
+                        onUpdateShares={(ticker, shares) => {
+                          if (user) updateShares.mutate({ ticker, shares });
+                        }}
                       />
                     </div>
                   ))}
