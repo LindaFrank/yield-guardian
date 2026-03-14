@@ -59,6 +59,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
     },
     {
       label: 'Weighted Avg Yield',
+      subtitle: 'total dividends ÷ portfolio value × 100',
       value: formatPercentage(avgYield),
       icon: Target,
       color: avgYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
@@ -88,6 +89,9 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
             <p className={cn('font-mono font-semibold text-xl', stat.color)}>
               {stat.value}
             </p>
+            {'subtitle' in stat && stat.subtitle && (
+              <p className="text-[10px] text-muted-foreground/60 mt-1">{stat.subtitle}</p>
+            )}
           </div>
         );
 
