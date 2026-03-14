@@ -201,7 +201,7 @@ const Index = () => {
                 </HelpTooltip>
                 <div className="flex items-center gap-2">
                   {wizardDone && (
-                    <Button variant="outline" size="sm" onClick={() => setWizardDone(false)} className="gap-1.5">
+                    <Button variant="outline" size="sm" onClick={() => setWizardDismissed(false)} className="gap-1.5">
                       <Target className="w-3.5 h-3.5" />
                       Find Stocks
                     </Button>
