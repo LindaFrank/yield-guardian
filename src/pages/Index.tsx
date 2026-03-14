@@ -42,6 +42,13 @@ const Index = () => {
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
   const [wizardDone, setWizardDone] = useState(false);
   const [addStockOpen, setAddStockOpen] = useState(false);
+
+  // Auto-skip wizard if user already has stocks in their portfolio
+  useEffect(() => {
+    if (!tickersLoading && tickers.length > 0) {
+      setWizardDone(true);
+    }
+  }, [tickersLoading, tickers]);
   const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
 
@@ -180,7 +187,7 @@ const Index = () => {
           />
         </section>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className={`grid ${wizardDone ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-8`}>
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
             <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
@@ -238,29 +245,31 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Sidebar */}
-          <aside className="space-y-6">
-            <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
-              <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <UnderperformersList
-                  underperformers={underperformers}
-                  selectedStock={selectedUnderperformer}
-                  onSelectStock={handleSelectUnderperformer}
-                  targetYield={targetYield}
-                />
-              </section>
-            </HelpTooltip>
+          {/* Sidebar — hidden during wizard */}
+          {wizardDone && (
+            <aside className="space-y-6">
+              <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
+                <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+                  <UnderperformersList
+                    underperformers={underperformers}
+                    selectedStock={selectedUnderperformer}
+                    onSelectStock={handleSelectUnderperformer}
+                    targetYield={targetYield}
+                  />
+                </section>
+              </HelpTooltip>
 
-            <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
-              <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
-                <ReplacementSuggestions
-                  removedStock={selectedUnderperformer}
-                  candidates={replacements}
-                  onAddStock={handleAddStock}
-                />
-              </section>
-            </HelpTooltip>
-          </aside>
+              <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
+                <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+                  <ReplacementSuggestions
+                    removedStock={selectedUnderperformer}
+                    candidates={replacements}
+                    onAddStock={handleAddStock}
+                  />
+                </section>
+              </HelpTooltip>
+            </aside>
+          )}
         </div>
       </main>
     </div>
