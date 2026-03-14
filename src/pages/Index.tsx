@@ -200,13 +200,14 @@ const Index = () => {
                 />
               </div>
               
-              {stocks.length === 0 && !isLoading && !tickersLoading ? (
+              {!wizardDone && !isLoading && !tickersLoading && (!savedTickers || savedTickers.length === 0) ? (
                 <EmptyPortfolio
                   onSelectStocks={() => setAddStockOpen(true)}
                   onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                   onAddStock={handleAddStock}
                   onYieldChange={setTargetYield}
                   currentYield={targetYield}
+                  onDone={() => setWizardDone(true)}
                 />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
