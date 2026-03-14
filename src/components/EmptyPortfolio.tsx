@@ -262,9 +262,9 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               Search Other Stocks
             </Button>
             {addedStocks.size > 0 && (
-              <Button className="gap-2">
+              <Button className="gap-2" onClick={onDone}>
                 <Check className="w-4 h-4" />
-                {addedStocks.size} Stock{addedStocks.size !== 1 ? 's' : ''} Added
+                Done — View Portfolio
               </Button>
             )}
           </div>
