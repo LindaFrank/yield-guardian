@@ -45,8 +45,15 @@ const Index = () => {
   // Fetch live data for portfolio tickers
   const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
 
-  // Update stocks when live data arrives
+  // Keep local portfolio state in sync when user/account tickers change
   useEffect(() => {
+    // Critical for new accounts: never keep stale stocks from a previous session/user
+    if (tickers.length === 0) {
+      setStocks([]);
+      setSelectedUnderperformer(null);
+      return;
+    }
+
     if (liveStocks && liveStocks.length > 0) {
       const merged = liveStocks.map((live) => {
         const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
@@ -57,7 +64,7 @@ const Index = () => {
       });
       setStocks(merged);
     }
-  }, [liveStocks]);
+  }, [tickers, liveStocks]);
 
   // Track whether we've already notified the user that the feed went live
   const feedNotifiedRef = useRef(false);
