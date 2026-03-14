@@ -222,7 +222,7 @@ const Index = () => {
                   onAddStock={handleAddStock}
                   onYieldChange={setTargetYield}
                   currentYield={targetYield}
-                  onDone={() => setWizardDone(true)}
+                  onDone={() => setWizardDismissed(true)}
                 />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
