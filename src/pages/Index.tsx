@@ -180,6 +180,9 @@ const Index = () => {
         <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
           <PortfolioStats
             stocks={stocks}
+            sharesMap={Object.fromEntries(
+              (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+            )}
             targetYield={targetYield}
             underperformerCount={underperformers.length}
           />

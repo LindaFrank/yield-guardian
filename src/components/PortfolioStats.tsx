@@ -6,6 +6,7 @@ import { HelpTooltip } from '@/components/HelpTooltip';
 
 interface PortfolioStatsProps {
   stocks: Stock[];
+  sharesMap?: Record<string, number | null>;
   targetYield: number;
   underperformerCount: number;
   helpEnabled?: boolean;
@@ -30,9 +31,15 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
   },
 };
 
-export function PortfolioStats({ stocks, targetYield, underperformerCount }: PortfolioStatsProps) {
-  const totalValue = stocks.reduce((sum, s) => sum + s.currentPrice, 0);
-  const totalDividends = stocks.reduce((sum, s) => sum + s.annualDividend, 0);
+export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperformerCount }: PortfolioStatsProps) {
+  const totalValue = stocks.reduce((sum, s) => {
+    const shares = sharesMap[s.ticker] ?? 1;
+    return sum + s.currentPrice * shares;
+  }, 0);
+  const totalDividends = stocks.reduce((sum, s) => {
+    const shares = sharesMap[s.ticker] ?? 1;
+    return sum + s.annualDividend * shares;
+  }, 0);
   const avgYield = stocks.length > 0 
     ? stocks.reduce((sum, s) => sum + calculateDividendYield(s), 0) / stocks.length 
     : 0;
