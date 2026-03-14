@@ -90,7 +90,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
               {stat.value}
             </p>
             {'subtitle' in stat && stat.subtitle && (
-              <p className="text-[10px] text-muted-foreground/60 mt-1">{stat.subtitle}</p>
+              <p className="text-[10px] text-primary mt-1">{stat.subtitle}</p>
             )}
           </div>
         );
