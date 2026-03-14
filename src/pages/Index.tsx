@@ -38,6 +38,8 @@ const Index = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
+  const [addStockOpen, setAddStockOpen] = useState(false);
+  const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
 
   // Fetch live data for portfolio tickers
