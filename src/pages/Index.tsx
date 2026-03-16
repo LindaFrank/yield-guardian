@@ -51,10 +51,12 @@ const Index = () => {
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
   const [addStockOpen, setAddStockOpen] = useState(false);
   const [findStocksStep, setFindStocksStep] = useState(0);
+  const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
   const wizardDone = wizardDismissed || (!tickersLoading && tickers.length > 0);
+  const showStockFinder = !wizardDone || showFindStocksFlow;
   const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
 

@@ -17,13 +17,14 @@ interface EmptyPortfolioProps {
   currentYield?: number;
   onDone?: () => void;
   initialStep?: number;
+  onCancel?: () => void;
 }
 
 interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0 }: EmptyPortfolioProps) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel }: EmptyPortfolioProps) {
   const [step, setStep] = useState(initialStep);
 
   useEffect(() => {
