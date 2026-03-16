@@ -228,12 +228,6 @@ const Index = () => {
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
                 <div className="flex items-center gap-2">
-                  {wizardDone && (
-                    <Button variant="outline" size="sm" onClick={() => { setFindStocksStep(2); setShowFindStocksFlow(true); }} className="gap-1.5">
-                      <Target className="w-3.5 h-3.5" />
-                      Find Stocks
-                    </Button>
-                  )}
                   <AddStockModal
                     existingTickers={stocks.map((s) => s.ticker)}
                     onAddStock={handleAddStock}
