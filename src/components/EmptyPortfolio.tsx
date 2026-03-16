@@ -154,7 +154,10 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               <span>10% Aggressive</span>
             </div>
           </Card>
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {onCancel && (
+              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            )}
             <Button variant="outline" onClick={() => setStep(0)}>Back</Button>
             <Button onClick={handleYieldConfirm} className="gap-2">
               Find Matching Stocks <ChevronRight className="w-4 h-4" />
