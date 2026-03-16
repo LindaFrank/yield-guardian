@@ -66,18 +66,24 @@ export type Database = {
         Row: {
           added_at: string
           id: string
+          purchase_price: number | null
+          shares_owned: number | null
           ticker: string
           user_id: string
         }
         Insert: {
           added_at?: string
           id?: string
+          purchase_price?: number | null
+          shares_owned?: number | null
           ticker: string
           user_id: string
         }
         Update: {
           added_at?: string
           id?: string
+          purchase_price?: number | null
+          shares_owned?: number | null
           ticker?: string
           user_id?: string
         }
