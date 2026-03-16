@@ -16,14 +16,15 @@ interface EmptyPortfolioProps {
   onYieldChange?: (value: number) => void;
   currentYield?: number;
   onDone?: () => void;
+  initialStep?: number;
 }
 
 interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone }: EmptyPortfolioProps) {
-  const [step, setStep] = useState(0);
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0 }: EmptyPortfolioProps) {
+  const [step, setStep] = useState(initialStep);
   const [localYield, setLocalYield] = useState(currentYield);
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
