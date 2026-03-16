@@ -50,7 +50,7 @@ export function ReplacementSuggestions({
                 <span className="font-mono font-medium">{candidate.stock.ticker}</span>
                 <span className={cn(
                   'font-mono text-sm',
-                  candidate.yield >= 5 ? 'text-yield-positive' : 'text-yield-warning'
+                  candidate.yield >= 5 ? 'text-yield-positive' : candidate.yield >= 3.5 ? 'text-yield-warning' : 'text-yield-negative'
                 )}>
                   {formatPercentage(candidate.yield)}
                 </span>
