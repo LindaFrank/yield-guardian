@@ -17,13 +17,14 @@ interface EmptyPortfolioProps {
   currentYield?: number;
   onDone?: () => void;
   initialStep?: number;
+  onCancel?: () => void;
 }
 
 interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0 }: EmptyPortfolioProps) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel }: EmptyPortfolioProps) {
   const [step, setStep] = useState(initialStep);
 
   useEffect(() => {
@@ -108,9 +109,16 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
           <p className="text-muted-foreground max-w-md mx-auto">
             Let's build your dividend portfolio. We'll start by setting your desired yield target, then find stocks that match.
           </p>
-          <Button size="lg" onClick={() => setStep(1)} className="gap-2">
-            Get Started <ChevronRight className="w-4 h-4" />
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {onCancel && (
+              <Button variant="outline" onClick={onCancel}>
+                Back to Portfolio
+              </Button>
+            )}
+            <Button size="lg" onClick={() => setStep(1)} className="gap-2">
+              Get Started <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       )}
 
@@ -146,7 +154,10 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               <span>10% Aggressive</span>
             </div>
           </Card>
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {onCancel && (
+              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            )}
             <Button variant="outline" onClick={() => setStep(0)}>Back</Button>
             <Button onClick={handleYieldConfirm} className="gap-2">
               Find Matching Stocks <ChevronRight className="w-4 h-4" />
@@ -216,7 +227,10 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             </div>
           )}
 
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {onCancel && (
+              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            )}
             <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
             <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
             {selectedTickers.size > 0 && (
@@ -282,7 +296,10 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             <p className="text-sm text-destructive text-center">Please enter a valid number of shares for all stocks.</p>
           )}
 
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {onCancel && (
+              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            )}
             <Button variant="outline" onClick={() => { setSubmitted(false); setStep(2); }}>
               Back to Selection
             </Button>

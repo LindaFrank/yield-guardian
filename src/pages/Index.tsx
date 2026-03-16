@@ -51,10 +51,12 @@ const Index = () => {
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
   const [addStockOpen, setAddStockOpen] = useState(false);
   const [findStocksStep, setFindStocksStep] = useState(0);
+  const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
   const wizardDone = wizardDismissed || (!tickersLoading && tickers.length > 0);
+  const showStockFinder = !wizardDone || showFindStocksFlow;
   const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
 
@@ -211,7 +213,7 @@ const Index = () => {
           />
         </section>
 
-        <div className={`grid ${wizardDone ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-8`}>
+        <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
           {/* Main Portfolio Section */}
           <div className="lg:col-span-2 space-y-6">
             <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
@@ -227,7 +229,7 @@ const Index = () => {
                 </HelpTooltip>
                 <div className="flex items-center gap-2">
                   {wizardDone && (
-                    <Button variant="outline" size="sm" onClick={() => { setFindStocksStep(2); setWizardDismissed(false); }} className="gap-1.5">
+                    <Button variant="outline" size="sm" onClick={() => { setFindStocksStep(2); setShowFindStocksFlow(true); }} className="gap-1.5">
                       <Target className="w-3.5 h-3.5" />
                       Find Stocks
                     </Button>
@@ -243,15 +245,23 @@ const Index = () => {
                 </div>
               </div>
               
-              {!wizardDone && !isLoading && !tickersLoading ? (
+              {showStockFinder ? (
                 <EmptyPortfolio
                   onSelectStocks={() => setAddStockOpen(true)}
                   onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                   onAddStock={handleAddStock}
                   onYieldChange={setTargetYield}
                   currentYield={targetYield}
-                  onDone={() => { setWizardDismissed(true); setFindStocksStep(0); }}
-                  initialStep={findStocksStep}
+                  onDone={() => {
+                    setWizardDismissed(true);
+                    setShowFindStocksFlow(false);
+                    setFindStocksStep(0);
+                  }}
+                  onCancel={() => {
+                    setShowFindStocksFlow(false);
+                    setFindStocksStep(0);
+                  }}
+                  initialStep={showFindStocksFlow ? findStocksStep : 0}
                 />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -277,7 +287,7 @@ const Index = () => {
           </div>
 
           {/* Sidebar — hidden during wizard */}
-          {wizardDone && (
+          {!showStockFinder && (
             <aside className="space-y-6">
               <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
                 <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
