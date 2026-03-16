@@ -296,7 +296,10 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             <p className="text-sm text-destructive text-center">Please enter a valid number of shares for all stocks.</p>
           )}
 
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {onCancel && (
+              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            )}
             <Button variant="outline" onClick={() => { setSubmitted(false); setStep(2); }}>
               Back to Selection
             </Button>
