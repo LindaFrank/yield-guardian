@@ -50,6 +50,7 @@ const Index = () => {
   const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
   const [addStockOpen, setAddStockOpen] = useState(false);
+  const [findStocksStep, setFindStocksStep] = useState(0);
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
@@ -226,7 +227,7 @@ const Index = () => {
                 </HelpTooltip>
                 <div className="flex items-center gap-2">
                   {wizardDone && (
-                    <Button variant="outline" size="sm" onClick={() => setWizardDismissed(false)} className="gap-1.5">
+                    <Button variant="outline" size="sm" onClick={() => { setFindStocksStep(2); setWizardDismissed(false); }} className="gap-1.5">
                       <Target className="w-3.5 h-3.5" />
                       Find Stocks
                     </Button>
@@ -249,7 +250,8 @@ const Index = () => {
                   onAddStock={handleAddStock}
                   onYieldChange={setTargetYield}
                   currentYield={targetYield}
-                  onDone={() => setWizardDismissed(true)}
+                  onDone={() => { setWizardDismissed(true); setFindStocksStep(0); }}
+                  initialStep={findStocksStep}
                 />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
