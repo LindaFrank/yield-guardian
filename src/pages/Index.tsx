@@ -245,15 +245,23 @@ const Index = () => {
                 </div>
               </div>
               
-              {!wizardDone && !isLoading && !tickersLoading ? (
+              {showStockFinder ? (
                 <EmptyPortfolio
                   onSelectStocks={() => setAddStockOpen(true)}
                   onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                   onAddStock={handleAddStock}
                   onYieldChange={setTargetYield}
                   currentYield={targetYield}
-                  onDone={() => { setWizardDismissed(true); setFindStocksStep(0); }}
-                  initialStep={findStocksStep}
+                  onDone={() => {
+                    setWizardDismissed(true);
+                    setShowFindStocksFlow(false);
+                    setFindStocksStep(0);
+                  }}
+                  onCancel={() => {
+                    setShowFindStocksFlow(false);
+                    setFindStocksStep(0);
+                  }}
+                  initialStep={showFindStocksFlow ? findStocksStep : 0}
                 />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
