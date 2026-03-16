@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
+const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
 
 const Index = () => {
   const { user } = useAuth();
@@ -38,6 +39,12 @@ const Index = () => {
     if (tickersLoading) return [];
     return savedTickers && savedTickers.length > 0 ? savedTickers : [];
   }, [user, tickersLoading, savedTickers]);
+
+  // Candidate tickers = market stocks NOT already in the portfolio
+  const candidateTickers = useMemo(
+    () => ALL_MARKET_TICKERS.filter((t) => !tickers.includes(t)),
+    [tickers]
+  );
 
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
