@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Stock } from '@/types/portfolio';
 import { useStockSearch, SearchResult } from '@/hooks/useStockData';
+import { calculateDividendYield, formatPercentage } from '@/lib/portfolioUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
-import { Plus, Search, Loader2, ChevronRight, Check } from 'lucide-react';
+import { Plus, Search, Loader2, ChevronRight, Check, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface AddStockModalProps {
   existingTickers: string[];
@@ -14,9 +16,11 @@ interface AddStockModalProps {
   marketStocks?: Stock[];
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  suggestedStocks?: Stock[];
+  targetYield?: number;
 }
 
-export function AddStockModal({ existingTickers, onAddStock, open: controlledOpen, onOpenChange }: AddStockModalProps) {
+export function AddStockModal({ existingTickers, onAddStock, open: controlledOpen, onOpenChange, suggestedStocks, targetYield = 5 }: AddStockModalProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = onOpenChange || setInternalOpen;
@@ -32,6 +36,20 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
     (r) => !existingTickers.includes(r.symbol.toUpperCase())
   );
 
+  // Build yield-based suggestions from live candidate stocks
+  const yieldSuggestions = useMemo(() => {
+    if (!suggestedStocks) return [];
+    return suggestedStocks
+      .filter((s) => !existingTickers.includes(s.ticker))
+      .map((s) => ({
+        stock: s,
+        yield: s.currentYield > 0 ? s.currentYield : calculateDividendYield(s),
+      }))
+      .filter((s) => s.yield >= targetYield * 0.7)
+      .sort((a, b) => b.yield - a.yield)
+      .slice(0, 8);
+  }, [suggestedStocks, existingTickers, targetYield]);
+
   const toggleSelect = (result: SearchResult) => {
     setSelected((prev) => {
       const next = new Map(prev);
@@ -42,6 +60,16 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
       }
       return next;
     });
+  };
+
+  const handleSelectSuggestion = (stock: Stock) => {
+    const result: SearchResult = {
+      symbol: stock.ticker,
+      name: stock.name,
+      currency: 'USD',
+      stockExchange: 'NYSE',
+    };
+    toggleSelect(result);
   };
 
   const handleProceedToShares = () => {
@@ -114,7 +142,52 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
             </div>
 
             <div className="max-h-72 overflow-y-auto space-y-2 mt-2">
-              {search.length === 0 && (
+              {/* Show yield-based suggestions when not searching */}
+              {search.length === 0 && yieldSuggestions.length > 0 && (
+                <>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground px-1 pb-1">
+                    <Sparkles className="w-3.5 h-3.5 text-primary" />
+                    <span>Suggestions meeting your {formatPercentage(targetYield)} yield target</span>
+                  </div>
+                  {yieldSuggestions.map(({ stock, yield: stockYield }) => {
+                    const isChecked = selected.has(stock.ticker);
+                    return (
+                      <div
+                        key={stock.ticker}
+                        onClick={() => handleSelectSuggestion(stock)}
+                        role="button"
+                        className={cn(
+                          'w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left cursor-pointer',
+                          isChecked
+                            ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20'
+                            : 'bg-secondary/30 border-border/30 hover:border-primary/30 hover:bg-secondary/50'
+                        )}
+                      >
+                        <Checkbox
+                          checked={isChecked}
+                          onCheckedChange={() => handleSelectSuggestion(stock)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-medium">{stock.ticker}</span>
+                            <span className={cn(
+                              'font-mono text-sm',
+                              stockYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning'
+                            )}>
+                              {formatPercentage(stockYield)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-0.5">{stock.name}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+
+              {search.length === 0 && yieldSuggestions.length === 0 && (
                 <p className="text-center text-muted-foreground py-8 text-sm">
                   Type a ticker or company name to search
                 </p>

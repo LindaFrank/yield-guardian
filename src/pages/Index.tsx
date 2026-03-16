@@ -236,6 +236,8 @@ const Index = () => {
                     onAddStock={handleAddStock}
                     open={addStockOpen}
                     onOpenChange={setAddStockOpen}
+                    suggestedStocks={liveMarketStocks}
+                    targetYield={targetYield}
                   />
                 </div>
               </div>
