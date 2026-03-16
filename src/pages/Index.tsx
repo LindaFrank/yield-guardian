@@ -122,15 +122,27 @@ const Index = () => {
     [stocks, targetYield]
   );
 
+  // Build a live market stocks pool for replacement suggestions
+  const liveMarketStocks = useMemo(() => {
+    if (!liveCandidates || liveCandidates.length === 0) return [];
+    return liveCandidates.map((live) => {
+      const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
+      return {
+        ...live,
+        sector: live.sector || mock?.sector || 'Unknown',
+      };
+    });
+  }, [liveCandidates]);
+
   const replacements = useMemo(() => {
     if (!selectedUnderperformer) return [];
     return suggestReplacements(
       selectedUnderperformer,
-      mockMarketStocks,
+      liveMarketStocks,
       targetYield,
       stocks.map((s) => s.ticker)
     );
-  }, [selectedUnderperformer, stocks, targetYield]);
+  }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks]);
 
   const handleRemoveStock = (ticker: string) => {
     setStocks((prev) => prev.filter((s) => s.ticker !== ticker));
