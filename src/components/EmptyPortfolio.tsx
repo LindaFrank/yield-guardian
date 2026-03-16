@@ -109,9 +109,16 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
           <p className="text-muted-foreground max-w-md mx-auto">
             Let's build your dividend portfolio. We'll start by setting your desired yield target, then find stocks that match.
           </p>
-          <Button size="lg" onClick={() => setStep(1)} className="gap-2">
-            Get Started <ChevronRight className="w-4 h-4" />
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {onCancel && (
+              <Button variant="outline" onClick={onCancel}>
+                Back to Portfolio
+              </Button>
+            )}
+            <Button size="lg" onClick={() => setStep(1)} className="gap-2">
+              Get Started <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       )}
 
