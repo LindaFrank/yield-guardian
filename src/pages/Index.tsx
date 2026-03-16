@@ -250,7 +250,8 @@ const Index = () => {
                   onAddStock={handleAddStock}
                   onYieldChange={setTargetYield}
                   currentYield={targetYield}
-                  onDone={() => setWizardDismissed(true)}
+                  onDone={() => { setWizardDismissed(true); setFindStocksStep(0); }}
+                  initialStep={findStocksStep}
                 />
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
