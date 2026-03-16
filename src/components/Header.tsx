@@ -30,7 +30,7 @@ export function Header() {
               <TrendingUp className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h1 className="font-semibold text-lg">Dividend Tracker</h1>
+              <h1 className="font-semibold text-lg">Yield Guardian</h1>
               <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
           </div>
