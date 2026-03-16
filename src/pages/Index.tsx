@@ -60,6 +60,9 @@ const Index = () => {
   // Fetch live data for portfolio tickers
   const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
 
+  // Fetch live quotes for candidate replacement stocks
+  const { data: liveCandidates } = useStockQuotes(candidateTickers);
+
   // Keep local portfolio state in sync when user/account tickers change
   useEffect(() => {
     // Critical for new accounts: never keep stale stocks from a previous session/user
