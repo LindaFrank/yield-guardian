@@ -37,6 +37,35 @@ export function useAddTicker() {
   });
 }
 
+export function useAddTickerWithCostBasis() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      ticker,
+      purchasePrice,
+      sharesOwned,
+    }: {
+      ticker: string;
+      purchasePrice?: number;
+      sharesOwned?: number;
+    }) => {
+      if (!user) throw new Error('Not authenticated');
+      const { error } = await supabase
+        .from('user_stocks')
+        .insert({
+          user_id: user.id,
+          ticker,
+          purchase_price: purchasePrice ?? null,
+          shares_owned: sharesOwned ?? null,
+        } as any);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['user-stocks'] }),
+  });
+}
+
 export function useRemoveTicker() {
   const { user } = useAuth();
   const qc = useQueryClient();

@@ -20,6 +20,6 @@ export default defineConfig(({ mode }) => ({
     dedupe: ["react", "react-dom", "react/jsx-runtime"],
   },
   optimizeDeps: {
-    include: ["@tanstack/react-query"],
+    include: ["react", "react-dom", "@tanstack/react-query", "framer-motion"],
   },
 }));
