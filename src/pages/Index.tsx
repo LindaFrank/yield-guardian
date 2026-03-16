@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
+const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
 
 const Index = () => {
   const { user } = useAuth();
@@ -39,6 +40,12 @@ const Index = () => {
     return savedTickers && savedTickers.length > 0 ? savedTickers : [];
   }, [user, tickersLoading, savedTickers]);
 
+  // Candidate tickers = market stocks NOT already in the portfolio
+  const candidateTickers = useMemo(
+    () => ALL_MARKET_TICKERS.filter((t) => !tickers.includes(t)),
+    [tickers]
+  );
+
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
@@ -52,6 +59,9 @@ const Index = () => {
 
   // Fetch live data for portfolio tickers
   const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
+
+  // Fetch live quotes for candidate replacement stocks
+  const { data: liveCandidates } = useStockQuotes(candidateTickers);
 
   // Keep local portfolio state in sync when user/account tickers change
   useEffect(() => {
@@ -112,15 +122,27 @@ const Index = () => {
     [stocks, targetYield]
   );
 
+  // Build a live market stocks pool for replacement suggestions
+  const liveMarketStocks = useMemo(() => {
+    if (!liveCandidates || liveCandidates.length === 0) return [];
+    return liveCandidates.map((live) => {
+      const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
+      return {
+        ...live,
+        sector: live.sector || mock?.sector || 'Unknown',
+      };
+    });
+  }, [liveCandidates]);
+
   const replacements = useMemo(() => {
     if (!selectedUnderperformer) return [];
     return suggestReplacements(
       selectedUnderperformer,
-      mockMarketStocks,
+      liveMarketStocks,
       targetYield,
       stocks.map((s) => s.ticker)
     );
-  }, [selectedUnderperformer, stocks, targetYield]);
+  }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks]);
 
   const handleRemoveStock = (ticker: string) => {
     setStocks((prev) => prev.filter((s) => s.ticker !== ticker));
