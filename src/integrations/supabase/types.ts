@@ -16,25 +16,34 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          age: number | null
           created_at: string
           display_name: string | null
+          email_updates: boolean
           id: string
+          stock_tips: boolean
           target_yield: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          age?: number | null
           created_at?: string
           display_name?: string | null
+          email_updates?: boolean
           id?: string
+          stock_tips?: boolean
           target_yield?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          age?: number | null
           created_at?: string
           display_name?: string | null
+          email_updates?: boolean
           id?: string
+          stock_tips?: boolean
           target_yield?: number
           updated_at?: string
           user_id?: string
