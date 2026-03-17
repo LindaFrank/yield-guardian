@@ -83,10 +83,10 @@ export function Header() {
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Before you go…</AlertDialogTitle>
+            <AlertDialogTitle>Hold on!</AlertDialogTitle>
             <AlertDialogDescription>
-              If you didn't get what you wanted, {' '}
-              <a href="/contact" className="text-primary hover:underline">tell us what you want</a>!
+              We want you to leave satisfied! {' '}
+              <a href="/contact" className="text-primary hover:underline">Share what's missing</a> and we'll work on it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
