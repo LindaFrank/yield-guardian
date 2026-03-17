@@ -64,7 +64,8 @@ export default function PrivacyPolicy() {
 
         <h2 className="text-foreground text-lg font-semibold mt-6">8. Contact Us</h2>
         <p className="text-muted-foreground">
-          If you have any questions about this privacy policy, please reach out to us through the application.
+          If you have any questions about this privacy policy or feedback about the app, please email us at{' '}
+          <a href="mailto:lindafrank@aol.com" className="text-primary hover:underline">lindafrank@aol.com</a>.
         </p>
       </main>
     </div>
