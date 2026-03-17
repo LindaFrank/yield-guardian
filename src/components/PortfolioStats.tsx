@@ -6,6 +6,7 @@ import { HelpTooltip } from '@/components/HelpTooltip';
 
 interface PortfolioStatsProps {
   stocks: Stock[];
+  sharesMap?: Record<string, number | null>;
   targetYield: number;
   underperformerCount: number;
   helpEnabled?: boolean;
@@ -20,8 +21,8 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
     text: 'This is the total amount of dividend income the portfolio investment pays over one year.',
     side: 'bottom',
   },
-  'Average Yield': {
-    text: 'This is the percentage of annual dividend income the portfolio generates relative to its cost or market value.',
+  'Weighted Avg Yield': {
+    text: 'Weighted Average (total dividends ÷ portfolio value × 100). This reflects the true portfolio yield based on position sizes.',
     side: 'bottom',
   },
   'Underperformers': {
@@ -30,11 +31,17 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
   },
 };
 
-export function PortfolioStats({ stocks, targetYield, underperformerCount }: PortfolioStatsProps) {
-  const totalValue = stocks.reduce((sum, s) => sum + s.currentPrice, 0);
-  const totalDividends = stocks.reduce((sum, s) => sum + s.annualDividend, 0);
-  const avgYield = stocks.length > 0 
-    ? stocks.reduce((sum, s) => sum + calculateDividendYield(s), 0) / stocks.length 
+export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperformerCount }: PortfolioStatsProps) {
+  const totalValue = stocks.reduce((sum, s) => {
+    const shares = sharesMap[s.ticker] ?? 1;
+    return sum + s.currentPrice * shares;
+  }, 0);
+  const totalDividends = stocks.reduce((sum, s) => {
+    const shares = sharesMap[s.ticker] ?? 1;
+    return sum + s.annualDividend * shares;
+  }, 0);
+  const avgYield = totalValue > 0
+    ? (totalDividends / totalValue) * 100
     : 0;
 
   const stats = [
@@ -51,7 +58,8 @@ export function PortfolioStats({ stocks, targetYield, underperformerCount }: Por
       color: 'text-yield-positive',
     },
     {
-      label: 'Average Yield',
+      label: 'Weighted Avg Yield',
+      subtitle: 'total dividends ÷ portfolio value × 100',
       value: formatPercentage(avgYield),
       icon: Target,
       color: avgYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
@@ -81,6 +89,9 @@ export function PortfolioStats({ stocks, targetYield, underperformerCount }: Por
             <p className={cn('font-mono font-semibold text-xl', stat.color)}>
               {stat.value}
             </p>
+            {'subtitle' in stat && stat.subtitle && (
+              <p className="text-[10px] text-primary mt-1">{stat.subtitle}</p>
+            )}
           </div>
         );
 

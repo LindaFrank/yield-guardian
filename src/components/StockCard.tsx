@@ -1,17 +1,23 @@
+import { useState } from 'react';
 import { Stock, StockAnalysis } from '@/types/portfolio';
 import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle, Pencil, Check } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 interface StockCardProps {
   analysis: StockAnalysis;
+  sharesOwned?: number | null;
   onRemove?: (ticker: string) => void;
   onSelect?: (stock: Stock) => void;
+  onUpdateShares?: (ticker: string, shares: number | null) => void;
   isSelected?: boolean;
 }
 
-export function StockCard({ analysis, onRemove, onSelect, isSelected }: StockCardProps) {
+export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateShares, isSelected }: StockCardProps) {
   const { stock, currentYield, isStable, isUnderperforming, stabilityYears } = analysis;
+  const [editing, setEditing] = useState(false);
+  const [sharesInput, setSharesInput] = useState(sharesOwned?.toString() ?? '');
 
   const getYieldColor = () => {
     if (currentYield >= 5) return 'text-yield-positive';
@@ -43,6 +49,12 @@ export function StockCard({ analysis, onRemove, onSelect, isSelected }: StockCar
           </span>
         );
     }
+  };
+
+  const handleSaveShares = () => {
+    const val = parseFloat(sharesInput);
+    onUpdateShares?.(stock.ticker, val > 0 ? val : null);
+    setEditing(false);
   };
 
   return (
@@ -90,7 +102,7 @@ export function StockCard({ analysis, onRemove, onSelect, isSelected }: StockCar
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-4">
+      <div className="mt-4 grid grid-cols-3 gap-4">
         <div>
           <p className="text-xs text-muted-foreground mb-1">Price</p>
           <p className="font-mono font-medium">{formatCurrency(stock.currentPrice)}</p>
@@ -98,6 +110,38 @@ export function StockCard({ analysis, onRemove, onSelect, isSelected }: StockCar
         <div>
           <p className="text-xs text-muted-foreground mb-1">Annual Div</p>
           <p className="font-mono font-medium">{formatCurrency(stock.annualDividend)}</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground mb-1">Shares</p>
+          {editing ? (
+            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+              <Input
+                type="number"
+                min="0"
+                step="1"
+                value={sharesInput}
+                onChange={(e) => setSharesInput(e.target.value)}
+                className="h-7 w-16 text-xs px-1.5"
+                autoFocus
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSaveShares(); if (e.key === 'Escape') setEditing(false); }}
+              />
+              <button onClick={handleSaveShares} className="p-0.5 rounded hover:bg-primary/10 text-primary">
+                <Check className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setSharesInput(sharesOwned?.toString() ?? '');
+                setEditing(true);
+              }}
+              className="flex items-center gap-1 font-mono font-medium hover:text-primary transition-colors"
+            >
+              {sharesOwned != null ? sharesOwned : '—'}
+              {onUpdateShares && <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-60" />}
+            </button>
+          )}
         </div>
       </div>
 
