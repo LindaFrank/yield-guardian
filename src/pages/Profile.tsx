@@ -134,7 +134,7 @@ export default function Profile() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="age">Age</Label>
+                <Label htmlFor="age">Age <span className="text-muted-foreground font-normal">* optional</span></Label>
                 <Input
                   id="age"
                   type="number"
