@@ -40,9 +40,14 @@ export function Header() {
             <HelpIconToggle />
             {user && (
               <div className="flex items-center gap-3 ml-[100px]">
-                <span className="text-xs text-muted-foreground hidden sm:inline">
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors hidden sm:flex"
+                  title="Edit profile"
+                >
+                  <User className="w-3.5 h-3.5" />
                   {profile?.display_name || user.email}
-                </span>
+                </button>
                 <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">
                   <LogOut className="w-4 h-4" />
                 </Button>
