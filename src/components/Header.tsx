@@ -1,4 +1,5 @@
-import { TrendingUp, LogOut } from 'lucide-react';
+import { TrendingUp, LogOut, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { HelpIconToggle } from '@/components/HelpIconToggle';
