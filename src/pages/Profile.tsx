@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'; // v2
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Save, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -184,6 +184,11 @@ export default function Profile() {
             <Save className="w-4 h-4 mr-2" />
             {updateProfile.isPending ? 'Saving…' : 'Save Changes'}
           </Button>
+
+          <p className="text-center text-xs text-muted-foreground">
+            By using Yield Guardian you agree to our{' '}
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+          </p>
         </form>
       </main>
     </div>
