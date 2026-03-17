@@ -85,8 +85,8 @@ export function Header() {
           <AlertDialogHeader>
             <AlertDialogTitle>Before you go…</AlertDialogTitle>
             <AlertDialogDescription>
-              Did you get what you wanted from Yield Guardian? We'd love to hear your feedback — feel free to{' '}
-              <a href="/contact" className="text-primary hover:underline">contact us</a> anytime.
+              If you didn't get what you wanted, {' '}
+              <a href="/contact" className="text-primary hover:underline">tell us what you want</a>!
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
