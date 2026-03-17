@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export function Header() {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
