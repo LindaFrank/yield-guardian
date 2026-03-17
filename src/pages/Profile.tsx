@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -154,28 +154,28 @@ export default function Profile() {
               <CardTitle className="text-base">Preferences</CardTitle>
               <CardDescription>Manage your communication settings</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="emailUpdates">Email Updates</Label>
-                  <p className="text-xs text-muted-foreground">Receive portfolio and market updates</p>
-                </div>
-                <Switch
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3">
+                <Checkbox
                   id="emailUpdates"
                   checked={emailUpdates}
-                  onCheckedChange={setEmailUpdates}
+                  onCheckedChange={(checked) => setEmailUpdates(checked === true)}
                 />
-              </div>
-              <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="stockTips">Stock Tips</Label>
-                  <p className="text-xs text-muted-foreground">Get dividend stock recommendations</p>
+                  <Label htmlFor="emailUpdates" className="cursor-pointer">Email Updates</Label>
+                  <p className="text-xs text-muted-foreground">Receive portfolio and market updates</p>
                 </div>
-                <Switch
+              </div>
+              <div className="flex items-start gap-3">
+                <Checkbox
                   id="stockTips"
                   checked={stockTips}
-                  onCheckedChange={setStockTips}
+                  onCheckedChange={(checked) => setStockTips(checked === true)}
                 />
+                <div className="space-y-0.5">
+                  <Label htmlFor="stockTips" className="cursor-pointer">Stock Tips</Label>
+                  <p className="text-xs text-muted-foreground">Get dividend stock recommendations</p>
+                </div>
               </div>
             </CardContent>
           </Card>
