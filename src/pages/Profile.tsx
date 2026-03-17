@@ -184,6 +184,11 @@ export default function Profile() {
             <Save className="w-4 h-4 mr-2" />
             {updateProfile.isPending ? 'Saving…' : 'Save Changes'}
           </Button>
+
+          <p className="text-center text-xs text-muted-foreground">
+            By using Yield Guardian you agree to our{' '}
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+          </p>
         </form>
       </main>
     </div>
