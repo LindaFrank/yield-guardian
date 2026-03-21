@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Target } from 'lucide-react';
+import { Target, FileDown } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
@@ -8,6 +8,7 @@ import {
   scanPortfolioForUnderperformers, 
   suggestReplacements 
 } from '@/lib/portfolioUtils';
+import { generatePortfolioReport } from '@/lib/generatePortfolioReport';
 import { Header } from '@/components/Header';
 import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
@@ -230,6 +231,27 @@ const Index = () => {
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
                 <div className="flex items-center gap-2">
+                  {stocks.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        generatePortfolioReport({
+                          stocks,
+                          sharesMap: Object.fromEntries(
+                            (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                          ),
+                          targetYield,
+                          underperformers,
+                          getReplacements: (stock) =>
+                            suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                        })
+                      }
+                    >
+                      <FileDown className="w-4 h-4" />
+                      Generate Report
+                    </Button>
+                  )}
                   <AddStockModal
                     existingTickers={stocks.map((s) => s.ticker)}
                     onAddStock={handleAddStock}
