@@ -109,28 +109,41 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
         y = 20;
       }
 
-      // Underperformer header
+      // Underperformer header with price & dividend info
+      const underShares = data.sharesMap[analysis.stock.ticker] ?? 1;
+      const underperformerDiv = analysis.stock.annualDividend * underShares;
       doc.setFillColor(184, 80, 66);
-      doc.roundedRect(14, y, pageWidth - 28, 8, 2, 2, 'F');
+      doc.roundedRect(14, y, pageWidth - 28, 14, 2, 2, 'F');
       doc.setFontSize(9);
       doc.setTextColor(255, 255, 255);
       doc.text(
-        `${analysis.stock.ticker} — ${analysis.stock.name}  |  Yield: ${formatPercentage(analysis.currentYield)}  |  Status: ${analysis.isStable}`,
+        `${analysis.stock.ticker} — ${analysis.stock.name}  |  Price: ${formatCurrency(analysis.stock.currentPrice)}  |  Yield: ${formatPercentage(analysis.currentYield)}  |  Status: ${analysis.isStable}`,
         18,
         y + 5.5
       );
-      y += 12;
+      doc.setFontSize(8);
+      doc.text(
+        `Annual Dividend Received: ${formatCurrency(underperformerDiv)} (${underShares} share${underShares !== 1 ? 's' : ''})`,
+        18,
+        y + 11.5
+      );
+      y += 18;
 
-      // Replacement candidates
+      // Replacement candidates sorted by price closest to underperformer
       const replacements = data.getReplacements(analysis.stock);
-      if (replacements.length > 0) {
+      const sortedReplacements = [...replacements].sort((a, b) => {
+        const aDiff = Math.abs(a.stock.currentPrice - analysis.stock.currentPrice);
+        const bDiff = Math.abs(b.stock.currentPrice - analysis.stock.currentPrice);
+        return aDiff - bDiff;
+      });
+      if (sortedReplacements.length > 0) {
         autoTable(doc, {
           startY: y,
-          head: [['Ticker', 'Name', 'Sector', 'Yield', 'Stability', 'Reason']],
-          body: replacements.map(r => [
+          head: [['Ticker', 'Name', 'Price', 'Yield', 'Stability', 'Reason']],
+          body: sortedReplacements.map(r => [
             r.stock.ticker,
             r.stock.name,
-            r.stock.sector,
+            formatCurrency(r.stock.currentPrice),
             formatPercentage(r.yield),
             r.stabilityScore >= 3 ? 'Stable' : r.stabilityScore >= 2 ? 'Warning' : 'Unstable',
             r.matchReason,
