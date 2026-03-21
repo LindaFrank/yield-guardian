@@ -135,8 +135,9 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
       if (sortedReplacements.length > 0) {
         autoTable(doc, {
           startY: y,
-          head: [['Ticker', 'Name', 'Price', 'Yield', 'Stability', 'Reason']],
-          body: sortedReplacements.map(r => [
+          head: [['#', 'Ticker', 'Name', 'Price', 'Yield', 'Stability', 'Reason']],
+          body: sortedReplacements.map((r, idx) => [
+            (idx + 1).toString(),
             r.stock.ticker,
             r.stock.name,
             formatCurrency(r.stock.currentPrice),
