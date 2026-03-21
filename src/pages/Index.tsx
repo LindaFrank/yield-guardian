@@ -231,6 +231,27 @@ const Index = () => {
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
                 <div className="flex items-center gap-2">
+                  {stocks.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        generatePortfolioReport({
+                          stocks,
+                          sharesMap: Object.fromEntries(
+                            (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                          ),
+                          targetYield,
+                          underperformers,
+                          getReplacements: (stock) =>
+                            suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                        })
+                      }
+                    >
+                      <FileDown className="w-4 h-4" />
+                      Generate Report
+                    </Button>
+                  )}
                   <AddStockModal
                     existingTickers={stocks.map((s) => s.ticker)}
                     onAddStock={handleAddStock}
