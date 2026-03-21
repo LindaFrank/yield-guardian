@@ -8,6 +8,7 @@ import {
   scanPortfolioForUnderperformers, 
   suggestReplacements 
 } from '@/lib/portfolioUtils';
+import { generatePortfolioReport } from '@/lib/generatePortfolioReport';
 import { Header } from '@/components/Header';
 import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
