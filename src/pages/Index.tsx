@@ -220,18 +220,23 @@ const Index = () => {
                 variant="outline"
                 size="lg"
                 className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
-                onClick={() =>
-                  generatePortfolioReport({
-                    stocks,
-                    sharesMap: Object.fromEntries(
-                      (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
-                    ),
-                    targetYield,
-                    underperformers,
-                    getReplacements: (stock) =>
-                      suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
-                  })
-                }
+                onClick={async () => {
+                  try {
+                    await generatePortfolioReport({
+                      stocks,
+                      sharesMap: Object.fromEntries(
+                        (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                      ),
+                      targetYield,
+                      underperformers,
+                      getReplacements: (stock) =>
+                        suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                    });
+                  } catch (err) {
+                    console.error('Report generation failed:', err);
+                    toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
+                  }
+                }}
               >
                 <FileDown className="w-5 h-5 mr-2" />
                 Generate Report
