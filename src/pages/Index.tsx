@@ -214,6 +214,30 @@ const Index = () => {
             targetYield={targetYield}
             underperformerCount={underperformers.length}
           />
+          {stocks.length > 0 && (
+            <div className="mt-4 flex justify-end">
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
+                onClick={() =>
+                  generatePortfolioReport({
+                    stocks,
+                    sharesMap: Object.fromEntries(
+                      (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                    ),
+                    targetYield,
+                    underperformers,
+                    getReplacements: (stock) =>
+                      suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                  })
+                }
+              >
+                <FileDown className="w-5 h-5 mr-2" />
+                Generate Report
+              </Button>
+            </div>
+          )}
         </section>
 
         <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
