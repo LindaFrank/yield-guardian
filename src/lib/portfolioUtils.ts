@@ -126,7 +126,7 @@ export function suggestReplacements(
         matchReason,
       };
     })
-    .filter((candidate) => candidate.yield >= targetMinYield * 0.7 && candidate.stabilityScore >= 1)
+    .filter((candidate) => candidate.yield >= targetMinYield && candidate.stabilityScore >= 1)
     .sort((a, b) => {
       // Prioritize meets target, then same sector, then yield
       const aMetTarget = a.yield >= targetMinYield ? 1 : 0;
