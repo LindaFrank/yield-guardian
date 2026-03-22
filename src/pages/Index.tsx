@@ -22,7 +22,7 @@ import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { GettingStartedModal } from '@/components/GettingStartedModal';
+
 
 const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
 const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
@@ -176,7 +176,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <GettingStartedModal />
+      
       <Header />
       
       <main className="container mx-auto px-6 py-8">
