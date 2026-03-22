@@ -131,7 +131,8 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
 
       // Replacement candidates sorted by price closest to underperformer
       const replacements = data.getReplacements(analysis.stock);
-      const sortedReplacements = [...replacements].sort((a, b) => a.stock.currentPrice - b.stock.currentPrice);
+      const underPrice = analysis.stock.currentPrice;
+      const sortedReplacements = [...replacements].sort((a, b) => Math.abs(a.stock.currentPrice - underPrice) - Math.abs(b.stock.currentPrice - underPrice));
       if (sortedReplacements.length > 0) {
         autoTable(doc, {
           startY: y,
