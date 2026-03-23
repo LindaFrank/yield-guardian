@@ -105,15 +105,11 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
       <div className="mt-4 grid grid-cols-4 gap-3">
         <div>
           <p className="text-xs text-muted-foreground mb-1">Price</p>
-          <p className="font-mono font-medium">{formatCurrency(stock.currentPrice)}</p>
+          <p className="font-mono font-medium text-sm">{formatCurrency(stock.currentPrice)}</p>
         </div>
         <div>
           <p className="text-xs text-muted-foreground mb-1">Div/Share</p>
-          <p className="font-mono font-medium">{formatCurrency(stock.annualDividend)}</p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground mb-1">Total Annual Div</p>
-          <p className="font-mono font-medium">{formatCurrency(stock.annualDividend * (sharesOwned ?? 1))}</p>
+          <p className="font-mono font-medium text-sm">{formatCurrency(stock.annualDividend)}</p>
         </div>
         <div>
           <p className="text-xs text-muted-foreground mb-1">Shares</p>
