@@ -143,6 +143,10 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
             </button>
           )}
         </div>
+        <div>
+          <p className="text-xs text-muted-foreground mb-1">Total Annual Div</p>
+          <p className="font-mono font-medium text-sm">{formatCurrency(stock.annualDividend * (sharesOwned ?? 1))}</p>
+        </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-border/50">
