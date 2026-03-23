@@ -41,7 +41,7 @@ serve(async (req) => {
 
     const cleanTickers = tickers
       .map((t: string) => t.toUpperCase().replace(/[^A-Z0-9.-]/g, ''))
-      .slice(0, 50);
+      .slice(0, 100);
 
     const sb = getServiceClient();
 
