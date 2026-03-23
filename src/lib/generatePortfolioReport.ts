@@ -60,38 +60,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
   });
   y += 32;
 
-  // Portfolio Holdings table
-  doc.setFontSize(13);
-  doc.setTextColor(40, 40, 40);
-  doc.text('Portfolio Holdings', 14, y);
-  y += 6;
-
-  autoTable(doc, {
-    startY: y,
-    head: [['Ticker', 'Name', 'Sector', 'Price', 'Div/Share', 'Shares', 'Total Annual Div', 'Yield']],
-    body: data.stocks.map(s => {
-      const shares = data.sharesMap[s.ticker] ?? 1;
-      const yld = s.currentPrice > 0 ? (s.annualDividend / s.currentPrice) * 100 : 0;
-      return [
-        s.ticker,
-        s.name,
-        s.sector,
-        formatCurrency(s.currentPrice),
-        formatCurrency(s.annualDividend),
-        shares.toString(),
-        formatCurrency(s.annualDividend * shares),
-        formatPercentage(yld),
-      ];
-    }),
-    styles: { fontSize: 8, cellPadding: 3 },
-    headStyles: { fillColor: [74, 111, 165], textColor: 255, fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [248, 249, 252] },
-    margin: { left: 14, right: 14 },
-  });
-
-  y = (doc as any).lastAutoTable.finalY + 14;
-
-  // Underperformers section
+  // Underperformers section (lead the report with this)
   if (data.underperformers.length > 0) {
     // Check if we need a new page
     if (y > doc.internal.pageSize.getHeight() - 60) {
