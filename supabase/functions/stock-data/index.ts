@@ -145,14 +145,39 @@ serve(async (req) => {
 
     if (action === 'search') {
       const query = cleanTickers[0];
-      const res = await fetch(
-        `${FMP_BASE}/search-symbol?query=${encodeURIComponent(query)}&apikey=${apiKey}`
-      );
-      if (!res.ok) {
-        throw new Error(`FMP search API failed [${res.status}]: ${await res.text()}`);
+      // Run both a symbol search and a direct quote lookup in parallel
+      const [searchRes, quoteRes] = await Promise.all([
+        fetch(`${FMP_BASE}/search-symbol?query=${encodeURIComponent(query)}&apikey=${apiKey}`),
+        fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(query)}&apikey=${apiKey}`),
+      ]);
+
+      if (!searchRes.ok) {
+        throw new Error(`FMP search API failed [${searchRes.status}]: ${await searchRes.text()}`);
       }
-      const data = await res.json();
-      return new Response(JSON.stringify(data), {
+      const searchData = await searchRes.json();
+      const results = Array.isArray(searchData) ? searchData : [];
+
+      // If the direct quote lookup found an exact match, prepend it
+      if (quoteRes.ok) {
+        const quoteData = await quoteRes.json();
+        const quote = Array.isArray(quoteData) ? quoteData[0] : quoteData;
+        if (quote && quote.symbol) {
+          const alreadyInResults = results.some(
+            (r: any) => r.symbol === quote.symbol
+          );
+          if (!alreadyInResults) {
+            results.unshift({
+              symbol: quote.symbol,
+              name: quote.name,
+              currency: 'USD',
+              stockExchange: quote.exchange,
+              exchange: quote.exchange,
+            });
+          }
+        }
+      }
+
+      return new Response(JSON.stringify(results), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
