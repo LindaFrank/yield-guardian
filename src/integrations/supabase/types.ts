@@ -14,27 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      profiles: {
+      contact_messages: {
         Row: {
           created_at: string
-          display_name: string | null
+          email: string
           id: string
+          message: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          created_at: string
+          display_name: string | null
+          email_updates: boolean
+          id: string
+          stock_tips: boolean
           target_yield: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          age?: number | null
           created_at?: string
           display_name?: string | null
+          email_updates?: boolean
           id?: string
+          stock_tips?: boolean
           target_yield?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          age?: number | null
           created_at?: string
           display_name?: string | null
+          email_updates?: boolean
           id?: string
+          stock_tips?: boolean
           target_yield?: number
           updated_at?: string
           user_id?: string
@@ -66,18 +99,24 @@ export type Database = {
         Row: {
           added_at: string
           id: string
+          purchase_price: number | null
+          shares_owned: number | null
           ticker: string
           user_id: string
         }
         Insert: {
           added_at?: string
           id?: string
+          purchase_price?: number | null
+          shares_owned?: number | null
           ticker: string
           user_id: string
         }
         Update: {
           added_at?: string
           id?: string
+          purchase_price?: number | null
+          shares_owned?: number | null
           ticker?: string
           user_id?: string
         }
