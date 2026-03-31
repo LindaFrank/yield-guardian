@@ -126,9 +126,12 @@ export function suggestReplacements(
         matchReason,
       };
     })
-    .filter((candidate) => candidate.yield >= targetMinYield && candidate.stabilityScore >= 2)
+    .filter((candidate) => candidate.yield >= targetMinYield && candidate.stabilityScore >= 1)
     .sort((a, b) => {
-      // Prioritize same sector, then yield, then stability
+      // Prioritize meets target, then same sector, then yield
+      const aMetTarget = a.yield >= targetMinYield ? 1 : 0;
+      const bMetTarget = b.yield >= targetMinYield ? 1 : 0;
+      if (aMetTarget !== bMetTarget) return bMetTarget - aMetTarget;
       if (a.stock.sector === removedStock.sector && b.stock.sector !== removedStock.sector) return -1;
       if (b.stock.sector === removedStock.sector && a.stock.sector !== removedStock.sector) return 1;
       return b.yield - a.yield;
