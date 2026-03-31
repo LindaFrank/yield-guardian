@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Target } from 'lucide-react';
+import { Target, FileDown } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
@@ -8,6 +8,7 @@ import {
   scanPortfolioForUnderperformers, 
   suggestReplacements 
 } from '@/lib/portfolioUtils';
+import { generatePortfolioReport } from '@/lib/generatePortfolioReport';
 import { Header } from '@/components/Header';
 import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
@@ -21,7 +22,7 @@ import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { GettingStartedModal } from '@/components/GettingStartedModal';
+
 
 const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
 const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
@@ -175,7 +176,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <GettingStartedModal />
+      
       <Header />
       
       <main className="container mx-auto px-6 py-8">
@@ -213,6 +214,35 @@ const Index = () => {
             targetYield={targetYield}
             underperformerCount={underperformers.length}
           />
+          {stocks.length > 0 && (
+            <div className="mt-4 flex justify-end">
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
+                onClick={async () => {
+                  try {
+                    await generatePortfolioReport({
+                      stocks,
+                      sharesMap: Object.fromEntries(
+                        (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                      ),
+                      targetYield,
+                      underperformers,
+                      getReplacements: (stock) =>
+                        suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                    });
+                  } catch (err) {
+                    console.error('Report generation failed:', err);
+                    toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
+                  }
+                }}
+              >
+                <FileDown className="w-5 h-5 mr-2" />
+                Generate Report
+              </Button>
+            </div>
+          )}
         </section>
 
         <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>

@@ -102,14 +102,14 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-4">
+      <div className="mt-4 grid grid-cols-4 gap-3">
         <div>
           <p className="text-xs text-muted-foreground mb-1">Price</p>
-          <p className="font-mono font-medium">{formatCurrency(stock.currentPrice)}</p>
+          <p className="font-mono font-medium text-sm">{formatCurrency(stock.currentPrice)}</p>
         </div>
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Annual Div</p>
-          <p className="font-mono font-medium">{formatCurrency(stock.annualDividend)}</p>
+          <p className="text-xs text-muted-foreground mb-1">Div/Share</p>
+          <p className="font-mono font-medium text-sm">{formatCurrency(stock.annualDividend)}</p>
         </div>
         <div>
           <p className="text-xs text-muted-foreground mb-1">Shares</p>
@@ -142,6 +142,10 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
               {onUpdateShares && <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-60" />}
             </button>
           )}
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground mb-1">Total Annual Div</p>
+          <p className="font-mono font-medium text-sm">{formatCurrency(stock.annualDividend * (sharesOwned ?? 1))}</p>
         </div>
       </div>
 
