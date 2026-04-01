@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Target, FileDown } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
+import { PortfolioReportPreview } from '@/components/PortfolioReportPreview';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
@@ -9,7 +10,13 @@ import {
   suggestReplacements 
 } from '@/lib/portfolioUtils';
 import { generatePortfolioReport } from '@/lib/generatePortfolioReport';
-import { createPortfolioReportFileName, presentPortfolioReport } from '@/lib/reportExport';
+import {
+  createPortfolioReportFileName,
+  createPortfolioReportPreview,
+  downloadPortfolioReport,
+  revokePortfolioReportPreview,
+  type PortfolioReportPreviewData,
+} from '@/lib/reportExport';
 import { Header } from '@/components/Header';
 import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
@@ -55,13 +62,41 @@ const Index = () => {
   const [addStockOpen, setAddStockOpen] = useState(false);
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
+  const [reportPreview, setReportPreview] = useState<PortfolioReportPreviewData | null>(null);
+  const [reportPreviewOpen, setReportPreviewOpen] = useState(false);
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
   const wizardDone = wizardDismissed || (!tickersLoading && tickers.length > 0);
   const showStockFinder = !wizardDone || showFindStocksFlow;
   const yieldSliderRef = useRef<HTMLElement>(null);
+  const reportPreviewUrlRef = useRef<string | null>(null);
   const { toast } = useToast();
+
+  const updateReportPreview = (nextPreview: PortfolioReportPreviewData | null) => {
+    if (reportPreviewUrlRef.current && reportPreviewUrlRef.current !== nextPreview?.url) {
+      revokePortfolioReportPreview(reportPreviewUrlRef.current);
+    }
+
+    reportPreviewUrlRef.current = nextPreview?.url ?? null;
+    setReportPreview(nextPreview);
+  };
+
+  const handleReportPreviewOpenChange = (open: boolean) => {
+    setReportPreviewOpen(open);
+
+    if (!open) {
+      updateReportPreview(null);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (reportPreviewUrlRef.current) {
+        revokePortfolioReportPreview(reportPreviewUrlRef.current);
+      }
+    };
+  }, []);
 
   // Fetch live data for portfolio tickers
   const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
@@ -235,13 +270,13 @@ const Index = () => {
                     });
 
                     const fileName = createPortfolioReportFileName();
-                    const { openedInNewTab } = presentPortfolioReport(report.blob, fileName);
+                    const preview = createPortfolioReportPreview(report.blob, fileName);
+                    updateReportPreview(preview);
+                    setReportPreviewOpen(true);
 
                     toast({
                       title: 'Report ready',
-                      description: openedInNewTab
-                        ? `${fileName} opened in a new tab so you can save it there.`
-                        : `Trying to download ${fileName}. If nothing appears, allow pop-ups/downloads for the preview and try again.`,
+                      description: `Previewing ${fileName} inside the app. Use Download PDF to save it.`,
                     });
                   } catch (err) {
                     console.error('Report generation failed:', err);
@@ -350,6 +385,17 @@ const Index = () => {
           )}
         </div>
       </main>
+
+      <PortfolioReportPreview
+        fileName={reportPreview?.fileName ?? 'portfolio-report.pdf'}
+        open={reportPreviewOpen}
+        previewUrl={reportPreview?.url ?? null}
+        onDownload={() => {
+          if (!reportPreview) return;
+          downloadPortfolioReport(reportPreview.url, reportPreview.fileName);
+        }}
+        onOpenChange={handleReportPreviewOpenChange}
+      />
     </div>
   );
 };
