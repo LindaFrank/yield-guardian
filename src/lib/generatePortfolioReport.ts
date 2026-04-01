@@ -9,7 +9,11 @@ interface ReportData {
   getReplacements: (stock: Stock) => ReplacementCandidate[];
 }
 
-export async function generatePortfolioReport(data: ReportData): Promise<void> {
+export interface GeneratedPortfolioReport {
+  blob: Blob;
+}
+
+export async function generatePortfolioReport(data: ReportData): Promise<GeneratedPortfolioReport> {
   const { jsPDF } = await import('jspdf');
   const { default: autoTable } = await import('jspdf-autotable');
 
@@ -200,5 +204,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
     doc.text('Dividend Tracker — Portfolio Report', 14, doc.internal.pageSize.getHeight() - 8);
   }
 
-  doc.save('portfolio-report.pdf');
+  return {
+    blob: doc.output('blob'),
+  };
 }
