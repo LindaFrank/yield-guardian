@@ -182,7 +182,33 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ error: 'Invalid action. Use: quote, dividends, search' }), {
+    if (action === 'profile') {
+      const results: Record<string, any> = {};
+      await Promise.all(
+        cleanTickers.map(async (ticker: string) => {
+          const res = await fetch(`${FMP_BASE}/profile?symbol=${ticker}&apikey=${apiKey}`);
+          if (res.ok) {
+            const data = await res.json();
+            results[ticker] = Array.isArray(data) ? data[0] : data;
+          }
+        })
+      );
+      return new Response(JSON.stringify(results), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (action === 'screener') {
+      const url = `${FMP_BASE}/stock-screener?dividendYieldMoreThan=4&marketCapMoreThan=10000000000&limit=5&apikey=${apiKey}`;
+      console.log(`Testing screener: ${url.replace(apiKey, '***')}`);
+      const res = await fetch(url);
+      const data = await res.json();
+      return new Response(JSON.stringify({ status: res.status, data }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    return new Response(JSON.stringify({ error: 'Invalid action. Use: quote, dividends, search, profile, screener' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
