@@ -45,7 +45,7 @@ export const PortfolioReportPreview = forwardRef<HTMLDivElement, PortfolioReport
   return (
     <div ref={ref} className="contents">
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="flex h-[min(90vh,calc(100dvh-2rem))] max-h-[calc(100dvh-2rem)] w-[min(95vw,72rem)] max-w-none flex-col gap-0 overflow-hidden p-0">
+        <DialogContent className="flex h-auto max-h-[min(80vh,30rem)] w-[min(95vw,72rem)] max-w-none flex-col gap-0 overflow-hidden p-0">
           <DialogHeader className="shrink-0 border-b px-6 py-4">
             <DialogTitle>Portfolio report ready</DialogTitle>
             <DialogDescription>
@@ -61,17 +61,17 @@ export const PortfolioReportPreview = forwardRef<HTMLDivElement, PortfolioReport
                 src={previewUrl}
                 title={fileName}
                 loading="lazy"
-                className="h-full min-h-[18rem] w-full rounded-md border bg-background md:min-h-[28rem]"
+                className="h-full min-h-[8rem] w-full rounded-md border bg-background"
               />
             ) : hasPreview ? (
-              <div className="flex h-full min-h-[18rem] flex-col items-center justify-center rounded-md border border-dashed bg-muted/20 px-6 text-center md:min-h-[28rem]">
+              <div className="flex h-full min-h-[8rem] flex-col items-center justify-center rounded-md border border-dashed bg-muted/20 px-6 text-center">
                 <p className="text-base font-medium text-foreground">Preview unavailable in editor</p>
                 <p className="mt-2 max-w-xl text-sm text-muted-foreground">
                   Chrome blocks embedded PDF viewers inside this preview frame. Download the PDF below to view the full report normally.
                 </p>
               </div>
             ) : (
-              <div className="flex h-full min-h-[18rem] items-center justify-center rounded-md border bg-muted/30 text-sm text-muted-foreground md:min-h-[28rem]">
+              <div className="flex h-full min-h-[8rem] items-center justify-center rounded-md border bg-muted/30 text-sm text-muted-foreground">
                 Generating report preview…
               </div>
             )}
