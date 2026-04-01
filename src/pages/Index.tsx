@@ -9,6 +9,7 @@ import {
   suggestReplacements 
 } from '@/lib/portfolioUtils';
 import { generatePortfolioReport } from '@/lib/generatePortfolioReport';
+import { createPortfolioReportFileName, presentPortfolioReport } from '@/lib/reportExport';
 import { Header } from '@/components/Header';
 import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
@@ -222,7 +223,7 @@ const Index = () => {
                 className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
                 onClick={async () => {
                   try {
-                    await generatePortfolioReport({
+                    const report = await generatePortfolioReport({
                       stocks,
                       sharesMap: Object.fromEntries(
                         (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
@@ -231,6 +232,16 @@ const Index = () => {
                       underperformers,
                       getReplacements: (stock) =>
                         suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                    });
+
+                    const fileName = createPortfolioReportFileName();
+                    const { openedInNewTab } = presentPortfolioReport(report.blob, fileName);
+
+                    toast({
+                      title: 'Report ready',
+                      description: openedInNewTab
+                        ? `${fileName} opened in a new tab so you can save it there.`
+                        : `Trying to download ${fileName}. If nothing appears, allow pop-ups/downloads for the preview and try again.`,
                     });
                   } catch (err) {
                     console.error('Report generation failed:', err);
