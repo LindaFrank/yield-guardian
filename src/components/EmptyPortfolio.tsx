@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, forwardRef } from 'react';
 import { TrendingUp, DollarSign, Target, ChevronRight, Check, Hash, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,10 @@ interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel }: EmptyPortfolioProps) {
+export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(function EmptyPortfolio(
+  { onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel },
+  ref
+) {
   const [step, setStep] = useState(initialStep);
 
   useEffect(() => {
@@ -95,7 +98,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div ref={ref} className="space-y-6 animate-fade-in">
       {/* Step 0: Portfolio value = $0 */}
       {step === 0 && (
         <div className="text-center py-8 space-y-6">
@@ -312,4 +315,6 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
       )}
     </div>
   );
-}
+});
+
+EmptyPortfolio.displayName = 'EmptyPortfolio';
