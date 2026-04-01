@@ -19,6 +19,16 @@ interface PortfolioReportPreviewProps {
   onOpenChange: (open: boolean) => void;
 }
 
+function canRenderPdfInline() {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    return window.self === window.top;
+  } catch {
+    return false;
+  }
+}
+
 export const PortfolioReportPreview = forwardRef<HTMLDivElement, PortfolioReportPreviewProps>(function PortfolioReportPreview(
   {
     fileName,
@@ -29,6 +39,9 @@ export const PortfolioReportPreview = forwardRef<HTMLDivElement, PortfolioReport
   },
   ref
 ) {
+  const hasPreview = Boolean(previewUrl);
+  const showInlinePreview = hasPreview && canRenderPdfInline();
+
   return (
     <div ref={ref} className="contents">
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -36,18 +49,27 @@ export const PortfolioReportPreview = forwardRef<HTMLDivElement, PortfolioReport
           <DialogHeader className="border-b px-6 py-4">
             <DialogTitle>Portfolio report ready</DialogTitle>
             <DialogDescription>
-              Preview {fileName} below, then use Download PDF if you want to save a copy.
+              {showInlinePreview
+                ? `Preview ${fileName} below, then use Download PDF if you want to save a copy.`
+                : `Inline PDF preview is blocked inside the editor preview, so use Download PDF to open ${fileName}.`}
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 px-6 pb-6 pt-4">
-            {previewUrl ? (
+            {showInlinePreview ? (
               <iframe
                 src={previewUrl}
                 title={fileName}
                 loading="lazy"
                 className="h-full min-h-[65vh] w-full rounded-md border bg-background"
               />
+            ) : hasPreview ? (
+              <div className="flex h-full min-h-[65vh] flex-col items-center justify-center rounded-md border border-dashed bg-muted/20 px-6 text-center">
+                <p className="text-base font-medium text-foreground">Preview unavailable in editor</p>
+                <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+                  Chrome blocks embedded PDF viewers inside this preview frame. Download the PDF below to view the full report normally.
+                </p>
+              </div>
             ) : (
               <div className="flex h-full min-h-[65vh] items-center justify-center rounded-md border bg-muted/30 text-sm text-muted-foreground">
                 Generating report preview…
