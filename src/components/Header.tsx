@@ -84,7 +84,7 @@ export function Header() {
           </div>
           <div className="flex items-center justify-center gap-1 mt-3">
             <span className="text-muted-foreground/60 text-[10px] leading-none">◂</span>
-            <div className="h-[1px] w-3/4 bg-muted-foreground/40" />
+            <div className="h-[1px] w-[90%] bg-muted-foreground/40" />
             <span className="text-muted-foreground/60 text-[10px] leading-none">▸</span>
           </div>
         </div>
