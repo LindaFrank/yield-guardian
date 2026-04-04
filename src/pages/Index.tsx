@@ -360,7 +360,7 @@ const Index = () => {
               </HelpTooltip>
 
               <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
-                <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+                <section className="animate-fade-in mt-14" style={{ animationDelay: '500ms' }}>
                   <ReplacementSuggestions
                     removedStock={selectedUnderperformer}
                     candidates={replacements}
