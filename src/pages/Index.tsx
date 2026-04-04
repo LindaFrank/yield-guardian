@@ -365,7 +365,7 @@ const Index = () => {
           </div>
 
           {!showStockFinder && (
-            <div className="mt-12">
+            <div className="mt-[52px]">
               <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
                 <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
                   <ReplacementSuggestions
