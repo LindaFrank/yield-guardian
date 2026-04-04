@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Stock, StockAnalysis } from '@/types/portfolio';
 import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle, Pencil, Check } from 'lucide-react';
@@ -18,6 +18,13 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
   const { stock, currentYield, isStable, isUnderperforming, stabilityYears } = analysis;
   const [editing, setEditing] = useState(false);
   const [sharesInput, setSharesInput] = useState(sharesOwned?.toString() ?? '');
+
+  // Keep local input in sync with DB value when not editing
+  useEffect(() => {
+    if (!editing) {
+      setSharesInput(sharesOwned?.toString() ?? '');
+    }
+  }, [sharesOwned, editing]);
 
   const getYieldColor = () => {
     if (currentYield >= 5) return 'text-yield-positive';
