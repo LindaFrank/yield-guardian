@@ -19,6 +19,12 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
   const [editing, setEditing] = useState(false);
   const [sharesInput, setSharesInput] = useState(sharesOwned?.toString() ?? '');
 
+  // Keep local input in sync with DB value when not editing
+  const prevSharesOwned = useState(sharesOwned)[0];
+  if (!editing && sharesOwned !== prevSharesOwned) {
+    setSharesInput(sharesOwned?.toString() ?? '');
+  }
+
   const getYieldColor = () => {
     if (currentYield >= 5) return 'text-yield-positive';
     if (currentYield >= 3) return 'text-yield-warning';
