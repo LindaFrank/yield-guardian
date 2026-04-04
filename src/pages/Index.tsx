@@ -148,18 +148,35 @@ const Index = () => {
         stocks.map((s) => s.ticker)
       );
     }
-    // Default suggestions: top-yield candidates not already in portfolio
+    // Default suggestions: top-yield, stability-prioritized candidates
     const portfolioTickers = stocks.map((s) => s.ticker);
     return liveMarketStocks
       .filter((s) => !portfolioTickers.includes(s.ticker))
-      .map((s) => ({
-        stock: s,
-        yield: s.currentYield,
-        stabilityScore: 2,
-        matchReason: s.currentYield >= targetYield ? 'Meets yield target' : 'Popular dividend stock',
-      }))
+      .map((s) => {
+        const stability = checkDividendStability(s, 2, targetYield);
+        const stabilityScore = stability.status === 'stable' ? 3 : stability.status === 'warning' ? 2 : 1;
+        const yieldVal = calculateDividendYield(s);
+        let matchReason = '';
+        if (stabilityScore === 3 && yieldVal >= targetYield) {
+          matchReason = 'Strong yield & stable history';
+        } else if (yieldVal >= targetYield) {
+          matchReason = 'Meets yield target';
+        } else {
+          matchReason = 'Popular dividend stock';
+        }
+        return {
+          stock: s,
+          yield: yieldVal,
+          stabilityScore,
+          matchReason,
+        };
+      })
       .filter((c) => c.yield >= targetYield)
-      .sort((a, b) => b.yield - a.yield)
+      .sort((a, b) => {
+        // Prioritize stability first, then yield
+        if (a.stabilityScore !== b.stabilityScore) return b.stabilityScore - a.stabilityScore;
+        return b.yield - a.yield;
+      })
       .slice(0, 5);
   }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks]);
 
