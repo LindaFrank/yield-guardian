@@ -82,6 +82,12 @@ export function Header() {
               )}
             </div>
           </div>
+          {/* Decorative bottom separator */}
+          <div className="flex items-center gap-1.5 mt-3 mx-auto" style={{ width: '90%' }}>
+            <span className="text-muted-foreground/50 text-[10px]">◂</span>
+            <div className="h-px flex-1 bg-muted-foreground/30" />
+            <span className="text-muted-foreground/50 text-[10px]">▸</span>
+          </div>
         </div>
       </header>
 
