@@ -140,13 +140,27 @@ const Index = () => {
   }, [liveCandidates]);
 
   const replacements = useMemo(() => {
-    if (!selectedUnderperformer) return [];
-    return suggestReplacements(
-      selectedUnderperformer,
-      liveMarketStocks,
-      targetYield,
-      stocks.map((s) => s.ticker)
-    );
+    if (selectedUnderperformer) {
+      return suggestReplacements(
+        selectedUnderperformer,
+        liveMarketStocks,
+        targetYield,
+        stocks.map((s) => s.ticker)
+      );
+    }
+    // Default suggestions: top-yield candidates not already in portfolio
+    const portfolioTickers = stocks.map((s) => s.ticker);
+    return liveMarketStocks
+      .filter((s) => !portfolioTickers.includes(s.ticker))
+      .map((s) => ({
+        stock: s,
+        yield: s.currentYield,
+        stabilityScore: 2,
+        matchReason: s.currentYield >= targetYield ? 'Meets yield target' : 'Popular dividend stock',
+      }))
+      .filter((c) => c.yield >= targetYield)
+      .sort((a, b) => b.yield - a.yield)
+      .slice(0, 5);
   }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks]);
 
   const handleRemoveStock = (ticker: string) => {
