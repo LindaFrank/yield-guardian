@@ -18,7 +18,7 @@ export function UnderperformersList({
 }: UnderperformersListProps) {
   if (underperformers.length === 0) {
     return (
-      <div className="p-8 rounded-xl bg-yield-positive border border-yield-positive text-center">
+      <div className="p-8 rounded-xl bg-yield-positive border-[4px] border-yield-positive text-center transition-all hover:scale-[1.02] active:scale-[0.97]">
         <p className="text-yield-positive font-medium">
           ✓ All stocks meet your {formatPercentage(targetYield)} yield target
         </p>
@@ -27,7 +27,7 @@ export function UnderperformersList({
   }
 
   return (
-    <div className="p-5 rounded-xl gradient-card shadow-card border border-yield-negative">
+    <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-yield-negative transition-all hover:scale-[1.02] active:scale-[0.97]">
       <div className="flex items-center gap-2 mb-4 text-yield-negative">
         <AlertTriangle className="w-5 h-5" />
         <span className="font-medium">Underperforming Stocks</span>
