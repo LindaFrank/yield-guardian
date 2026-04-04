@@ -6,7 +6,9 @@ import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
   analyzeStock, 
   scanPortfolioForUnderperformers, 
-  suggestReplacements 
+  suggestReplacements,
+  checkDividendStability,
+  calculateDividendYield
 } from '@/lib/portfolioUtils';
 import { generatePortfolioReport } from '@/lib/generatePortfolioReport';
 import { Header } from '@/components/Header';
