@@ -129,6 +129,7 @@ export function useUpdateShares() {
       if (error) throw error;
     },
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['user-stocks'] });
       qc.invalidateQueries({ queryKey: ['user-stocks-shares'] });
     },
   });
