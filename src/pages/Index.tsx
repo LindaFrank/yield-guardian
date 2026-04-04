@@ -347,7 +347,7 @@ const Index = () => {
 
           {/* Sidebar — hidden during wizard */}
           {!showStockFinder && (
-            <aside className="space-y-6">
+            <aside className="space-y-6 mt-12">
               <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
                 <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
                   <UnderperformersList
