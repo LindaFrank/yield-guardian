@@ -1,7 +1,8 @@
 import { ReplacementCandidate, Stock } from '@/types/portfolio';
 import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
-import { ArrowRight, Plus, Sparkles } from 'lucide-react';
+import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface ReplacementSuggestionsProps {
@@ -52,7 +53,7 @@ export function ReplacementSuggestions({
             className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border border-border/30 hover:border-border/50 transition-colors"
           >
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-mono font-medium">{candidate.stock.ticker}</span>
                 <span className={cn(
                   'font-mono text-sm',
@@ -60,6 +61,17 @@ export function ReplacementSuggestions({
                 )}>
                   {formatPercentage(candidate.yield)}
                 </span>
+                {candidate.stabilityScore >= 3 ? (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-emerald-500/50 text-emerald-500 gap-0.5">
+                    <ShieldCheck className="w-3 h-3" />
+                    Stable
+                  </Badge>
+                ) : candidate.stabilityScore <= 1 ? (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500/50 text-amber-500 gap-0.5">
+                    <AlertTriangle className="w-3 h-3" />
+                    Caution
+                  </Badge>
+                ) : null}
               </div>
               <p className="text-xs text-muted-foreground truncate mt-0.5">
                 {candidate.stock.name}
