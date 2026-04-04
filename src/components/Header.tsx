@@ -88,6 +88,7 @@ export function Header() {
             <span className="text-muted-foreground/60 text-[10px] leading-none">▸</span>
           </div>
         </div>
+      </header>
 
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
