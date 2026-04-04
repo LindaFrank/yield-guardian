@@ -15,29 +15,35 @@ export function ReplacementSuggestions({
   candidates, 
   onAddStock 
 }: ReplacementSuggestionsProps) {
-  if (!removedStock || candidates.length === 0) {
+  if (candidates.length === 0) {
     return (
       <div className="p-8 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 text-center transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 active:scale-[0.97]">
         <Sparkles className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
         <p className="text-muted-foreground">
-          Select an underperforming stock to see replacement suggestions
+          No replacement stocks meet your current yield target
         </p>
       </div>
     );
   }
 
+  const isDefaultMode = !removedStock;
+
   return (
     <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:scale-[1.01] hover:-translate-y-1 active:scale-[0.98]">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-primary" />
-        <span className="font-medium">Replacement Suggestions</span>
+        <span className="font-medium">
+          {isDefaultMode ? 'Suggested Stocks to Add' : 'Replacement Suggestions'}
+        </span>
       </div>
       
-      <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50">
-        <span className="font-mono text-sm text-muted-foreground">{removedStock.ticker}</span>
-        <ArrowRight className="w-4 h-4 text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">Showing alternatives</span>
-      </div>
+      {removedStock && (
+        <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50">
+          <span className="font-mono text-sm text-muted-foreground">{removedStock.ticker}</span>
+          <ArrowRight className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">Showing alternatives</span>
+        </div>
+      )}
 
       <div className="space-y-3">
         {candidates.map((candidate) => (
