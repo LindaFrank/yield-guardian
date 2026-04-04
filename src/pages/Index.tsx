@@ -347,7 +347,7 @@ const Index = () => {
 
           {/* Sidebar — hidden during wizard */}
           {!showStockFinder && (
-            <aside className="space-y-6 mt-20">
+            <aside className="space-y-6">
               <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
                 <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
                   <UnderperformersList
@@ -360,7 +360,7 @@ const Index = () => {
               </HelpTooltip>
 
               <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
-                <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+                <section className="animate-fade-in mt-14" style={{ animationDelay: '500ms' }}>
                   <ReplacementSuggestions
                     removedStock={selectedUnderperformer}
                     candidates={replacements}
