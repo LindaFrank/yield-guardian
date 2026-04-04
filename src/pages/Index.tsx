@@ -278,15 +278,34 @@ const Index = () => {
           )}
         </section>
 
+        {/* Row 1: Yield slider + Underperformers */}
         <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
-          {/* Main Portfolio Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2">
             <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
               <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
               </section>
             </HelpTooltip>
+          </div>
+          {!showStockFinder && (
+            <div>
+              <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
+                <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+                  <UnderperformersList
+                    underperformers={underperformers}
+                    selectedStock={selectedUnderperformer}
+                    onSelectStock={handleSelectUnderperformer}
+                    targetYield={targetYield}
+                  />
+                </section>
+              </HelpTooltip>
+            </div>
+          )}
+        </div>
 
+        {/* Row 2: Portfolio cards + Suggested stocks */}
+        <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8 mt-8`}>
+          <div className="lg:col-span-2">
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
                 <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
@@ -345,22 +364,10 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Sidebar — hidden during wizard */}
           {!showStockFinder && (
-            <aside className="space-y-6">
-              <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
-                <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-                  <UnderperformersList
-                    underperformers={underperformers}
-                    selectedStock={selectedUnderperformer}
-                    onSelectStock={handleSelectUnderperformer}
-                    targetYield={targetYield}
-                  />
-                </section>
-              </HelpTooltip>
-
+            <div>
               <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
-                <section className="animate-fade-in mt-56" style={{ animationDelay: '500ms' }}>
+                <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
                   <ReplacementSuggestions
                     removedStock={selectedUnderperformer}
                     candidates={replacements}
@@ -368,7 +375,7 @@ const Index = () => {
                   />
                 </section>
               </HelpTooltip>
-            </aside>
+            </div>
           )}
         </div>
       </main>
