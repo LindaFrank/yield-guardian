@@ -61,9 +61,10 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
     <div
       onClick={() => onSelect?.(stock)}
       className={cn(
-        'group relative p-5 rounded-xl gradient-card shadow-card border border-muted-foreground/40',
-        'transition-all duration-300 ease-out',
-        'hover:shadow-elevated hover:border-primary/20 hover:-translate-y-0.5',
+        'group relative p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50',
+        'transition-all duration-200 ease-out',
+        'hover:shadow-elevated hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.02]',
+        'active:scale-[0.97]',
         isSelected && 'ring-2 ring-primary border-primary/40',
         isUnderperforming && 'border-yield-negative',
         onSelect && 'cursor-pointer'
