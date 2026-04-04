@@ -27,7 +27,7 @@ export function ReplacementSuggestions({
   }
 
   return (
-    <div className="p-5 rounded-xl gradient-card shadow-card border border-muted-foreground/40">
+    <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all hover:scale-[1.02] active:scale-[0.97]">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-primary" />
         <span className="font-medium">Replacement Suggestions</span>
