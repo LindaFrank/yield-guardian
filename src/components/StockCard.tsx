@@ -25,10 +25,11 @@ interface StockCardProps {
   isSelected?: boolean;
 }
 
-export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateShares, isSelected }: StockCardProps) {
+export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateShares, onAddStock, replacements, isSelected }: StockCardProps) {
   const { stock, currentYield, isStable, isUnderperforming, stabilityYears } = analysis;
   const [editing, setEditing] = useState(false);
   const [sharesInput, setSharesInput] = useState(sharesOwned?.toString() ?? '');
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const getYieldColor = () => {
     if (currentYield >= 5) return 'text-yield-positive';
