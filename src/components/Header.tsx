@@ -46,15 +46,20 @@ export function Header() {
 
   return (
     <>
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10">
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <h1 className="font-semibold text-lg">Yield Guardian</h1>
+                <div className="flex items-center gap-1 my-0.5">
+                  <span className="text-muted-foreground/70 text-[10px] leading-none">◂</span>
+                  <div className="h-[1px] w-24 bg-muted-foreground/40" />
+                  <span className="text-muted-foreground/70 text-[10px] leading-none">▸</span>
+                </div>
                 <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
               </div>
             </div>
@@ -76,6 +81,11 @@ export function Header() {
                 </div>
               )}
             </div>
+          </div>
+          <div className="flex items-center justify-center gap-1 mt-3">
+            <span className="text-muted-foreground/60 text-[10px] leading-none">◂</span>
+            <div className="h-[1px] w-[90%] bg-muted-foreground/40" />
+            <span className="text-muted-foreground/60 text-[10px] leading-none">▸</span>
           </div>
         </div>
       </header>

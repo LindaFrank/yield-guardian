@@ -6,7 +6,9 @@ import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
   analyzeStock, 
   scanPortfolioForUnderperformers, 
-  suggestReplacements 
+  suggestReplacements,
+  checkDividendStability,
+  calculateDividendYield
 } from '@/lib/portfolioUtils';
 import { generatePortfolioReport } from '@/lib/generatePortfolioReport';
 import { Header } from '@/components/Header';
@@ -140,13 +142,44 @@ const Index = () => {
   }, [liveCandidates]);
 
   const replacements = useMemo(() => {
-    if (!selectedUnderperformer) return [];
-    return suggestReplacements(
-      selectedUnderperformer,
-      liveMarketStocks,
-      targetYield,
-      stocks.map((s) => s.ticker)
-    );
+    if (selectedUnderperformer) {
+      return suggestReplacements(
+        selectedUnderperformer,
+        liveMarketStocks,
+        targetYield,
+        stocks.map((s) => s.ticker)
+      );
+    }
+    // Default suggestions: top-yield, stability-prioritized candidates
+    const portfolioTickers = stocks.map((s) => s.ticker);
+    return liveMarketStocks
+      .filter((s) => !portfolioTickers.includes(s.ticker))
+      .map((s) => {
+        const stability = checkDividendStability(s, 2, targetYield);
+        const stabilityScore = stability.status === 'stable' ? 3 : stability.status === 'warning' ? 2 : 1;
+        const yieldVal = calculateDividendYield(s);
+        let matchReason = '';
+        if (stabilityScore === 3 && yieldVal >= targetYield) {
+          matchReason = 'Strong yield & stable history';
+        } else if (yieldVal >= targetYield) {
+          matchReason = 'Meets yield target';
+        } else {
+          matchReason = 'Popular dividend stock';
+        }
+        return {
+          stock: s,
+          yield: yieldVal,
+          stabilityScore,
+          matchReason,
+        };
+      })
+      .filter((c) => c.yield >= targetYield)
+      .sort((a, b) => {
+        // Prioritize stability first, then yield
+        if (a.stabilityScore !== b.stabilityScore) return b.stabilityScore - a.stabilityScore;
+        return b.yield - a.yield;
+      })
+      .slice(0, 5);
   }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks]);
 
   const handleRemoveStock = (ticker: string) => {
@@ -245,15 +278,34 @@ const Index = () => {
           )}
         </section>
 
+        {/* Row 1: Yield slider + Underperformers */}
         <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
-          {/* Main Portfolio Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2">
             <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
               <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
               </section>
             </HelpTooltip>
+          </div>
+          {!showStockFinder && (
+            <div>
+              <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
+                <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+                  <UnderperformersList
+                    underperformers={underperformers}
+                    selectedStock={selectedUnderperformer}
+                    onSelectStock={handleSelectUnderperformer}
+                    targetYield={targetYield}
+                  />
+                </section>
+              </HelpTooltip>
+            </div>
+          )}
+        </div>
 
+        {/* Row 2: Portfolio cards + Suggested stocks */}
+        <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8 mt-8`}>
+          <div className="lg:col-span-2">
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
                 <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
@@ -312,20 +364,8 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Sidebar — hidden during wizard */}
           {!showStockFinder && (
-            <aside className="space-y-6">
-              <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
-                <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-                  <UnderperformersList
-                    underperformers={underperformers}
-                    selectedStock={selectedUnderperformer}
-                    onSelectStock={handleSelectUnderperformer}
-                    targetYield={targetYield}
-                  />
-                </section>
-              </HelpTooltip>
-
+            <div className="mt-[54px]">
               <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
                 <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
                   <ReplacementSuggestions
@@ -335,7 +375,7 @@ const Index = () => {
                   />
                 </section>
               </HelpTooltip>
-            </aside>
+            </div>
           )}
         </div>
       </main>

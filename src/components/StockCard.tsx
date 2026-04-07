@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Stock, StockAnalysis } from '@/types/portfolio';
 import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle, Pencil, Check } from 'lucide-react';
@@ -18,6 +18,13 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
   const { stock, currentYield, isStable, isUnderperforming, stabilityYears } = analysis;
   const [editing, setEditing] = useState(false);
   const [sharesInput, setSharesInput] = useState(sharesOwned?.toString() ?? '');
+
+  // Keep local input in sync with DB value when not editing
+  useEffect(() => {
+    if (!editing) {
+      setSharesInput(sharesOwned?.toString() ?? '');
+    }
+  }, [sharesOwned, editing]);
 
   const getYieldColor = () => {
     if (currentYield >= 5) return 'text-yield-positive';
@@ -61,9 +68,10 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
     <div
       onClick={() => onSelect?.(stock)}
       className={cn(
-        'group relative p-5 rounded-xl gradient-card shadow-card border border-muted-foreground/40',
-        'transition-all duration-300 ease-out',
-        'hover:shadow-elevated hover:border-primary/20 hover:-translate-y-0.5',
+        'group relative p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50',
+        'transition-all duration-200 ease-out',
+        'hover:shadow-elevated hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.02]',
+        'active:scale-[0.97]',
         isSelected && 'ring-2 ring-primary border-primary/40',
         isUnderperforming && 'border-yield-negative',
         onSelect && 'cursor-pointer'
