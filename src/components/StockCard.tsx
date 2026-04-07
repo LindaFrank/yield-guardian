@@ -1,9 +1,18 @@
 import { useState } from 'react';
-import { Stock, StockAnalysis } from '@/types/portfolio';
+import { Stock, StockAnalysis, ReplacementCandidate } from '@/types/portfolio';
 import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle, Pencil, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
+import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 
 interface StockCardProps {
   analysis: StockAnalysis;
@@ -11,6 +20,8 @@ interface StockCardProps {
   onRemove?: (ticker: string) => void;
   onSelect?: (stock: Stock) => void;
   onUpdateShares?: (ticker: string, shares: number | null) => void;
+  onAddStock?: (stock: Stock) => void;
+  replacements?: ReplacementCandidate[];
   isSelected?: boolean;
 }
 
