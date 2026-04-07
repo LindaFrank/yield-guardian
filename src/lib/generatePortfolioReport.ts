@@ -115,28 +115,37 @@ export async function generatePortfolioReport(data: ReportData): Promise<Generat
             'Ticker',
             'Name',
             'Price/Share',
-            'Yield/Share',
-            'Repl. Share Cost\n(Yield×N=Ann.Div)',
+            '% Yield',
+            'Yield/Share\n(Dollars)',
+            'Cost of Replacement\nStock (Yield×N=Ann.Div)',
             'Num Repl.\nShares',
             'Value Underperf.\nRetained',
             'Num Underperf.\nShares Retained',
+            'Projected Annual\nDividend Yield ($)',
           ]],
           body: sortedReplacements.map((r) => {
             const replDivPerShare = r.stock.annualDividend;
+            const replYieldPct = r.stock.currentPrice > 0 ? (replDivPerShare / r.stock.currentPrice) * 100 : 0;
             const numReplShares = replDivPerShare > 0 ? Math.round(underAnnualDiv / replDivPerShare) : 0;
             const replShareCost = numReplShares * r.stock.currentPrice;
             const underTotalValue = underPrice * underShares;
             const valueRetained = underTotalValue - replShareCost;
             const numUnderRetained = underPrice > 0 ? valueRetained / underPrice : 0;
+            const underYieldPct = underPrice > 0 ? (analysis.stock.annualDividend / underPrice) * 100 : 0;
+            const projectedAnnualDiv =
+              numUnderRetained * (underYieldPct / 100) * underPrice +
+              numReplShares * (replYieldPct / 100) * r.stock.currentPrice;
             return [
               r.stock.ticker,
               r.stock.name,
               formatCurrency(r.stock.currentPrice),
+              formatPercentage(replYieldPct),
               formatCurrency(replDivPerShare),
               formatCurrency(replShareCost),
               numReplShares.toString(),
               formatCurrency(valueRetained),
               numUnderRetained.toFixed(1),
+              formatCurrency(projectedAnnualDiv),
             ];
           }),
           styles: { fontSize: 6.5, cellPadding: 2 },
