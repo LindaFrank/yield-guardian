@@ -175,6 +175,45 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
           </div>
         </div>
       </div>
+
+      {/* Underperformer button */}
+      {isUnderperforming && (
+        <>
+          <Button
+            variant="destructive"
+            size="sm"
+            className="mt-3 w-full"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSheetOpen(true);
+            }}
+          >
+            <AlertTriangle className="w-4 h-4 mr-1.5" />
+            Underperformer — View Replacements
+          </Button>
+
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Replacements for {stock.ticker}</SheetTitle>
+                <SheetDescription>
+                  {stock.name} is underperforming your yield target. Here are suggested alternatives.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="mt-6">
+                <ReplacementSuggestions
+                  removedStock={stock}
+                  candidates={replacements ?? []}
+                  onAddStock={(s) => {
+                    onAddStock?.(s);
+                    setSheetOpen(false);
+                  }}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </>
+      )}
     </div>
   );
 }
