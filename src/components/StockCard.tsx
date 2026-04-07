@@ -1,9 +1,18 @@
 import { useState } from 'react';
-import { Stock, StockAnalysis } from '@/types/portfolio';
+import { Stock, StockAnalysis, ReplacementCandidate } from '@/types/portfolio';
 import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle, Pencil, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
+import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 
 interface StockCardProps {
   analysis: StockAnalysis;
@@ -11,13 +20,16 @@ interface StockCardProps {
   onRemove?: (ticker: string) => void;
   onSelect?: (stock: Stock) => void;
   onUpdateShares?: (ticker: string, shares: number | null) => void;
+  onAddStock?: (stock: Stock) => void;
+  replacements?: ReplacementCandidate[];
   isSelected?: boolean;
 }
 
-export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateShares, isSelected }: StockCardProps) {
+export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateShares, onAddStock, replacements, isSelected }: StockCardProps) {
   const { stock, currentYield, isStable, isUnderperforming, stabilityYears } = analysis;
   const [editing, setEditing] = useState(false);
   const [sharesInput, setSharesInput] = useState(sharesOwned?.toString() ?? '');
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const getYieldColor = () => {
     if (currentYield >= 5) return 'text-yield-positive';
@@ -163,6 +175,45 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
           </div>
         </div>
       </div>
+
+      {/* Underperformer button */}
+      {isUnderperforming && (
+        <>
+          <Button
+            variant="destructive"
+            size="sm"
+            className="mt-3 w-full"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSheetOpen(true);
+            }}
+          >
+            <AlertTriangle className="w-4 h-4 mr-1.5" />
+            Underperformer — View Replacements
+          </Button>
+
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Replacements for {stock.ticker}</SheetTitle>
+                <SheetDescription>
+                  {stock.name} is underperforming your yield target. Here are suggested alternatives.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="mt-6">
+                <ReplacementSuggestions
+                  removedStock={stock}
+                  candidates={replacements ?? []}
+                  onAddStock={(s) => {
+                    onAddStock?.(s);
+                    setSheetOpen(false);
+                  }}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </>
+      )}
     </div>
   );
 }
