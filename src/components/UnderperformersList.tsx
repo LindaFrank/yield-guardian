@@ -34,7 +34,7 @@ export function UnderperformersList({
         <span className="ml-auto text-sm font-mono">{underperformers.length}</span>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
         {underperformers.map((analysis) => (
           <button
             key={analysis.stock.ticker}
