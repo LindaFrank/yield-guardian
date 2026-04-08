@@ -181,6 +181,16 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                           </div>
                           <p className="text-sm text-muted-foreground mt-0.5">{stock.name}</p>
                         </div>
+                        {isChecked && (
+                          <Button
+                            size="sm"
+                            className="shrink-0 gap-1 text-xs"
+                            onClick={(e) => { e.stopPropagation(); handleProceedToShares(); }}
+                          >
+                            Enter Number of Shares
+                            <ChevronRight className="w-3 h-3" />
+                          </Button>
+                        )}
                       </div>
                     );
                   })}
@@ -234,19 +244,21 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                       </div>
                       <p className="text-sm text-muted-foreground mt-0.5">{result.name}</p>
                     </div>
+                    {isChecked && (
+                      <Button
+                        size="sm"
+                        className="shrink-0 gap-1 text-xs"
+                        onClick={(e) => { e.stopPropagation(); handleProceedToShares(); }}
+                      >
+                        Enter Number of Shares
+                        <ChevronRight className="w-3 h-3" />
+                      </Button>
+                    )}
                   </div>
                 );
               })}
             </div>
 
-            {selected.size > 0 && (
-              <div className="pt-2 border-t border-border/50">
-                <Button className="w-full gap-2" onClick={handleProceedToShares}>
-                  Enter Shares for {selected.size} Stock{selected.size !== 1 ? 's' : ''}
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
           </>
         )}
 
