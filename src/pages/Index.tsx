@@ -194,11 +194,15 @@ const Index = () => {
   };
 
   const handleAddStock = (stock: Stock, shares?: number) => {
-    if (!stocks.find((s) => s.ticker === stock.ticker)) {
+    const existing = stocks.find((s) => s.ticker === stock.ticker);
+    if (!existing) {
       setStocks((prev) => [...prev, stock]);
       if (user) {
         addTicker.mutate({ ticker: stock.ticker, shares });
       }
+    } else if (shares != null && user) {
+      // Stock already in portfolio — update its shares (e.g. from replacement sheet)
+      updateShares.mutate({ ticker: stock.ticker, shares });
     }
   };
 
