@@ -239,14 +239,6 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
               })}
             </div>
 
-            {selected.size > 0 && (
-              <div className="pt-2 border-t border-border/50">
-                <Button className="w-full gap-2" onClick={handleProceedToShares}>
-                  Enter Shares for {selected.size} Stock{selected.size !== 1 ? 's' : ''}
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
           </>
         )}
 
