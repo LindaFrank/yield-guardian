@@ -20,7 +20,7 @@ interface StockCardProps {
   onRemove?: (ticker: string) => void;
   onSelect?: (stock: Stock) => void;
   onUpdateShares?: (ticker: string, shares: number | null) => void;
-  onAddStock?: (stock: Stock) => void;
+  onAddStock?: (stock: Stock, shares?: number) => void;
   replacements?: ReplacementCandidate[];
   isSelected?: boolean;
 }
