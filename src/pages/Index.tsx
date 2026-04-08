@@ -236,6 +236,20 @@ const Index = () => {
           </div>
         </HelpTooltip>
 
+        {/* Add Stock button — always visible below live status */}
+        {!showStockFinder && (
+          <div className="mb-6 flex justify-end">
+            <AddStockModal
+              existingTickers={stocks.map((s) => s.ticker)}
+              onAddStock={handleAddStock}
+              open={addStockOpen}
+              onOpenChange={setAddStockOpen}
+              suggestedStocks={liveMarketStocks}
+              targetYield={targetYield}
+            />
+          </div>
+        )}
+
         {/* Empty portfolio wizard — shown first when no stocks */}
         {showStockFinder && (
           <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
@@ -324,16 +338,6 @@ const Index = () => {
                 <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
-                <div className="flex items-center gap-2">
-                  <AddStockModal
-                    existingTickers={stocks.map((s) => s.ticker)}
-                    onAddStock={handleAddStock}
-                    open={addStockOpen}
-                    onOpenChange={setAddStockOpen}
-                    suggestedStocks={liveMarketStocks}
-                    targetYield={targetYield}
-                  />
-                </div>
               </div>
               
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
