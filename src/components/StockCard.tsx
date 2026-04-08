@@ -204,8 +204,8 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
                 <ReplacementSuggestions
                   removedStock={stock}
                   candidates={replacements ?? []}
-                  onAddStock={(s) => {
-                    onAddStock?.(s);
+                  onAddStock={(s, shares) => {
+                    onAddStock?.(s, shares);
                     setSheetOpen(false);
                   }}
                 />
