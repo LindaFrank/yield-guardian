@@ -20,7 +20,7 @@ interface StockCardProps {
   onRemove?: (ticker: string) => void;
   onSelect?: (stock: Stock) => void;
   onUpdateShares?: (ticker: string, shares: number | null) => void;
-  onAddStock?: (stock: Stock) => void;
+  onAddStock?: (stock: Stock, shares?: number) => void;
   replacements?: ReplacementCandidate[];
   isSelected?: boolean;
 }
@@ -204,8 +204,8 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
                 <ReplacementSuggestions
                   removedStock={stock}
                   candidates={replacements ?? []}
-                  onAddStock={(s) => {
-                    onAddStock?.(s);
+                  onAddStock={(s, shares) => {
+                    onAddStock?.(s, shares);
                     setSheetOpen(false);
                   }}
                 />
