@@ -181,6 +181,16 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                           </div>
                           <p className="text-sm text-muted-foreground mt-0.5">{stock.name}</p>
                         </div>
+                        {isChecked && (
+                          <Button
+                            size="sm"
+                            className="shrink-0 gap-1 text-xs"
+                            onClick={(e) => { e.stopPropagation(); handleProceedToShares(); }}
+                          >
+                            Enter Number of Shares
+                            <ChevronRight className="w-3 h-3" />
+                          </Button>
+                        )}
                       </div>
                     );
                   })}
