@@ -232,8 +232,31 @@ const Index = () => {
           </div>
         </HelpTooltip>
 
+        {/* Empty portfolio wizard — shown first when no stocks */}
+        {showStockFinder && (
+          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
+            <EmptyPortfolio
+              onSelectStocks={() => setAddStockOpen(true)}
+              onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+              onAddStock={handleAddStock}
+              onYieldChange={setTargetYield}
+              currentYield={targetYield}
+              onDone={() => {
+                setWizardDismissed(true);
+                setShowFindStocksFlow(false);
+                setFindStocksStep(0);
+              }}
+              onCancel={() => {
+                setShowFindStocksFlow(false);
+                setFindStocksStep(0);
+              }}
+              initialStep={showFindStocksFlow ? findStocksStep : 0}
+            />
+          </section>
+        )}
+
         {/* Stats Overview */}
-        <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
+        <section className="mb-8 animate-fade-in" style={{ animationDelay: showStockFinder ? '100ms' : '0ms' }}>
           <PortfolioStats
             stocks={stocks}
             sharesMap={Object.fromEntries(
@@ -286,47 +309,29 @@ const Index = () => {
         {/* Portfolio Section — full width now */}
         <div>
           <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
-            <section ref={yieldSliderRef} className="animate-fade-in mb-6" style={{ animationDelay: '100ms' }}>
+            <section ref={yieldSliderRef} className="animate-fade-in mb-6" style={{ animationDelay: showStockFinder ? '200ms' : '100ms' }}>
               <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
             </section>
           </HelpTooltip>
 
-          <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="flex items-center justify-between mb-4">
-              <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
-                <h2 className="text-lg font-semibold">Your Portfolio</h2>
-              </HelpTooltip>
-              <div className="flex items-center gap-2">
-                <AddStockModal
-                  existingTickers={stocks.map((s) => s.ticker)}
-                  onAddStock={handleAddStock}
-                  open={addStockOpen}
-                  onOpenChange={setAddStockOpen}
-                  suggestedStocks={liveMarketStocks}
-                  targetYield={targetYield}
-                />
+          {!showStockFinder && (
+            <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
+              <div className="flex items-center justify-between mb-4">
+                <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
+                  <h2 className="text-lg font-semibold">Your Portfolio</h2>
+                </HelpTooltip>
+                <div className="flex items-center gap-2">
+                  <AddStockModal
+                    existingTickers={stocks.map((s) => s.ticker)}
+                    onAddStock={handleAddStock}
+                    open={addStockOpen}
+                    onOpenChange={setAddStockOpen}
+                    suggestedStocks={liveMarketStocks}
+                    targetYield={targetYield}
+                  />
+                </div>
               </div>
-            </div>
-            
-            {showStockFinder ? (
-              <EmptyPortfolio
-                onSelectStocks={() => setAddStockOpen(true)}
-                onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                onAddStock={handleAddStock}
-                onYieldChange={setTargetYield}
-                currentYield={targetYield}
-                onDone={() => {
-                  setWizardDismissed(true);
-                  setShowFindStocksFlow(false);
-                  setFindStocksStep(0);
-                }}
-                onCancel={() => {
-                  setShowFindStocksFlow(false);
-                  setFindStocksStep(0);
-                }}
-                initialStep={showFindStocksFlow ? findStocksStep : 0}
-              />
-            ) : (
+              
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {stockAnalyses.map((analysis, index) => (
                   <div
@@ -347,8 +352,8 @@ const Index = () => {
                   </div>
                 ))}
               </div>
-            )}
-          </section>
+            </section>
+          )}
         </div>
       </main>
 
