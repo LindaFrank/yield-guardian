@@ -325,45 +325,6 @@ const Index = () => {
             targetYield={targetYield}
             underperformerCount={underperformers.length}
           />
-          {stocks.length > 0 && (
-            <div className="mt-4 flex justify-end">
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
-                onClick={async () => {
-                  try {
-                    const report = await generatePortfolioReport({
-                      stocks,
-                      sharesMap: Object.fromEntries(
-                        (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
-                      ),
-                      targetYield,
-                      underperformers,
-                      getReplacements: (stock) =>
-                        suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
-                    });
-
-                    const fileName = createPortfolioReportFileName();
-                    const preview = createPortfolioReportPreview(report.blob, fileName);
-                    updateReportPreview(preview);
-                    setReportPreviewOpen(true);
-
-                    toast({
-                      title: 'Report ready',
-                      description: `Previewing ${fileName} inside the app. Use Download PDF to save it.`,
-                    });
-                  } catch (err) {
-                    console.error('Report generation failed:', err);
-                    toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
-                  }
-                }}
-              >
-                <FileDown className="w-5 h-5 mr-2" />
-                Generate Report
-              </Button>
-            </div>
-          )}
         </section>
 
         {/* Portfolio Section — full width now */}
