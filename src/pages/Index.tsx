@@ -239,7 +239,7 @@ const Index = () => {
 
         {/* Add Stock button — always visible below live status */}
         {!showStockFinder && (
-          <div className="sticky top-4 z-30 flex justify-end gap-2 mb-6 py-2 px-3 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 shadow-sm w-fit ml-auto">
+          <div className="sticky top-20 z-30 flex justify-end gap-2 mb-6 py-2 px-3 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 shadow-sm w-fit ml-auto">
             <CSVImportModal existingTickers={stocks.map((s) => s.ticker)} />
             <AddStockModal
               existingTickers={stocks.map((s) => s.ticker)}
