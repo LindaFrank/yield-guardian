@@ -22,6 +22,7 @@ import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
 import { StockCard } from '@/components/StockCard';
 import { AddStockModal } from '@/components/AddStockModal';
+import { CSVImportModal } from '@/components/CSVImportModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
