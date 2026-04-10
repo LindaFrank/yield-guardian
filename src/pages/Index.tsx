@@ -239,7 +239,7 @@ const Index = () => {
 
         {/* Action bar — sticky below header */}
         {!showStockFinder && (
-          <div className="sticky top-28 z-30 mb-6 rounded-lg border border-border bg-background/90 backdrop-blur-sm shadow-sm">
+          <div className="sticky top-28 z-30 mb-6 rounded-lg border-2 border-primary/30 bg-background/90 backdrop-blur-sm shadow-sm shadow-glow">
             <p className="px-4 pt-2 text-[11px] uppercase tracking-wider text-muted-foreground/70">What would you like to do?</p>
             <div className="flex items-center gap-2 px-4 py-2">
               <CSVImportModal existingTickers={stocks.map((s) => s.ticker)} />
