@@ -22,6 +22,7 @@ import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
 import { StockCard } from '@/components/StockCard';
 import { AddStockModal } from '@/components/AddStockModal';
+import { CSVImportModal } from '@/components/CSVImportModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
@@ -238,7 +239,8 @@ const Index = () => {
 
         {/* Add Stock button — always visible below live status */}
         {!showStockFinder && (
-          <div className="mb-6 flex justify-end">
+          <div className="mb-6 flex justify-end gap-2">
+            <CSVImportModal existingTickers={stocks.map((s) => s.ticker)} />
             <AddStockModal
               existingTickers={stocks.map((s) => s.ticker)}
               onAddStock={handleAddStock}
