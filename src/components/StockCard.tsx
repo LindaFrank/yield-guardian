@@ -182,14 +182,14 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
           <Button
             variant="destructive"
             size="sm"
-            className="mt-3 w-full"
+            className="mt-3 w-full gap-1.5 text-xs whitespace-nowrap overflow-hidden"
             onClick={(e) => {
               e.stopPropagation();
               setSheetOpen(true);
             }}
           >
-            <AlertTriangle className="w-4 h-4 mr-1.5" />
-            Underperformer — View Replacements
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Underperformer — View Replacements</span>
           </Button>
 
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
