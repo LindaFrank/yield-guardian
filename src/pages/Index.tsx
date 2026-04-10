@@ -237,18 +237,58 @@ const Index = () => {
           </div>
         </HelpTooltip>
 
-        {/* Add Stock button — always visible below live status */}
+        {/* Action bar — sticky below header */}
         {!showStockFinder && (
-          <div className="sticky top-28 z-30 flex justify-end gap-2 mb-6 py-2 px-3 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 shadow-sm w-fit ml-auto">
-            <CSVImportModal existingTickers={stocks.map((s) => s.ticker)} />
-            <AddStockModal
-              existingTickers={stocks.map((s) => s.ticker)}
-              onAddStock={handleAddStock}
-              open={addStockOpen}
-              onOpenChange={setAddStockOpen}
-              suggestedStocks={liveMarketStocks}
-              targetYield={targetYield}
-            />
+          <div className="sticky top-28 z-30 mb-6 rounded-lg border border-border bg-background/90 backdrop-blur-sm shadow-sm">
+            <p className="px-4 pt-2 text-[11px] uppercase tracking-wider text-muted-foreground/70">What would you like to do?</p>
+            <div className="flex items-center gap-2 px-4 py-2">
+              <CSVImportModal existingTickers={stocks.map((s) => s.ticker)} />
+              <AddStockModal
+                existingTickers={stocks.map((s) => s.ticker)}
+                onAddStock={handleAddStock}
+                open={addStockOpen}
+                onOpenChange={setAddStockOpen}
+                suggestedStocks={liveMarketStocks}
+                targetYield={targetYield}
+              />
+              {stocks.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
+                  onClick={async () => {
+                    try {
+                      const report = await generatePortfolioReport({
+                        stocks,
+                        sharesMap: Object.fromEntries(
+                          (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                        ),
+                        targetYield,
+                        underperformers,
+                        getReplacements: (stock) =>
+                          suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                      });
+
+                      const fileName = createPortfolioReportFileName();
+                      const preview = createPortfolioReportPreview(report.blob, fileName);
+                      updateReportPreview(preview);
+                      setReportPreviewOpen(true);
+
+                      toast({
+                        title: 'Report ready',
+                        description: `Previewing ${fileName} inside the app. Use Download PDF to save it.`,
+                      });
+                    } catch (err) {
+                      console.error('Report generation failed:', err);
+                      toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
+                    }
+                  }}
+                >
+                  <FileDown className="w-4 h-4 mr-1.5" />
+                  Generate Report
+                </Button>
+              )}
+            </div>
           </div>
         )}
 
@@ -285,45 +325,6 @@ const Index = () => {
             targetYield={targetYield}
             underperformerCount={underperformers.length}
           />
-          {stocks.length > 0 && (
-            <div className="mt-4 flex justify-end">
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
-                onClick={async () => {
-                  try {
-                    const report = await generatePortfolioReport({
-                      stocks,
-                      sharesMap: Object.fromEntries(
-                        (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
-                      ),
-                      targetYield,
-                      underperformers,
-                      getReplacements: (stock) =>
-                        suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
-                    });
-
-                    const fileName = createPortfolioReportFileName();
-                    const preview = createPortfolioReportPreview(report.blob, fileName);
-                    updateReportPreview(preview);
-                    setReportPreviewOpen(true);
-
-                    toast({
-                      title: 'Report ready',
-                      description: `Previewing ${fileName} inside the app. Use Download PDF to save it.`,
-                    });
-                  } catch (err) {
-                    console.error('Report generation failed:', err);
-                    toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
-                  }
-                }}
-              >
-                <FileDown className="w-5 h-5 mr-2" />
-                Generate Report
-              </Button>
-            </div>
-          )}
         </section>
 
         {/* Portfolio Section — full width now */}
