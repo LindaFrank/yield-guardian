@@ -56,9 +56,9 @@ export function Header() {
               <div>
                 <h1 className="font-semibold text-lg">Yield Guardian</h1>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-muted-foreground/60 text-[10px]">◂</span>
-                  <div className="h-px flex-1 bg-muted-foreground/40" />
-                  <span className="text-muted-foreground/60 text-[10px]">▸</span>
+                  <span className="text-muted-foreground/60 text-xs font-bold">◂</span>
+                  <div className="h-[2px] flex-1 bg-muted-foreground/40" />
+                  <span className="text-muted-foreground/60 text-xs font-bold">▸</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
               </div>
@@ -84,9 +84,9 @@ export function Header() {
           </div>
           {/* Decorative bottom separator */}
           <div className="flex items-center gap-1.5 mt-3 mx-auto" style={{ width: '90%' }}>
-            <span className="text-muted-foreground/50 text-[10px]">◂</span>
-            <div className="h-px flex-1 bg-muted-foreground/30" />
-            <span className="text-muted-foreground/50 text-[10px]">▸</span>
+            <span className="text-muted-foreground/50 text-xs font-bold">◂</span>
+            <div className="h-[2px] flex-1 bg-muted-foreground/30" />
+            <span className="text-muted-foreground/50 text-xs font-bold">▸</span>
           </div>
         </div>
       </header>
