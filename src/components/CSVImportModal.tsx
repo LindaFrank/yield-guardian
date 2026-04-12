@@ -139,7 +139,7 @@ export function CSVImportModal({ existingTickers, onImportComplete }: CSVImportM
         {!parsed ? (
           <div
             className={cn(
-              'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+              'border-[2px] border-dashed border-muted-foreground/50 rounded-lg p-8 text-center cursor-pointer transition-colors',
               'hover:border-primary hover:bg-primary/5'
             )}
             onDragOver={(e) => e.preventDefault()}
