@@ -126,7 +126,7 @@ export function CSVImportModal({ existingTickers, onImportComplete }: CSVImportM
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2 border-muted-foreground/70">
           <Upload className="w-4 h-4" />
           Import CSV
         </Button>
