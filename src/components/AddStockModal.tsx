@@ -157,10 +157,10 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                         onClick={() => handleSelectSuggestion(stock)}
                         role="button"
                         className={cn(
-                          'w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left cursor-pointer',
+                          'w-full flex items-center gap-3 p-3 rounded-lg border-[4px] transition-colors text-left cursor-pointer',
                           isChecked
                             ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20'
-                            : 'bg-secondary/30 border-border/30 hover:border-primary/30 hover:bg-secondary/50'
+                            : 'border-muted-foreground/50 hover:border-primary/30 hover:bg-secondary/50'
                         )}
                       >
                         <Checkbox
@@ -223,10 +223,10 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                     key={result.symbol}
                     onClick={() => toggleSelect(result)}
                     role="button"
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left cursor-pointer ${
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border-[4px] transition-colors text-left cursor-pointer ${
                       isChecked
                         ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20'
-                        : 'bg-secondary/30 border-border/30 hover:border-primary/30 hover:bg-secondary/50'
+                        : 'border-muted-foreground/50 hover:border-primary/30 hover:bg-secondary/50'
                     }`}
                   >
                     <Checkbox
