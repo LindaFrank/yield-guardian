@@ -207,8 +207,8 @@ export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(fu
                 return (
                   <Card
                     key={stock.ticker}
-                    className={`p-4 border-border/50 cursor-pointer transition-all duration-200 ${
-                      isChecked ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20' : 'hover:border-primary/30 hover:bg-accent/30'
+                    className={`p-4 border-[4px] cursor-pointer transition-all duration-200 ${
+                      isChecked ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20' : 'border-muted-foreground/50 hover:border-primary/30 hover:bg-accent/30'
                     }`}
                     onClick={() => toggleTicker(stock.ticker)}
                   >
