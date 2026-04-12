@@ -59,7 +59,7 @@ export function ReplacementSuggestions({
           return (
             <div
               key={candidate.stock.ticker}
-              className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border border-border/30 hover:border-border/50 transition-colors"
+              className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border-[4px] border-muted-foreground/50 hover:border-muted-foreground/70 transition-colors"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
