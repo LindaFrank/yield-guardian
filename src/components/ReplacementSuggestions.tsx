@@ -47,7 +47,7 @@ export function ReplacementSuggestions({
         <span className="font-medium">Replacement Suggestions</span>
       </div>
       
-      <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50">
+      <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border-[4px] border-muted-foreground/50">
         <span className="font-mono text-sm text-muted-foreground">{removedStock.ticker}</span>
         <ArrowRight className="w-4 h-4 text-muted-foreground" />
         <span className="text-sm text-muted-foreground">Showing alternatives</span>
