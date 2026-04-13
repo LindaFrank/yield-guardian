@@ -1,11 +1,15 @@
 import { useState, useCallback, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Upload, FileText, AlertCircle, Check, X } from 'lucide-react';
+import { Upload, FileText, AlertCircle, Check, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAddTicker } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Set up PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs`;
 
 interface ParsedRow {
   ticker: string;
@@ -64,6 +68,7 @@ export function CSVImportModal({ existingTickers, onImportComplete }: CSVImportM
   const [open, setOpen] = useState(false);
   const [parsed, setParsed] = useState<ParsedRow[] | null>(null);
   const [importing, setImporting] = useState(false);
+  const [parsing, setParsing] = useState(false);
   const [fileName, setFileName] = useState('');
 
   const validRows = parsed?.filter((r) => !r.error) ?? [];
@@ -71,15 +76,38 @@ export function CSVImportModal({ existingTickers, onImportComplete }: CSVImportM
   const duplicateRows = validRows.filter((r) => existingTickers.includes(r.ticker));
   const errorRows = parsed?.filter((r) => r.error) ?? [];
 
-  const handleFile = useCallback((file: File) => {
+  const handleFile = useCallback(async (file: File) => {
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target?.result as string;
-      setParsed(parseCSV(text));
-    };
-    reader.readAsText(file);
-  }, []);
+    const isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+
+    if (isPdf) {
+      setParsing(true);
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items.map((item: any) => item.str).join(' ');
+          fullText += pageText + '\n';
+        }
+        setParsed(parseCSV(fullText));
+      } catch (err) {
+        console.error('PDF parse error:', err);
+        toast({ title: 'Failed to parse PDF', description: String(err), variant: 'destructive' });
+      } finally {
+        setParsing(false);
+      }
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        setParsed(parseCSV(text));
+      };
+      reader.readAsText(file);
+    }
+  }, [toast]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -147,14 +175,24 @@ export function CSVImportModal({ existingTickers, onImportComplete }: CSVImportM
             onClick={() => fileInputRef.current?.click()}
           >
             <FileText className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
-            <p className="text-sm font-medium mb-1">Drop a CSV file here or click to browse</p>
-            <p className="text-xs text-muted-foreground">
-              Expected format: <code>Ticker, Shares</code> (one per line)
-            </p>
+            {parsing ? (
+              <>
+                <Loader2 className="w-10 h-10 mx-auto mb-3 text-primary animate-spin" />
+                <p className="text-sm font-medium mb-1">Parsing PDF…</p>
+              </>
+            ) : (
+              <>
+                <FileText className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-sm font-medium mb-1">Drop a CSV or PDF file here or click to browse</p>
+                <p className="text-xs text-muted-foreground">
+                  Expected format: <code>Ticker, Shares</code> (one per line)
+                </p>
+              </>
+            )}
             <input
               ref={fileInputRef}
               type="file"
-              accept=".csv,.txt"
+              accept=".csv,.txt,.pdf"
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
