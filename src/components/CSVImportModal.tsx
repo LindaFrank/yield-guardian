@@ -128,7 +128,7 @@ export function CSVImportModal({ existingTickers, onImportComplete }: CSVImportM
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2 border-muted-foreground/70">
           <Upload className="w-4 h-4" />
-          Import CSV
+          Import Stocks from Another Portfolio
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
