@@ -22,6 +22,10 @@ interface CSVImportModalProps {
   onImportComplete?: () => void;
 }
 
+// Common words / PII patterns to skip when scanning PDF text
+const NOISE_PATTERNS = /\b(name|address|ssn|social|security|account|date|page|total|summary|portfolio|report|generated|prepared|client|investor|balance|value|market)\b/i;
+const SSN_PATTERN = /\b\d{3}[- ]?\d{2}[- ]?\d{4}\b/;
+
 function parseCSV(text: string): ParsedRow[] {
   const lines = text.trim().split(/\r?\n/);
   if (lines.length === 0) return [];
@@ -31,30 +35,36 @@ function parseCSV(text: string): ParsedRow[] {
   const startIdx = /ticker|symbol|stock/i.test(firstLine) ? 1 : 0;
 
   const rows: ParsedRow[] = [];
+  const seen = new Set<string>();
+
   for (let i = startIdx; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
 
-    // Support comma, semicolon, or tab delimiters
+    // Skip lines that look like PII or report boilerplate
+    if (SSN_PATTERN.test(line) || NOISE_PATTERNS.test(line)) continue;
+
+    // Support comma, semicolon, tab, or whitespace delimiters
     const parts = line.split(/[,;\t]+/).map((p) => p.trim().replace(/^["']|["']$/g, ''));
-    const ticker = parts[0]?.toUpperCase();
 
-    if (!ticker || !/^[A-Z]{1,5}$/.test(ticker)) {
-      rows.push({ ticker: parts[0] || '(empty)', shares: null, error: 'Invalid ticker format' });
-      continue;
-    }
-
-    let shares: number | null = null;
-    if (parts[1]) {
-      const parsed = parseFloat(parts[1]);
-      if (isNaN(parsed) || parsed < 0) {
-        rows.push({ ticker, shares: null, error: 'Invalid share count' });
-        continue;
+    // Try to find a valid ticker in any part of the line
+    for (const part of parts) {
+      const candidate = part.toUpperCase();
+      if (/^[A-Z]{1,5}$/.test(candidate) && !seen.has(candidate)) {
+        // Look for a number near the ticker for shares
+        let shares: number | null = null;
+        for (const other of parts) {
+          if (other === part) continue;
+          const parsed = parseFloat(other.replace(/,/g, ''));
+          if (!isNaN(parsed) && parsed > 0) {
+            shares = parsed;
+            break;
+          }
+        }
+        seen.add(candidate);
+        rows.push({ ticker: candidate, shares });
       }
-      shares = parsed;
     }
-
-    rows.push({ ticker, shares });
   }
   return rows;
 }
