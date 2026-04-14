@@ -78,6 +78,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
     selectedTickers.forEach((t) => { initial[t] = sharesMap[t] || ''; });
     setSharesMap(initial);
     setStep(3);
+    // Scroll to top so user sees the first stock in the shares list
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleConfirmAll = () => {
