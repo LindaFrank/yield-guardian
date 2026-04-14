@@ -134,10 +134,21 @@ export async function parsePDF(file: File): Promise<ParsedRow[]> {
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    const pageText = content.items
-      .map((item: any) => item.str)
-      .join(' ');
-    fullText += pageText + '\n';
+
+    // Group text items into lines by y-position
+    let lastY: number | null = null;
+    let line = '';
+    for (const item of content.items as any[]) {
+      const y = item.transform ? item.transform[5] : null;
+      if (lastY !== null && y !== null && Math.abs(y - lastY) > 2) {
+        // Different y-position → new line
+        fullText += line + '\n';
+        line = '';
+      }
+      line += (line ? ' ' : '') + item.str;
+      lastY = y;
+    }
+    if (line) fullText += line + '\n';
   }
 
   return parseTextLines(fullText);
