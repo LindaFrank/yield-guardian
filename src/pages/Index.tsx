@@ -312,7 +312,7 @@ const Index = () => {
                     className="gap-2 border-[4px] border-muted-foreground/50"
                     onClick={() => {
                       const el = document.getElementById('underperformers-section');
-                      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
                   >
                     <TrendingDown className="w-4 h-4" />
