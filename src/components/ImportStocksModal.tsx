@@ -80,7 +80,7 @@ export function ImportStocksModal({ existingTickers, onAddStock }: ImportStocksM
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2 border-[4px] border-muted-foreground/50">
           <Upload className="w-4 h-4" />
-          Import
+          Import Stocks from Another Portfolio
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg border-[3px] border-muted-foreground/60">
