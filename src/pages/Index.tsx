@@ -238,7 +238,7 @@ const Index = () => {
           </div>
         </HelpTooltip>
 
-        {/* Stats Overview — individual panel tooltips handled inside PortfolioStats */}
+        {/* Stats Overview */}
         <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
           <PortfolioStats
             stocks={stocks}
@@ -248,36 +248,56 @@ const Index = () => {
             targetYield={targetYield}
             underperformerCount={underperformers.length}
           />
-          {stocks.length > 0 && (
-            <div className="mt-4 flex justify-end">
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
-                onClick={async () => {
-                  try {
-                    await generatePortfolioReport({
-                      stocks,
-                      sharesMap: Object.fromEntries(
-                        (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
-                      ),
-                      targetYield,
-                      underperformers,
-                      getReplacements: (stock) =>
-                        suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
-                    });
-                  } catch (err) {
-                    console.error('Report generation failed:', err);
-                    toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
-                  }
-                }}
-              >
-                <FileDown className="w-5 h-5 mr-2" />
-                Generate Report
-              </Button>
-            </div>
-          )}
         </section>
+
+        {/* Sticky Action Bar */}
+        {wizardDone && (
+          <div className="sticky top-28 z-30 mb-6 flex items-center justify-between gap-4 rounded-lg border-2 border-primary/30 bg-background/80 backdrop-blur-md px-5 py-3 shadow-glow animate-fade-in">
+            <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground/90">
+              WHAT WOULD YOU LIKE TO DO?
+            </span>
+            <div className="flex items-center gap-2">
+              <ImportStocksModal
+                existingTickers={stocks.map((s) => s.ticker)}
+                onAddStock={handleAddStock}
+              />
+              <AddStockModal
+                existingTickers={stocks.map((s) => s.ticker)}
+                onAddStock={handleAddStock}
+                open={addStockOpen}
+                onOpenChange={setAddStockOpen}
+                suggestedStocks={liveMarketStocks}
+                targetYield={targetYield}
+              />
+              {stocks.length > 0 && (
+                <Button
+                  variant="outline"
+                  className="gap-2 border-[4px] border-muted-foreground/50"
+                  onClick={async () => {
+                    try {
+                      await generatePortfolioReport({
+                        stocks,
+                        sharesMap: Object.fromEntries(
+                          (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                        ),
+                        targetYield,
+                        underperformers,
+                        getReplacements: (stock) =>
+                          suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                      });
+                    } catch (err) {
+                      console.error('Report generation failed:', err);
+                      toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
+                    }
+                  }}
+                >
+                  <FileDown className="w-4 h-4" />
+                  Generate Report
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Row 1: Yield slider + Underperformers */}
         <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
