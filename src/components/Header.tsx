@@ -57,7 +57,9 @@ export function Header() {
                 <h1 className="font-semibold text-lg">Yield Guardian</h1>
                 <div className="flex items-center gap-1 my-0.5">
                   <span className="text-muted-foreground/70 text-[10px] leading-none">◂</span>
-                  <div className="h-[1px] w-24 bg-muted-foreground/40" />
+                  <div className="h-[2px] w-10 bg-muted-foreground/40" />
+                  <span className="text-muted-foreground/50 text-[10px] leading-none font-mono">//</span>
+                  <div className="h-[2px] w-10 bg-muted-foreground/40" />
                   <span className="text-muted-foreground/70 text-[10px] leading-none">▸</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
@@ -84,7 +86,9 @@ export function Header() {
           </div>
           <div className="flex items-center justify-center gap-1 mt-3">
             <span className="text-muted-foreground/60 text-[10px] leading-none">◂</span>
-            <div className="h-[1px] w-[90%] bg-muted-foreground/40" />
+            <div className="h-[2px] w-[44%] bg-muted-foreground/40" />
+            <span className="text-muted-foreground/50 text-[10px] leading-none font-mono">//</span>
+            <div className="h-[2px] w-[44%] bg-muted-foreground/40" />
             <span className="text-muted-foreground/60 text-[10px] leading-none">▸</span>
           </div>
         </div>
