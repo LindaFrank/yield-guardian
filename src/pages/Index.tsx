@@ -288,7 +288,7 @@ const Index = () => {
 
         {/* Sticky Action Bar */}
         {wizardDone && (
-          <div className="sticky top-[72px] z-40 mb-6 flex flex-col gap-2 rounded-lg border-2 border-primary/30 bg-background px-4 py-2 shadow-glow animate-fade-in">
+          <div className="sticky top-[100px] z-40 mb-6 flex flex-col gap-2 rounded-lg border-2 border-primary/30 bg-background px-4 py-2 shadow-glow animate-fade-in">
             <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/90 text-center">
               WHAT WOULD YOU LIKE TO DO?
             </span>
