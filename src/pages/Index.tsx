@@ -238,6 +238,29 @@ const Index = () => {
           </div>
         </HelpTooltip>
 
+        {/* New user: show onboarding wizard prominently first */}
+        {showStockFinder && (
+          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
+            <EmptyPortfolio
+              onSelectStocks={() => setAddStockOpen(true)}
+              onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+              onAddStock={handleAddStock}
+              onYieldChange={setTargetYield}
+              currentYield={targetYield}
+              onDone={() => {
+                setWizardDismissed(true);
+                setShowFindStocksFlow(false);
+                setFindStocksStep(0);
+              }}
+              onCancel={() => {
+                setShowFindStocksFlow(false);
+                setFindStocksStep(0);
+              }}
+              initialStep={showFindStocksFlow ? findStocksStep : 0}
+            />
+          </section>
+        )}
+
         {/* Stats Overview */}
         <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
           <PortfolioStats
@@ -334,25 +357,7 @@ const Index = () => {
                 </HelpTooltip>
               </div>
               
-              {showStockFinder ? (
-                <EmptyPortfolio
-                  onSelectStocks={() => setAddStockOpen(true)}
-                  onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                  onAddStock={handleAddStock}
-                  onYieldChange={setTargetYield}
-                  currentYield={targetYield}
-                  onDone={() => {
-                    setWizardDismissed(true);
-                    setShowFindStocksFlow(false);
-                    setFindStocksStep(0);
-                  }}
-                  onCancel={() => {
-                    setShowFindStocksFlow(false);
-                    setFindStocksStep(0);
-                  }}
-                  initialStep={showFindStocksFlow ? findStocksStep : 0}
-                />
-              ) : (
+              {!showStockFinder && (
                 <div className="grid sm:grid-cols-2 gap-4">
                   {stockAnalyses.map((analysis, index) => (
                     <div
