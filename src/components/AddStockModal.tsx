@@ -121,7 +121,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
           Add Stock
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg border-[3px] border-muted-foreground/60">
         <DialogHeader>
           <DialogTitle>
             {phase === 'search' ? 'Add Stocks to Portfolio' : 'Enter Shares'}

@@ -261,7 +261,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               const numVal = parseFloat(val);
               const isInvalid = submitted && (!numVal || numVal <= 0);
               return (
-                <Card key={stock.ticker} className={`p-4 border-border/50 ${isInvalid ? 'border-destructive/50' : ''}`}>
+                <Card key={stock.ticker} className={`p-4 border-border/50 ${isInvalid ? 'border-yield-negative' : ''}`}>
                   <div className="flex items-center gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
