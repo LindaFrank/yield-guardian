@@ -1,18 +1,9 @@
-import { useState } from 'react';
-import { Stock, StockAnalysis, ReplacementCandidate } from '@/types/portfolio';
+import { useState, useEffect } from 'react';
+import { Stock, StockAnalysis } from '@/types/portfolio';
 import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle, Pencil, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from '@/components/ui/sheet';
-import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 
 interface StockCardProps {
   analysis: StockAnalysis;
@@ -20,16 +11,20 @@ interface StockCardProps {
   onRemove?: (ticker: string) => void;
   onSelect?: (stock: Stock) => void;
   onUpdateShares?: (ticker: string, shares: number | null) => void;
-  onAddStock?: (stock: Stock, shares?: number) => void;
-  replacements?: ReplacementCandidate[];
   isSelected?: boolean;
 }
 
-export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateShares, onAddStock, replacements, isSelected }: StockCardProps) {
+export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateShares, isSelected }: StockCardProps) {
   const { stock, currentYield, isStable, isUnderperforming, stabilityYears } = analysis;
   const [editing, setEditing] = useState(false);
   const [sharesInput, setSharesInput] = useState(sharesOwned?.toString() ?? '');
-  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Keep local input in sync with DB value when not editing
+  useEffect(() => {
+    if (!editing) {
+      setSharesInput(sharesOwned?.toString() ?? '');
+    }
+  }, [sharesOwned, editing]);
 
   const getYieldColor = () => {
     if (currentYield >= 5) return 'text-yield-positive';
@@ -74,8 +69,8 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
       onClick={() => onSelect?.(stock)}
       className={cn(
         'group relative p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50',
-        'transition-all duration-300 ease-out',
-        'hover:shadow-elevated hover:border-primary/20 hover:-translate-y-0.5 hover:scale-[1.02]',
+        'transition-all duration-200 ease-out',
+        'hover:shadow-elevated hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.02]',
         'active:scale-[0.97]',
         isSelected && 'ring-2 ring-primary border-primary/40',
         isUnderperforming && 'border-yield-negative',
@@ -175,45 +170,6 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
           </div>
         </div>
       </div>
-
-      {/* Underperformer button */}
-      {isUnderperforming && (
-        <>
-          <Button
-            variant="destructive"
-            size="sm"
-            className="mt-3 w-full gap-1.5 text-xs whitespace-nowrap overflow-hidden"
-            onClick={(e) => {
-              e.stopPropagation();
-              setSheetOpen(true);
-            }}
-          >
-            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">Underperformer — View Replacements</span>
-          </Button>
-
-          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>Replacements for {stock.ticker}</SheetTitle>
-                <SheetDescription>
-                  {stock.name} is underperforming your yield target. Here are suggested alternatives.
-                </SheetDescription>
-              </SheetHeader>
-              <div className="mt-6">
-                <ReplacementSuggestions
-                  removedStock={stock}
-                  candidates={replacements ?? []}
-                  onAddStock={(s, shares) => {
-                    onAddStock?.(s, shares);
-                    setSheetOpen(false);
-                  }}
-                />
-              </div>
-            </SheetContent>
-          </Sheet>
-        </>
-      )}
     </div>
   );
 }

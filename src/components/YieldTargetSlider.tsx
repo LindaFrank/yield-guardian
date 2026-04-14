@@ -8,7 +8,7 @@ interface YieldTargetSliderProps {
 
 export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
   return (
-    <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all hover:scale-[1.02] active:scale-[0.97]">
+    <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-elevated active:scale-[0.97]">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5 text-primary" />

@@ -9,15 +9,11 @@ interface ReportData {
   getReplacements: (stock: Stock) => ReplacementCandidate[];
 }
 
-export interface GeneratedPortfolioReport {
-  blob: Blob;
-}
-
-export async function generatePortfolioReport(data: ReportData): Promise<GeneratedPortfolioReport> {
+export async function generatePortfolioReport(data: ReportData): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const { default: autoTable } = await import('jspdf-autotable');
 
-  const doc = new jsPDF({ orientation: 'landscape' });
+  const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   let y = 20;
 
@@ -106,56 +102,24 @@ export async function generatePortfolioReport(data: ReportData): Promise<Generat
       // Replacement candidates sorted by price closest to underperformer
       const replacements = data.getReplacements(analysis.stock);
       const underPrice = analysis.stock.currentPrice;
-      const underAnnualDiv = analysis.stock.annualDividend * underShares;
       const sortedReplacements = [...replacements].sort((a, b) => Math.abs(a.stock.currentPrice - underPrice) - Math.abs(b.stock.currentPrice - underPrice));
       if (sortedReplacements.length > 0) {
         autoTable(doc, {
           startY: y,
-          head: [[
-            'Ticker',
-            'Name',
-            'Price/Share',
-            '% Yield',
-            'Yield/Share\n(Dollars)',
-            'Cost of Replacement\nStock (Yield×N=Ann.Div)',
-            'Num Repl.\nShares',
-            'Value Underperf.\nRetained',
-            'Num Underperf.\nShares Retained',
-            'Projected Annual\nDividend Yield ($)',
-          ]],
-          body: sortedReplacements.map((r) => {
-            const replDivPerShare = r.stock.annualDividend;
-            const replYieldPct = r.stock.currentPrice > 0 ? (replDivPerShare / r.stock.currentPrice) * 100 : 0;
-            const numReplShares = replDivPerShare > 0 ? Math.round(underAnnualDiv / replDivPerShare) : 0;
-            const replShareCost = numReplShares * r.stock.currentPrice;
-            const underTotalValue = underPrice * underShares;
-            const valueRetained = underTotalValue - replShareCost;
-            const numUnderRetained = underPrice > 0 ? valueRetained / underPrice : 0;
-            const underYieldPct = underPrice > 0 ? (analysis.stock.annualDividend / underPrice) * 100 : 0;
-            const projectedAnnualDiv =
-              numUnderRetained * (underYieldPct / 100) * underPrice +
-              numReplShares * (replYieldPct / 100) * r.stock.currentPrice;
-            return [
-              r.stock.ticker,
-              r.stock.name,
-              formatCurrency(r.stock.currentPrice),
-              formatPercentage(replYieldPct),
-              formatCurrency(replDivPerShare),
-              formatCurrency(replShareCost),
-              numReplShares.toString(),
-              formatCurrency(valueRetained),
-              numUnderRetained.toFixed(1),
-              formatCurrency(projectedAnnualDiv),
-            ];
-          }),
-          styles: { fontSize: 6.5, cellPadding: 2 },
-          headStyles: { fillColor: [74, 111, 165], textColor: 255, fontStyle: 'bold', fontSize: 6 },
+          head: [['#', 'Ticker', 'Name', 'Price', 'Yield', 'Stability', 'Reason']],
+          body: sortedReplacements.map((r, idx) => [
+            (idx + 1).toString(),
+            r.stock.ticker,
+            r.stock.name,
+            formatCurrency(r.stock.currentPrice),
+            formatPercentage(r.yield),
+            r.stabilityScore >= 3 ? 'Stable' : r.stabilityScore >= 2 ? 'Warning' : 'Unstable',
+            r.matchReason,
+          ]),
+          styles: { fontSize: 7.5, cellPadding: 2.5 },
+          headStyles: { fillColor: [74, 111, 165], textColor: 255, fontStyle: 'bold' },
           alternateRowStyles: { fillColor: [245, 248, 255] },
           margin: { left: 18, right: 18 },
-          columnStyles: {
-            0: { cellWidth: 18 },
-            1: { cellWidth: 45 },
-          },
         });
         y = (doc as any).lastAutoTable.finalY + 10;
       } else {
@@ -213,7 +177,5 @@ export async function generatePortfolioReport(data: ReportData): Promise<Generat
     doc.text('Dividend Tracker — Portfolio Report', 14, doc.internal.pageSize.getHeight() - 8);
   }
 
-  return {
-    blob: doc.output('blob'),
-  };
+  doc.save('portfolio-report.pdf');
 }

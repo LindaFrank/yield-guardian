@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, forwardRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { TrendingUp, DollarSign, Target, ChevronRight, Check, Hash, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,10 +24,7 @@ interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(function EmptyPortfolio(
-  { onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel },
-  ref
-) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel }: EmptyPortfolioProps) {
   const [step, setStep] = useState(initialStep);
 
   useEffect(() => {
@@ -98,7 +95,7 @@ export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(fu
   };
 
   return (
-    <div ref={ref} className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       {/* Step 0: Portfolio value = $0 */}
       {step === 0 && (
         <div className="text-center py-8 space-y-6">
@@ -113,6 +110,11 @@ export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(fu
             Let's build your dividend portfolio. We'll start by setting your desired yield target, then find stocks that match.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
+            {onCancel && (
+              <Button variant="outline" onClick={onCancel}>
+                Back to Portfolio
+              </Button>
+            )}
             <Button size="lg" onClick={() => setStep(1)} className="gap-2">
               Get Started <ChevronRight className="w-4 h-4" />
             </Button>
@@ -180,19 +182,6 @@ export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(fu
             {livePricesLoading && <Loader2 className="w-5 h-5 animate-spin text-primary mx-auto mt-2" />}
           </div>
 
-          <div className="flex flex-wrap gap-3 justify-center">
-            {onCancel && (
-              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
-            )}
-            <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
-            <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
-            {selectedTickers.size > 0 && (
-              <Button className="gap-2" onClick={handleProceedToShares}>
-                Enter Number of Shares <ChevronRight className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-
           {matchingStocks.length === 0 ? (
             <Card className="p-6 text-center border-border/50">
               <p className="text-muted-foreground">
@@ -207,8 +196,8 @@ export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(fu
                 return (
                   <Card
                     key={stock.ticker}
-                    className={`p-4 border-[4px] cursor-pointer transition-all duration-200 ${
-                      isChecked ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20' : 'border-muted-foreground/50 hover:border-primary/30 hover:bg-accent/30'
+                    className={`p-4 border-border/50 cursor-pointer transition-all duration-200 ${
+                      isChecked ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20' : 'hover:border-primary/30 hover:bg-accent/30'
                     }`}
                     onClick={() => toggleTicker(stock.ticker)}
                   >
@@ -238,6 +227,18 @@ export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(fu
             </div>
           )}
 
+          <div className="flex flex-wrap gap-3 justify-center">
+            {onCancel && (
+              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            )}
+            <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
+            <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
+            {selectedTickers.size > 0 && (
+              <Button className="gap-2" onClick={handleProceedToShares}>
+                Enter Shares for {selectedTickers.size} Stock{selectedTickers.size !== 1 ? 's' : ''} <ChevronRight className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
         </div>
       )}
 
@@ -260,7 +261,7 @@ export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(fu
               const numVal = parseFloat(val);
               const isInvalid = submitted && (!numVal || numVal <= 0);
               return (
-                <Card key={stock.ticker} className={`p-4 border-border/50 ${isInvalid ? 'border-destructive/50' : ''}`}>
+                <Card key={stock.ticker} className={`p-4 border-border/50 ${isInvalid ? 'border-yield-negative' : ''}`}>
                   <div className="flex items-center gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -311,6 +312,4 @@ export const EmptyPortfolio = forwardRef<HTMLDivElement, EmptyPortfolioProps>(fu
       )}
     </div>
   );
-});
-
-EmptyPortfolio.displayName = 'EmptyPortfolio';
+}

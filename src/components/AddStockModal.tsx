@@ -121,7 +121,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
           Add Stock
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg border-[3px] border-muted-foreground/60">
         <DialogHeader>
           <DialogTitle>
             {phase === 'search' ? 'Add Stocks to Portfolio' : 'Enter Shares'}
@@ -159,8 +159,8 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                         className={cn(
                           'w-full flex items-center gap-3 p-3 rounded-lg border-[4px] transition-colors text-left cursor-pointer',
                           isChecked
-                            ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20'
-                            : 'border-muted-foreground/50 hover:border-primary/30 hover:bg-secondary/50'
+                            ? 'bg-primary/5 border-primary/40 ring-1 ring-primary/20'
+                            : 'bg-secondary/30 border-muted-foreground/50 hover:border-primary/30 hover:bg-secondary/50'
                         )}
                       >
                         <Checkbox
@@ -181,16 +181,6 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                           </div>
                           <p className="text-sm text-muted-foreground mt-0.5">{stock.name}</p>
                         </div>
-                        {isChecked && (
-                          <Button
-                            size="sm"
-                            className="shrink-0 gap-1 text-xs"
-                            onClick={(e) => { e.stopPropagation(); handleProceedToShares(); }}
-                          >
-                            Enter Number of Shares
-                            <ChevronRight className="w-3 h-3" />
-                          </Button>
-                        )}
                       </div>
                     );
                   })}
@@ -223,11 +213,12 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                     key={result.symbol}
                     onClick={() => toggleSelect(result)}
                     role="button"
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg border-[4px] transition-colors text-left cursor-pointer ${
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-lg border-[4px] transition-colors text-left cursor-pointer',
                       isChecked
-                        ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20'
-                        : 'border-muted-foreground/50 hover:border-primary/30 hover:bg-secondary/50'
-                    }`}
+                        ? 'bg-primary/5 border-primary/40 ring-1 ring-primary/20'
+                        : 'bg-secondary/30 border-muted-foreground/50 hover:border-primary/30 hover:bg-secondary/50'
+                    )}
                   >
                     <Checkbox
                       checked={isChecked}
@@ -244,21 +235,19 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                       </div>
                       <p className="text-sm text-muted-foreground mt-0.5">{result.name}</p>
                     </div>
-                    {isChecked && (
-                      <Button
-                        size="sm"
-                        className="shrink-0 gap-1 text-xs"
-                        onClick={(e) => { e.stopPropagation(); handleProceedToShares(); }}
-                      >
-                        Enter Number of Shares
-                        <ChevronRight className="w-3 h-3" />
-                      </Button>
-                    )}
                   </div>
                 );
               })}
             </div>
 
+            {selected.size > 0 && (
+              <div className="pt-2 border-t border-border/50">
+                <Button className="w-full gap-2" onClick={handleProceedToShares}>
+                  Enter Shares for {selected.size} Stock{selected.size !== 1 ? 's' : ''}
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
           </>
         )}
 

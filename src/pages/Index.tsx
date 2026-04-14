@@ -1,28 +1,24 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Target, FileDown } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
-import { PortfolioReportPreview } from '@/components/PortfolioReportPreview';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
   analyzeStock, 
   scanPortfolioForUnderperformers, 
-  suggestReplacements 
+  suggestReplacements,
+  checkDividendStability,
+  calculateDividendYield
 } from '@/lib/portfolioUtils';
 import { generatePortfolioReport } from '@/lib/generatePortfolioReport';
-import {
-  createPortfolioReportFileName,
-  createPortfolioReportPreview,
-  downloadPortfolioReport,
-  revokePortfolioReportPreview,
-  type PortfolioReportPreviewData,
-} from '@/lib/reportExport';
 import { Header } from '@/components/Header';
 import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
 import { StockCard } from '@/components/StockCard';
+import { UnderperformersList } from '@/components/UnderperformersList';
+import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { AddStockModal } from '@/components/AddStockModal';
-import { CSVImportModal } from '@/components/CSVImportModal';
+import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
@@ -57,44 +53,17 @@ const Index = () => {
 
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
+  const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
   const [addStockOpen, setAddStockOpen] = useState(false);
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
-  const [reportPreview, setReportPreview] = useState<PortfolioReportPreviewData | null>(null);
-  const [reportPreviewOpen, setReportPreviewOpen] = useState(false);
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
   const wizardDone = wizardDismissed || (!tickersLoading && tickers.length > 0);
   const showStockFinder = !wizardDone || showFindStocksFlow;
   const yieldSliderRef = useRef<HTMLElement>(null);
-  const reportPreviewUrlRef = useRef<string | null>(null);
   const { toast } = useToast();
-
-  const updateReportPreview = (nextPreview: PortfolioReportPreviewData | null) => {
-    if (reportPreviewUrlRef.current && reportPreviewUrlRef.current !== nextPreview?.url) {
-      revokePortfolioReportPreview(reportPreviewUrlRef.current);
-    }
-
-    reportPreviewUrlRef.current = nextPreview?.url ?? null;
-    setReportPreview(nextPreview);
-  };
-
-  const handleReportPreviewOpenChange = (open: boolean) => {
-    setReportPreviewOpen(open);
-
-    if (!open) {
-      updateReportPreview(null);
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (reportPreviewUrlRef.current) {
-        revokePortfolioReportPreview(reportPreviewUrlRef.current);
-      }
-    };
-  }, []);
 
   // Fetch live data for portfolio tickers
   const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
@@ -104,8 +73,10 @@ const Index = () => {
 
   // Keep local portfolio state in sync when user/account tickers change
   useEffect(() => {
+    // Critical for new accounts: never keep stale stocks from a previous session/user
     if (tickers.length === 0) {
       setStocks([]);
+      setSelectedUnderperformer(null);
       return;
     }
 
@@ -171,40 +142,70 @@ const Index = () => {
     });
   }, [liveCandidates]);
 
-  // Pre-compute replacements for each underperforming stock
-  const replacementsMap = useMemo(() => {
-    const map: Record<string, ReturnType<typeof suggestReplacements>> = {};
-    for (const analysis of stockAnalyses) {
-      if (analysis.isUnderperforming) {
-        map[analysis.stock.ticker] = suggestReplacements(
-          analysis.stock,
-          liveMarketStocks,
-          targetYield,
-          stocks.map((s) => s.ticker)
-        );
-      }
+  const replacements = useMemo(() => {
+    if (selectedUnderperformer) {
+      return suggestReplacements(
+        selectedUnderperformer,
+        liveMarketStocks,
+        targetYield,
+        stocks.map((s) => s.ticker)
+      );
     }
-    return map;
-  }, [stockAnalyses, liveMarketStocks, targetYield, stocks]);
+    // Default suggestions: top-yield, stability-prioritized candidates
+    const portfolioTickers = stocks.map((s) => s.ticker);
+    return liveMarketStocks
+      .filter((s) => !portfolioTickers.includes(s.ticker))
+      .map((s) => {
+        const stability = checkDividendStability(s, 2, targetYield);
+        const stabilityScore = stability.status === 'stable' ? 3 : stability.status === 'warning' ? 2 : 1;
+        const yieldVal = calculateDividendYield(s);
+        let matchReason = '';
+        if (stabilityScore === 3 && yieldVal >= targetYield) {
+          matchReason = 'Strong yield & stable history';
+        } else if (yieldVal >= targetYield) {
+          matchReason = 'Meets yield target';
+        } else {
+          matchReason = 'Popular dividend stock';
+        }
+        return {
+          stock: s,
+          yield: yieldVal,
+          stabilityScore,
+          matchReason,
+        };
+      })
+      .filter((c) => c.yield >= targetYield)
+      .sort((a, b) => {
+        // Prioritize stability first, then yield
+        if (a.stabilityScore !== b.stabilityScore) return b.stabilityScore - a.stabilityScore;
+        return b.yield - a.yield;
+      })
+      .slice(0, 5);
+  }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks]);
 
   const handleRemoveStock = (ticker: string) => {
     setStocks((prev) => prev.filter((s) => s.ticker !== ticker));
+    if (selectedUnderperformer?.ticker === ticker) {
+      setSelectedUnderperformer(null);
+    }
     if (user) {
       removeTicker.mutate(ticker);
     }
   };
 
   const handleAddStock = (stock: Stock, shares?: number) => {
-    const existing = stocks.find((s) => s.ticker === stock.ticker);
-    if (!existing) {
+    if (!stocks.find((s) => s.ticker === stock.ticker)) {
       setStocks((prev) => [...prev, stock]);
       if (user) {
         addTicker.mutate({ ticker: stock.ticker, shares });
       }
-    } else if (shares != null && user) {
-      // Stock already in portfolio — update its shares (e.g. from replacement sheet)
-      updateShares.mutate({ ticker: stock.ticker, shares });
     }
+  };
+
+  const handleSelectUnderperformer = (stock: Stock) => {
+    setSelectedUnderperformer(
+      selectedUnderperformer?.ticker === stock.ticker ? null : stock
+    );
   };
 
   return (
@@ -237,86 +238,8 @@ const Index = () => {
           </div>
         </HelpTooltip>
 
-        {/* Action bar — sticky below header */}
-        {!showStockFinder && (
-          <div className="sticky top-28 z-30 mb-6 rounded-lg border-2 border-primary/30 bg-background/90 backdrop-blur-sm shadow-sm shadow-glow">
-            <p className="px-4 pt-2 text-sm uppercase tracking-wider text-muted-foreground/90">What would you like to do?</p>
-            <div className="flex items-center gap-2 px-4 py-2">
-              <CSVImportModal existingTickers={stocks.map((s) => s.ticker)} />
-              <AddStockModal
-                existingTickers={stocks.map((s) => s.ticker)}
-                onAddStock={handleAddStock}
-                open={addStockOpen}
-                onOpenChange={setAddStockOpen}
-                suggestedStocks={liveMarketStocks}
-                targetYield={targetYield}
-              />
-              {stocks.length > 0 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
-                  onClick={async () => {
-                    try {
-                      const report = await generatePortfolioReport({
-                        stocks,
-                        sharesMap: Object.fromEntries(
-                          (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
-                        ),
-                        targetYield,
-                        underperformers,
-                        getReplacements: (stock) =>
-                          suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
-                      });
-
-                      const fileName = createPortfolioReportFileName();
-                      const preview = createPortfolioReportPreview(report.blob, fileName);
-                      updateReportPreview(preview);
-                      setReportPreviewOpen(true);
-
-                      toast({
-                        title: 'Report ready',
-                        description: `Previewing ${fileName} inside the app. Use Download PDF to save it.`,
-                      });
-                    } catch (err) {
-                      console.error('Report generation failed:', err);
-                      toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
-                    }
-                  }}
-                >
-                  <FileDown className="w-4 h-4 mr-1.5" />
-                  Generate Report
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Empty portfolio wizard — shown first when no stocks */}
-        {showStockFinder && (
-          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
-            <EmptyPortfolio
-              onSelectStocks={() => setAddStockOpen(true)}
-              onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-              onAddStock={handleAddStock}
-              onYieldChange={setTargetYield}
-              currentYield={targetYield}
-              onDone={() => {
-                setWizardDismissed(true);
-                setShowFindStocksFlow(false);
-                setFindStocksStep(0);
-              }}
-              onCancel={() => {
-                setShowFindStocksFlow(false);
-                setFindStocksStep(0);
-              }}
-              initialStep={showFindStocksFlow ? findStocksStep : 0}
-            />
-          </section>
-        )}
-
-        {/* Stats Overview */}
-        <section className="mb-8 animate-fade-in" style={{ animationDelay: showStockFinder ? '100ms' : '0ms' }}>
+        {/* Stats Overview — individual panel tooltips handled inside PortfolioStats */}
+        <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
           <PortfolioStats
             stocks={stocks}
             sharesMap={Object.fromEntries(
@@ -325,59 +248,142 @@ const Index = () => {
             targetYield={targetYield}
             underperformerCount={underperformers.length}
           />
+          {stocks.length > 0 && (
+            <div className="mt-4 flex justify-end">
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
+                onClick={async () => {
+                  try {
+                    await generatePortfolioReport({
+                      stocks,
+                      sharesMap: Object.fromEntries(
+                        (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                      ),
+                      targetYield,
+                      underperformers,
+                      getReplacements: (stock) =>
+                        suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                    });
+                  } catch (err) {
+                    console.error('Report generation failed:', err);
+                    toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
+                  }
+                }}
+              >
+                <FileDown className="w-5 h-5 mr-2" />
+                Generate Report
+              </Button>
+            </div>
+          )}
         </section>
 
-        {/* Portfolio Section — full width now */}
-        <div>
-          <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
-            <section ref={yieldSliderRef} className="animate-fade-in mb-6" style={{ animationDelay: showStockFinder ? '200ms' : '100ms' }}>
-              <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
-            </section>
-          </HelpTooltip>
-
+        {/* Row 1: Yield slider + Underperformers */}
+        <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
+          <div className="lg:col-span-2">
+            <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
+              <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+                <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
+              </section>
+            </HelpTooltip>
+          </div>
           {!showStockFinder && (
+            <div>
+              <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
+                <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+                  <UnderperformersList
+                    underperformers={underperformers}
+                    selectedStock={selectedUnderperformer}
+                    onSelectStock={handleSelectUnderperformer}
+                    targetYield={targetYield}
+                  />
+                </section>
+              </HelpTooltip>
+            </div>
+          )}
+        </div>
+
+        {/* Row 2: Portfolio cards + Suggested stocks */}
+        <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8 mt-8`}>
+          <div className="lg:col-span-2">
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
                 <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
+                <div className="flex items-center gap-2">
+                  <ImportStocksModal
+                    existingTickers={stocks.map((s) => s.ticker)}
+                    onAddStock={handleAddStock}
+                  />
+                  <AddStockModal
+                    existingTickers={stocks.map((s) => s.ticker)}
+                    onAddStock={handleAddStock}
+                    open={addStockOpen}
+                    onOpenChange={setAddStockOpen}
+                    suggestedStocks={liveMarketStocks}
+                    targetYield={targetYield}
+                  />
+                </div>
               </div>
               
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {stockAnalyses.map((analysis, index) => (
-                  <div
-                    key={analysis.stock.ticker}
-                    className="animate-fade-in"
-                    style={{ animationDelay: `${300 + index * 50}ms` }}
-                  >
-                    <StockCard
-                      analysis={analysis}
-                      sharesOwned={stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
-                      onRemove={handleRemoveStock}
-                      onAddStock={handleAddStock}
-                      replacements={replacementsMap[analysis.stock.ticker]}
-                      onUpdateShares={(ticker, shares) => {
-                        if (user) updateShares.mutate({ ticker, shares });
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
+              {showStockFinder ? (
+                <EmptyPortfolio
+                  onSelectStocks={() => setAddStockOpen(true)}
+                  onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                  onAddStock={handleAddStock}
+                  onYieldChange={setTargetYield}
+                  currentYield={targetYield}
+                  onDone={() => {
+                    setWizardDismissed(true);
+                    setShowFindStocksFlow(false);
+                    setFindStocksStep(0);
+                  }}
+                  onCancel={() => {
+                    setShowFindStocksFlow(false);
+                    setFindStocksStep(0);
+                  }}
+                  initialStep={showFindStocksFlow ? findStocksStep : 0}
+                />
+              ) : (
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {stockAnalyses.map((analysis, index) => (
+                    <div
+                      key={analysis.stock.ticker}
+                      className="animate-fade-in"
+                      style={{ animationDelay: `${300 + index * 50}ms` }}
+                    >
+                      <StockCard
+                        analysis={analysis}
+                        sharesOwned={stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
+                        onRemove={handleRemoveStock}
+                        onUpdateShares={(ticker, shares) => {
+                          if (user) updateShares.mutate({ ticker, shares });
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
+          </div>
+
+          {!showStockFinder && (
+            <div className="mt-[54px]">
+              <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
+                <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+                  <ReplacementSuggestions
+                    removedStock={selectedUnderperformer}
+                    candidates={replacements}
+                    onAddStock={handleAddStock}
+                  />
+                </section>
+              </HelpTooltip>
+            </div>
           )}
         </div>
       </main>
-
-      <PortfolioReportPreview
-        fileName={reportPreview?.fileName ?? 'portfolio-report.pdf'}
-        open={reportPreviewOpen}
-        previewUrl={reportPreview?.url ?? null}
-        onDownload={() => {
-          if (!reportPreview) return;
-          downloadPortfolioReport(reportPreview.url, reportPreview.fileName);
-        }}
-        onOpenChange={handleReportPreviewOpenChange}
-      />
     </div>
   );
 };
