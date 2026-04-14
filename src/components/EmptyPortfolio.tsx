@@ -119,7 +119,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               />
             )}
             <Button size="lg" onClick={() => setStep(1)} className="gap-2">
-              Get Started <ChevronRight className="w-4 h-4" />
+              Find Matching Stocks <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         </div>
