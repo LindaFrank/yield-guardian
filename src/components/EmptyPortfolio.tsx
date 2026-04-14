@@ -112,10 +112,11 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             Let's build your dividend portfolio. We'll start by setting your desired yield target, then find stocks that match.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            {onCancel && (
-              <Button variant="outline" onClick={onCancel}>
-                Back to Portfolio
-              </Button>
+            {onAddStock && (
+              <ImportStocksModal
+                existingTickers={existingTickers}
+                onAddStock={onAddStock}
+              />
             )}
             <Button size="lg" onClick={() => setStep(1)} className="gap-2">
               Get Started <ChevronRight className="w-4 h-4" />
@@ -157,8 +158,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             </div>
           </Card>
           <div className="flex flex-wrap gap-3 justify-center">
-            {onCancel && (
-              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            {onAddStock && (
+              <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
             )}
             <Button variant="outline" onClick={() => setStep(0)}>Back</Button>
             <Button onClick={handleYieldConfirm} className="gap-2">
@@ -230,8 +231,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
           )}
 
           <div className="flex flex-wrap gap-3 justify-center">
-            {onCancel && (
-              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            {onAddStock && (
+              <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
             )}
             <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
             <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
@@ -299,8 +300,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
           )}
 
           <div className="flex flex-wrap gap-3 justify-center">
-            {onCancel && (
-              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            {onAddStock && (
+              <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
             )}
             <Button variant="outline" onClick={() => { setSubmitted(false); setStep(2); }}>
               Back to Selection
