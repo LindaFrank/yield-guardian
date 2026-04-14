@@ -62,6 +62,15 @@ const KNOWN_TICKERS = new Set([
   'SO','SPG','SPGI','SRE','SYY','T','TGT','TJX','TMO','TROW','TRV','TSLA',
   'TXN','UNH','UNP','UPS','USB','V','VLO','VZ','WBA','WEC','WFC','WM','WMT',
   'XEL','XOM','ZTS',
+  // Schwab ETFs
+  'SCHH','SCHE','SCHF','SCHX','SCHA','SCHP','SCHD','SCHB','SCHG','SCHV','SCHR',
+  'FNDF','FNDA','FNDX','FNDE','FNDC',
+  'SCYB','EBND',
+  // SPDR / iShares / Vanguard ETFs
+  'SPY','IVV','VOO','VTI','VEA','VWO','BND','AGG','GLD','TLT','XLF','XLE','XLK',
+  'XLV','XLI','XLU','XLP','XLY','XLRE','XLB','XLC',
+  'IEFA','IEMG','IJR','IJH','IWM','IWF','IWD','DVY','HDV','IDV',
+  'VIG','VYM','VXUS','VGT','VNQ','VCIT','VCSH',
 ]);
 
 function isLikelyTicker(word: string): boolean {
