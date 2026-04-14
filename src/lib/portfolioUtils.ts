@@ -102,21 +102,25 @@ export function suggestReplacements(
   targetMinYield: number,
   existingTickers: string[]
 ): ReplacementCandidate[] {
-  return marketData
+  const scoredCandidates = marketData
     .filter((stock) => !existingTickers.includes(stock.ticker))
     .map((stock) => {
       const currentYield = calculateDividendYield(stock);
       const stability = checkDividendStability(stock, 2, targetMinYield);
       
       let matchReason = '';
-      if (stock.sector === removedStock.sector) {
+      if (stock.sector === removedStock.sector && currentYield >= targetMinYield) {
         matchReason = `Same sector (${stock.sector})`;
+      } else if (stock.sector === removedStock.sector) {
+        matchReason = `Closest same-sector option (${stock.sector})`;
       } else if (currentYield > targetMinYield + 1) {
         matchReason = 'High yield performer';
       } else if (stability.status === 'stable') {
         matchReason = 'Consistent dividend history';
-      } else {
+      } else if (currentYield >= targetMinYield) {
         matchReason = 'Meets yield target';
+      } else {
+        matchReason = 'Closest available match';
       }
       
       return {
@@ -126,17 +130,20 @@ export function suggestReplacements(
         matchReason,
       };
     })
-    .filter((candidate) => candidate.yield >= targetMinYield && candidate.stabilityScore >= 1)
     .sort((a, b) => {
-      // Prioritize meets target, then same sector, then yield
       const aMetTarget = a.yield >= targetMinYield ? 1 : 0;
       const bMetTarget = b.yield >= targetMinYield ? 1 : 0;
       if (aMetTarget !== bMetTarget) return bMetTarget - aMetTarget;
       if (a.stock.sector === removedStock.sector && b.stock.sector !== removedStock.sector) return -1;
       if (b.stock.sector === removedStock.sector && a.stock.sector !== removedStock.sector) return 1;
       return b.yield - a.yield;
-    })
-    .slice(0, 5);
+    });
+
+  const exactMatches = scoredCandidates.filter(
+    (candidate) => candidate.yield >= targetMinYield && candidate.stabilityScore >= 1
+  );
+
+  return (exactMatches.length > 0 ? exactMatches : scoredCandidates).slice(0, 5);
 }
 
 export function formatCurrency(value: number): string {
