@@ -210,11 +210,13 @@ function isLikelyHoldingRow(tokens: ParsedToken[], candidate: ParsedToken): bool
   const decimalMetricCount = countDecimalMetrics(tokens, startIndex);
   const hasPercent = tokens.slice(startIndex).some((token) => token.raw.includes('%'));
 
-  if (decimalMetricCount < 2) return false;
+  // Real holding rows have many columns (shares, price, value, cost, gain, yield, etc.)
+  // Summary rows like "Top Account Holdings" only have 2-3 values (market value + %)
+  if (decimalMetricCount < 3) return false;
 
   return KNOWN_TICKERS.has(candidate.normalized)
-    ? metricCount >= 2 || (metricCount >= 1 && hasPercent)
-    : metricCount >= 3 || (metricCount >= 2 && hasPercent);
+    ? metricCount >= 4 || (metricCount >= 3 && hasPercent)
+    : metricCount >= 5 || (metricCount >= 4 && hasPercent);
 }
 
 function parseLine(line: string, source: ParseSource): ParsedRow | undefined {
