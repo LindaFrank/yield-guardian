@@ -206,6 +206,11 @@ const Index = () => {
     setSelectedUnderperformer(
       selectedUnderperformer?.ticker === stock.ticker ? null : stock
     );
+    // Scroll to replacement suggestions section
+    setTimeout(() => {
+      const el = document.getElementById('replacement-suggestions-section');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   return (
@@ -397,7 +402,7 @@ const Index = () => {
           {!showStockFinder && (
             <div className="mt-[54px]">
               <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
-                <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+                <section id="replacement-suggestions-section" className="animate-fade-in" style={{ animationDelay: '500ms' }}>
                   <ReplacementSuggestions
                     removedStock={selectedUnderperformer}
                     candidates={replacements}
