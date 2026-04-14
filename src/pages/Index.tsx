@@ -360,7 +360,7 @@ const Index = () => {
           {!showStockFinder && (
             <div>
               <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
-                <section id="underperformers-section" className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+                <section id="underperformers-section" className="animate-fade-in scroll-mt-[180px]" style={{ animationDelay: '400ms' }}>
                   <UnderperformersList
                     underperformers={underperformers}
                     selectedStock={selectedUnderperformer}
