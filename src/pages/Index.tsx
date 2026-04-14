@@ -409,7 +409,7 @@ const Index = () => {
           {!showStockFinder && (
             <div className="mt-[54px]">
               <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
-                <section id="replacement-suggestions-section" className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+                <section id="replacement-suggestions-section" className="animate-fade-in scroll-mt-[180px]" style={{ animationDelay: '500ms' }}>
                   <ReplacementSuggestions
                     removedStock={selectedUnderperformer}
                     candidates={replacements}
