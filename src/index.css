@@ -138,7 +138,7 @@
   }
 
   .border-yield-negative {
-    border-color: hsl(var(--yield-negative) / 0.2);
+    border-color: hsl(var(--yield-negative) / 0.6);
   }
 
   .gradient-card {
