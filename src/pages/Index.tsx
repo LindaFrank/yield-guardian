@@ -276,11 +276,11 @@ const Index = () => {
 
         {/* Sticky Action Bar */}
         {wizardDone && (
-          <div className="sticky top-28 z-30 mb-6 flex items-center justify-between gap-4 rounded-lg border-2 border-primary/30 bg-background/80 backdrop-blur-md px-5 py-3 shadow-glow animate-fade-in">
-            <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground/90">
+          <div className="sticky top-28 z-30 mb-6 flex flex-col gap-3 rounded-lg border-2 border-primary/30 bg-background/80 backdrop-blur-md px-5 py-3 shadow-glow animate-fade-in">
+            <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground/90 text-center">
               WHAT WOULD YOU LIKE TO DO?
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center gap-2 flex-wrap">
               <ImportStocksModal
                 existingTickers={stocks.map((s) => s.ticker)}
                 onAddStock={handleAddStock}
