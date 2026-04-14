@@ -85,12 +85,20 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
 
   const handleConfirmAll = () => {
     setSubmitted(true);
-    // Validate all have valid shares
-    const allValid = selectedStocks.every((s) => {
+    // Find the first stock missing valid shares
+    const firstInvalid = selectedStocks.find((s) => {
       const val = parseFloat(sharesMap[s.ticker] || '');
-      return val > 0;
+      return !(val > 0);
     });
-    if (!allValid) return;
+    if (firstInvalid) {
+      // Scroll to the invalid card and show a toast
+      const el = document.getElementById(`shares-card-${firstInvalid.ticker}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      toast.error(`Please enter shares for ${firstInvalid.ticker}`, {
+        description: 'Every selected stock needs a valid number of shares.',
+      });
+      return;
+    }
 
     selectedStocks.forEach((stock) => {
       const shares = parseFloat(sharesMap[stock.ticker]);
