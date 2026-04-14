@@ -21,8 +21,23 @@ export interface ImportValidation {
   errors: { raw: string; reason: string }[];
 }
 
-// Common US stock ticker pattern (1-5 uppercase letters)
-const TICKER_RE = /\b([A-Z]{1,5})\b/;
+type ParseSource = 'text' | 'pdf';
+
+interface ParseTextOptions {
+  source?: ParseSource;
+}
+
+interface ParsedToken {
+  raw: string;
+  normalized: string;
+  index: number;
+}
+
+interface PositionedTextItem {
+  str: string;
+  x: number;
+  width: number;
+}
 
 // PII patterns to skip entire lines
 const PII_PATTERNS = [
@@ -45,6 +60,12 @@ const NOISE_WORDS = new Set([
   'DATE', 'PAGE', 'ACCOUNT', 'STATEMENT', 'BROKERAGE', 'HOLDINGS',
   'DESCRIPTION', 'TYPE', 'ACTION', 'DIVIDEND', 'YIELD', 'SECTOR',
   'MARKET', 'EXCHANGE', 'CURRENCY',
+]);
+
+const BLOCKED_TICKER_WORDS = new Set([
+  'AND', 'ARE', 'AS', 'AT', 'FOR', 'FROM', 'GAIN', 'HAS', 'HAVE', 'HOW',
+  'ID', 'IN', 'IS', 'ITS', 'LOSS', 'NOT', 'OF', 'ONE', 'OUR', 'OUT',
+  'ST', 'THE', 'TO', 'WAS', 'WHO', 'WHY', 'WITH', 'YOUR',
 ]);
 
 // Known valid tickers for quick validation (top dividend stocks)
@@ -70,17 +91,28 @@ const KNOWN_TICKERS = new Set([
   'SPY','IVV','VOO','VTI','VEA','VWO','BND','AGG','GLD','TLT','XLF','XLE','XLK',
   'XLV','XLI','XLU','XLP','XLY','XLRE','XLB','XLC',
   'IEFA','IEMG','IJR','IJH','IWM','IWF','IWD','DVY','HDV','IDV',
-  'VIG','VYM','VXUS','VGT','VNQ','VCIT','VCSH',
+  'VIG','VTEB','VYM','VXUS','VGT','VNQ','VCIT','VCSH',
 ]);
+
+const HOLDING_METRIC_RE = /^(?:<\s*)?\(?-?\$?\d[\d,]*(?:\.\d+)?%?\)?$/;
+const Y_TOLERANCE = 3;
+const COLUMN_GAP_THRESHOLD = 12;
+
+function normalizeTickerToken(word: string): string {
+  return word.toUpperCase().replace(/[^A-Z.]/g, '');
+}
 
 function isLikelyTicker(word: string): boolean {
   if (word.length < 1 || word.length > 5) return false;
   if (NOISE_WORDS.has(word)) return false;
+  if (BLOCKED_TICKER_WORDS.has(word)) return false;
   if (/^\d+$/.test(word)) return false;
   // Known tickers pass immediately
   if (KNOWN_TICKERS.has(word)) return true;
-  // Heuristic: 1-5 uppercase letters
-  return /^[A-Z]{1,5}$/.test(word);
+  // Unknown 1-2 character codes are too ambiguous in statement PDFs
+  if (word.length <= 2) return false;
+  // Heuristic: 3-5 uppercase letters for unknown symbols
+  return /^[A-Z]{3,5}$/.test(word);
 }
 
 function hasPII(line: string): boolean {
@@ -88,42 +120,184 @@ function hasPII(line: string): boolean {
 }
 
 function parseNumber(s: string): number | undefined {
-  const cleaned = s.replace(/,/g, '').trim();
+  const cleaned = s.replace(/[,$%()<>\s]/g, '').replace(/,/g, '').trim();
   const n = parseFloat(cleaned);
   return isNaN(n) ? undefined : n;
 }
 
-export function parseTextLines(text: string): ParsedRow[] {
+function tokenizeLine(line: string): ParsedToken[] {
+  return line
+    .split(/[\s,;|\t]+/)
+    .map((raw, index) => ({
+      raw,
+      normalized: normalizeTickerToken(raw),
+      index,
+    }))
+    .filter((token) => token.raw.trim().length > 0);
+}
+
+function looksLikeHoldingMetric(raw: string): boolean {
+  return HOLDING_METRIC_RE.test(raw.trim());
+}
+
+function countHoldingMetrics(tokens: ParsedToken[], startIndex = 0): number {
+  return tokens.slice(startIndex).filter((token) => looksLikeHoldingMetric(token.raw)).length;
+}
+
+function countDecimalMetrics(tokens: ParsedToken[], startIndex = 0): number {
+  return tokens
+    .slice(startIndex)
+    .filter((token) => /\d+\.\d+/.test(token.raw) || token.raw.includes('%'))
+    .length;
+}
+
+function getFirstMetricOffset(tokens: ParsedToken[], startIndex = 0): number | null {
+  const index = tokens.slice(startIndex).findIndex((token) => looksLikeHoldingMetric(token.raw));
+  return index === -1 ? null : index;
+}
+
+function findTickerCandidate(tokens: ParsedToken[]): ParsedToken | undefined {
+  return tokens.slice(0, 4).find((token) => isLikelyTicker(token.normalized));
+}
+
+function findShareCount(tokens: ParsedToken[], startIndex = 0): number | undefined {
+  for (const token of tokens.slice(startIndex)) {
+    if (!looksLikeHoldingMetric(token.raw)) continue;
+    if (token.raw.includes('%') || token.raw.includes('$') || token.raw.includes('<')) continue;
+
+    const n = parseNumber(token.raw);
+    if (n !== undefined && n > 0 && n < 1_000_000_000) {
+      return n;
+    }
+  }
+}
+
+function isStandaloneTickerRow(
+  tokens: ParsedToken[],
+  candidate: ParsedToken,
+  source: ParseSource,
+  line: string
+): boolean {
+  if (candidate.index !== 0) return false;
+
+  const alphaTokens = tokens.filter((token) => /[A-Za-z]/.test(token.raw));
+  const metricCount = countHoldingMetrics(tokens, candidate.index + 1);
+
+  if (alphaTokens.length !== 1) {
+    return false;
+  }
+
+  if (tokens.length === 1) {
+    return source === 'text' || KNOWN_TICKERS.has(candidate.normalized);
+  }
+
+  if (metricCount === 1) {
+    return source === 'text' || KNOWN_TICKERS.has(candidate.normalized) || /[,;\t]/.test(line);
+  }
+
+  return false;
+}
+
+function isLikelyHoldingRow(tokens: ParsedToken[], candidate: ParsedToken): boolean {
+  if (candidate.index > 1) return false;
+
+  const startIndex = candidate.index + 1;
+  const firstMetricOffset = getFirstMetricOffset(tokens, startIndex);
+  if (firstMetricOffset === null || firstMetricOffset > 8) return false;
+
+  const metricCount = countHoldingMetrics(tokens, startIndex);
+  const decimalMetricCount = countDecimalMetrics(tokens, startIndex);
+  const hasPercent = tokens.slice(startIndex).some((token) => token.raw.includes('%'));
+
+  if (decimalMetricCount < 2) return false;
+
+  return KNOWN_TICKERS.has(candidate.normalized)
+    ? metricCount >= 2 || (metricCount >= 1 && hasPercent)
+    : metricCount >= 3 || (metricCount >= 2 && hasPercent);
+}
+
+function parseLine(line: string, source: ParseSource): ParsedRow | undefined {
+  const trimmed = line.trim();
+  if (!trimmed || hasPII(trimmed)) return undefined;
+
+  const normalizedLine = trimmed.replace(/\s+/g, ' ');
+  const tokens = tokenizeLine(normalizedLine);
+  if (!tokens.length) return undefined;
+
+  const candidate = findTickerCandidate(tokens);
+  if (!candidate) return undefined;
+
+  if (!isStandaloneTickerRow(tokens, candidate, source, normalizedLine) && !isLikelyHoldingRow(tokens, candidate)) {
+    return undefined;
+  }
+
+  return {
+    ticker: candidate.normalized,
+    shares: findShareCount(tokens, candidate.index + 1),
+    raw: normalizedLine,
+  };
+}
+
+export function parseTextLines(text: string, options: ParseTextOptions = {}): ParsedRow[] {
   const rows: ParsedRow[] = [];
+  const source = options.source ?? 'text';
   const lines = text.split(/\r?\n/);
 
   for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || hasPII(trimmed)) continue;
-
-    // Try to find a ticker in the line
-    const words = trimmed.split(/[\s,;|\t]+/);
-    let foundTicker: string | null = null;
-    let foundShares: number | undefined;
-
-    for (const word of words) {
-      const upper = word.toUpperCase().replace(/[^A-Z.]/g, '');
-      if (!foundTicker && isLikelyTicker(upper)) {
-        foundTicker = upper;
-      } else if (foundTicker && !foundShares) {
-        const n = parseNumber(word);
-        if (n !== undefined && n > 0 && n < 1_000_000_000) {
-          foundShares = n;
-        }
-      }
-    }
-
-    if (foundTicker) {
-      rows.push({ ticker: foundTicker, shares: foundShares, raw: trimmed });
+    const parsedRow = parseLine(line, source);
+    if (parsedRow) {
+      rows.push(parsedRow);
     }
   }
 
   return rows;
+}
+
+async function extractPageTextWithStructure(page: any): Promise<string> {
+  const content = await page.getTextContent();
+  const lineMap = new Map<number, PositionedTextItem[]>();
+
+  for (const item of content.items as any[]) {
+    if (!('str' in item) || !item.str?.trim() || !item.transform) continue;
+
+    const y = Math.round(item.transform[5] / Y_TOLERANCE) * Y_TOLERANCE;
+    const x = item.transform[4];
+
+    if (!lineMap.has(y)) {
+      lineMap.set(y, []);
+    }
+
+    lineMap.get(y)?.push({
+      str: item.str.trim(),
+      x,
+      width: item.width ?? item.str.trim().length * 5,
+    });
+  }
+
+  return Array.from(lineMap.entries())
+    .sort((a, b) => b[0] - a[0])
+    .map(([_, items]) => {
+      const sortedItems = items.sort((a, b) => a.x - b.x);
+      let line = '';
+      let previous: PositionedTextItem | null = null;
+
+      for (const item of sortedItems) {
+        if (!line) {
+          line = item.str;
+          previous = item;
+          continue;
+        }
+
+        const gap = item.x - ((previous?.x ?? 0) + (previous?.width ?? 0));
+        line += gap > COLUMN_GAP_THRESHOLD ? '  ' : ' ';
+        line += item.str;
+        previous = item;
+      }
+
+      return line.trim();
+    })
+    .filter(Boolean)
+    .join('\n');
 }
 
 export async function parsePDF(file: File): Promise<ParsedRow[]> {
@@ -133,25 +307,10 @@ export async function parsePDF(file: File): Promise<ParsedRow[]> {
 
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-
-    // Group text items into lines by y-position
-    let lastY: number | null = null;
-    let line = '';
-    for (const item of content.items as any[]) {
-      const y = item.transform ? item.transform[5] : null;
-      if (lastY !== null && y !== null && Math.abs(y - lastY) > 2) {
-        // Different y-position → new line
-        fullText += line + '\n';
-        line = '';
-      }
-      line += (line ? ' ' : '') + item.str;
-      lastY = y;
-    }
-    if (line) fullText += line + '\n';
+    fullText += `${await extractPageTextWithStructure(page)}\n`;
   }
 
-  return parseTextLines(fullText);
+  return parseTextLines(fullText, { source: 'pdf' });
 }
 
 export function parseFile(file: File): Promise<ParsedRow[]> {
@@ -163,7 +322,7 @@ export function parseFile(file: File): Promise<ParsedRow[]> {
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      resolve(parseTextLines(text));
+      resolve(parseTextLines(text, { source: 'text' }));
     };
     reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsText(file);
