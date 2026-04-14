@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { TrendingUp, DollarSign, Target, ChevronRight, Check, Hash, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -84,12 +85,20 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
 
   const handleConfirmAll = () => {
     setSubmitted(true);
-    // Validate all have valid shares
-    const allValid = selectedStocks.every((s) => {
+    // Find the first stock missing valid shares
+    const firstInvalid = selectedStocks.find((s) => {
       const val = parseFloat(sharesMap[s.ticker] || '');
-      return val > 0;
+      return !(val > 0);
     });
-    if (!allValid) return;
+    if (firstInvalid) {
+      // Scroll to the invalid card and show a toast
+      const el = document.getElementById(`shares-card-${firstInvalid.ticker}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      toast.error(`Please enter shares for ${firstInvalid.ticker}`, {
+        description: 'Every selected stock needs a valid number of shares.',
+      });
+      return;
+    }
 
     selectedStocks.forEach((stock) => {
       const shares = parseFloat(sharesMap[stock.ticker]);
@@ -269,7 +278,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               const numVal = parseFloat(val);
               const isInvalid = submitted && (!numVal || numVal <= 0);
               return (
-                <Card key={stock.ticker} className={`p-4 border-border/50 ${isInvalid ? 'border-yield-negative' : ''}`}>
+                <Card key={stock.ticker} id={`shares-card-${stock.ticker}`} className={`p-4 border-border/50 ${isInvalid ? 'border-yield-negative' : ''}`}>
                   <div className="flex items-center gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
