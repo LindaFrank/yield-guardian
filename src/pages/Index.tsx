@@ -257,6 +257,7 @@ const Index = () => {
                 setFindStocksStep(0);
               }}
               initialStep={showFindStocksFlow ? findStocksStep : 0}
+              existingTickers={stocks.map((s) => s.ticker)}
             />
           </section>
         )}
