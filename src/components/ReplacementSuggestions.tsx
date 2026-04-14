@@ -1,14 +1,17 @@
+import { useState } from 'react';
 import { ReplacementCandidate, Stock } from '@/types/portfolio';
 import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
-import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ReplacementSuggestionsProps {
   removedStock: Stock | null;
   candidates: ReplacementCandidate[];
-  onAddStock: (stock: Stock) => void;
+  onAddStock: (stock: Stock, shares?: number) => void;
 }
 
 export function ReplacementSuggestions({ 
@@ -16,6 +19,30 @@ export function ReplacementSuggestions({
   candidates, 
   onAddStock 
 }: ReplacementSuggestionsProps) {
+  const [editingTicker, setEditingTicker] = useState<string | null>(null);
+  const [sharesInput, setSharesInput] = useState('');
+
+  const handlePlusClick = (ticker: string) => {
+    setEditingTicker(ticker);
+    setSharesInput('');
+  };
+
+  const handleConfirm = (stock: Stock) => {
+    const shares = parseFloat(sharesInput);
+    if (!(shares > 0)) {
+      toast.error(`Please enter a valid number of shares for ${stock.ticker}`);
+      return;
+    }
+    onAddStock(stock, shares);
+    setEditingTicker(null);
+    setSharesInput('');
+  };
+
+  const handleCancel = () => {
+    setEditingTicker(null);
+    setSharesInput('');
+  };
+
   if (candidates.length === 0) {
     return (
       <div className="p-8 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 text-center transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 active:scale-[0.97]">
@@ -78,14 +105,49 @@ export function ReplacementSuggestions({
               </p>
               <p className="text-xs text-primary/80 mt-1">{candidate.matchReason}</p>
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => onAddStock(candidate.stock)}
-              className="ml-2 hover:bg-primary/10 hover:text-primary"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
+
+            {editingTicker === candidate.stock.ticker ? (
+              <div className="flex items-center gap-1.5 ml-2">
+                <Input
+                  type="number"
+                  min="1"
+                  placeholder="Shares"
+                  value={sharesInput}
+                  onChange={(e) => setSharesInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleConfirm(candidate.stock);
+                    if (e.key === 'Escape') handleCancel();
+                  }}
+                  className="w-20 h-8 text-sm"
+                  autoFocus
+                />
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleConfirm(candidate.stock)}
+                  className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
+                >
+                  <Check className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleCancel}
+                  className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => handlePlusClick(candidate.stock.ticker)}
+                className="ml-2 hover:bg-primary/10 hover:text-primary"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         ))}
       </div>
