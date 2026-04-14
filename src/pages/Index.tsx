@@ -142,19 +142,25 @@ const Index = () => {
     });
   }, [liveCandidates]);
 
+  // Build default candidate list from either live or mock data
+  const candidatePool = useMemo(() => {
+    const portfolioTickers = stocks.map((s) => s.ticker);
+    const pool = liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks;
+    return pool.filter((s) => !portfolioTickers.includes(s.ticker));
+  }, [liveMarketStocks, stocks]);
+
   const replacements = useMemo(() => {
     if (selectedUnderperformer) {
+      const pool = liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks;
       return suggestReplacements(
         selectedUnderperformer,
-        liveMarketStocks,
+        pool,
         targetYield,
         stocks.map((s) => s.ticker)
       );
     }
     // Default suggestions: top-yield, stability-prioritized candidates
-    const portfolioTickers = stocks.map((s) => s.ticker);
-    return liveMarketStocks
-      .filter((s) => !portfolioTickers.includes(s.ticker))
+    const scored = candidatePool
       .map((s) => {
         const stability = checkDividendStability(s, 2, targetYield);
         const stabilityScore = stability.status === 'stable' ? 3 : stability.status === 'warning' ? 2 : 1;
@@ -174,14 +180,15 @@ const Index = () => {
           matchReason,
         };
       })
-      .filter((c) => c.yield >= targetYield)
       .sort((a, b) => {
-        // Prioritize stability first, then yield
         if (a.stabilityScore !== b.stabilityScore) return b.stabilityScore - a.stabilityScore;
         return b.yield - a.yield;
-      })
-      .slice(0, 5);
-  }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks]);
+      });
+
+    // Prefer those meeting yield target, but show top candidates regardless
+    const meetsTarget = scored.filter((c) => c.yield >= targetYield);
+    return (meetsTarget.length > 0 ? meetsTarget : scored).slice(0, 5);
+  }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks, candidatePool]);
 
   const handleRemoveStock = (ticker: string) => {
     setStocks((prev) => prev.filter((s) => s.ticker !== ticker));
