@@ -313,6 +313,10 @@ const Index = () => {
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
                 <div className="flex items-center gap-2">
+                  <ImportStocksModal
+                    existingTickers={stocks.map((s) => s.ticker)}
+                    onAddStock={handleAddStock}
+                  />
                   <AddStockModal
                     existingTickers={stocks.map((s) => s.ticker)}
                     onAddStock={handleAddStock}
