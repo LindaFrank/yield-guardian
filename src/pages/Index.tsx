@@ -280,7 +280,7 @@ const Index = () => {
             <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/90 text-center">
               WHAT WOULD YOU LIKE TO DO?
             </span>
-            <div className="flex items-center justify-center gap-2 flex-wrap [&_button]:text-xs [&_button]:h-8 [&_button]:px-3">
+            <div className="flex items-center justify-center gap-3 flex-wrap [&_button]:text-xs [&_button]:h-8 [&_button]:px-3">
               <ImportStocksModal
                 existingTickers={stocks.map((s) => s.ticker)}
                 onAddStock={handleAddStock}
