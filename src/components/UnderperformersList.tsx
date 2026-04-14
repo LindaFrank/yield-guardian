@@ -41,7 +41,7 @@ export function UnderperformersList({
             onClick={() => onSelectStock(analysis.stock)}
             className={cn(
               'w-full flex items-center justify-between p-3 rounded-lg transition-colors',
-              'bg-secondary/30 border border-border/30 hover:border-border/50',
+              'bg-secondary/30 border-[2px] border-muted-foreground/50 hover:border-muted-foreground/70',
               selectedStock?.ticker === analysis.stock.ticker && 'border-primary bg-primary/5'
             )}
           >
