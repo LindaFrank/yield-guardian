@@ -7,24 +7,26 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Stock } from '@/types/portfolio';
 import { marketStocks } from '@/data/mockData';
+import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { useStockQuotes } from '@/hooks/useStockData';
 
 interface EmptyPortfolioProps {
   onSelectStocks: () => void;
   onSetYield: () => void;
-  onAddStock?: (stock: Stock, shares: number) => void;
+  onAddStock?: (stock: Stock, shares?: number) => void;
   onYieldChange?: (value: number) => void;
   currentYield?: number;
   onDone?: () => void;
   initialStep?: number;
   onCancel?: () => void;
+  existingTickers?: string[];
 }
 
 interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel }: EmptyPortfolioProps) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel, existingTickers = [] }: EmptyPortfolioProps) {
   const [step, setStep] = useState(initialStep);
 
   useEffect(() => {
