@@ -183,13 +183,13 @@ export function ImportStocksModal({ existingTickers, onAddStock }: ImportStocksM
               </TabsContent>
 
               <TabsContent value="errors">
-                <div className="border-[4px] border-destructive/40 rounded-lg p-3 max-h-60 overflow-y-auto">
+                <div className="border-[4px] border-yield-negative rounded-lg p-3 max-h-60 overflow-y-auto">
                   {totalErrors === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">No errors</p>
                   ) : (
                     <div className="space-y-2">
                       {validation.errors.map((err, i) => (
-                        <div key={i} className="border border-destructive/30 rounded-md p-2 bg-destructive/5">
+                        <div key={i} className="border-[2px] border-yield-negative rounded-md p-2 bg-yield-negative">
                           <p className="text-sm font-mono">{err.raw}</p>
                           <p className="text-xs text-destructive mt-0.5">{err.reason}</p>
                         </div>
