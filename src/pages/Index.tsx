@@ -294,30 +294,43 @@ const Index = () => {
                 targetYield={targetYield}
               />
               {stocks.length > 0 && (
-                <Button
-                  variant="outline"
-                  className="gap-2 border-[4px] border-muted-foreground/50"
-                  onClick={async () => {
-                    try {
-                      await generatePortfolioReport({
-                        stocks,
-                        sharesMap: Object.fromEntries(
-                          (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
-                        ),
-                        targetYield,
-                        underperformers,
-                        getReplacements: (stock) =>
-                          suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
-                      });
-                    } catch (err) {
-                      console.error('Report generation failed:', err);
-                      toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
-                    }
-                  }}
-                >
-                  <FileDown className="w-4 h-4" />
-                  Generate Report
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    className="gap-2 border-[4px] border-muted-foreground/50"
+                    onClick={() => {
+                      const el = document.getElementById('underperformers-section');
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }}
+                  >
+                    <TrendingDown className="w-4 h-4" />
+                    Review Underperformers ({underperformers.length})
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="gap-2 border-[4px] border-muted-foreground/50"
+                    onClick={async () => {
+                      try {
+                        await generatePortfolioReport({
+                          stocks,
+                          sharesMap: Object.fromEntries(
+                            (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                          ),
+                          targetYield,
+                          underperformers,
+                          getReplacements: (stock) =>
+                            suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                        });
+                      } catch (err) {
+                        console.error('Report generation failed:', err);
+                        toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
+                      }
+                    }}
+                  >
+                    <FileDown className="w-4 h-4" />
+                    Generate Report
+                  </Button>
+                </>
               )}
             </div>
           </div>
