@@ -332,20 +332,6 @@ const Index = () => {
                 <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
                   <h2 className="text-lg font-semibold">Your Portfolio</h2>
                 </HelpTooltip>
-                <div className="flex items-center gap-2">
-                  <ImportStocksModal
-                    existingTickers={stocks.map((s) => s.ticker)}
-                    onAddStock={handleAddStock}
-                  />
-                  <AddStockModal
-                    existingTickers={stocks.map((s) => s.ticker)}
-                    onAddStock={handleAddStock}
-                    open={addStockOpen}
-                    onOpenChange={setAddStockOpen}
-                    suggestedStocks={liveMarketStocks}
-                    targetYield={targetYield}
-                  />
-                </div>
               </div>
               
               {showStockFinder ? (
