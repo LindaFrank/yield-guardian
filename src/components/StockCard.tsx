@@ -124,19 +124,19 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
         <div>
           <p className="text-xs text-muted-foreground mb-1">Shares</p>
           {editing ? (
-            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
               <Input
                 type="number"
                 min="0"
                 step="1"
                 value={sharesInput}
                 onChange={(e) => setSharesInput(e.target.value)}
-                className="h-7 w-16 text-xs px-1.5"
+                className="h-7 w-14 text-xs px-1.5"
                 autoFocus
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSaveShares(); if (e.key === 'Escape') setEditing(false); }}
               />
-              <button onClick={(e) => handleSaveShares(e)} className="p-0.5 rounded hover:bg-primary/10 text-primary">
-                <Check className="w-3.5 h-3.5" />
+              <button onClick={(e) => handleSaveShares(e)} className="p-1.5 rounded-md hover:bg-primary/10 text-primary">
+                <Check className="w-4 h-4" />
               </button>
             </div>
           ) : (
