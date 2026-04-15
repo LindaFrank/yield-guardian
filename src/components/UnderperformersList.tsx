@@ -54,7 +54,10 @@ export function UnderperformersList({
                 {formatPercentage(analysis.currentYield)}
               </span>
             </div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Replacement Suggestions</span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </div>
           </button>
         ))}
       </div>
