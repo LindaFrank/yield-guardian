@@ -418,7 +418,20 @@ const Index = () => {
                         onRemove={handleRemoveStock}
                         onSelect={analysis.isUnderperforming ? handleSelectUnderperformer : undefined}
                         onUpdateShares={(ticker, shares) => {
-                          if (user) updateShares.mutate({ ticker, shares });
+                          if (user) {
+                            updateShares.mutate(
+                              { ticker, shares },
+                              {
+                                onSuccess: () => {
+                                  toast({ title: 'Shares updated', description: `${ticker} set to ${shares ?? 0} shares.` });
+                                },
+                                onError: (err) => {
+                                  console.error('Share update failed:', err);
+                                  toast({ title: 'Update failed', description: String(err), variant: 'destructive' });
+                                },
+                              }
+                            );
+                          }
                         }}
                       />
                     </div>
