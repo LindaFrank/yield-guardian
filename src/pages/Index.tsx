@@ -304,6 +304,25 @@ const Index = () => {
                 suggestedStocks={liveMarketStocks}
                 targetYield={targetYield}
               />
+              <Button
+                variant="outline"
+                className="gap-2 border-[4px] border-muted-foreground/50"
+                onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+              >
+                <Target className="w-4 h-4" />
+                Set Yield Target
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2 border-[4px] border-muted-foreground/50"
+                onClick={() => {
+                  const el = document.getElementById('replacement-suggestions-section');
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
+                <Sparkles className="w-4 h-4" />
+                Find Matching Stocks
+              </Button>
               {stocks.length > 0 && (
                 <>
                   <Button
