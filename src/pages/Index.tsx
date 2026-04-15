@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Target, FileDown, TrendingDown } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
@@ -304,6 +304,25 @@ const Index = () => {
                 suggestedStocks={liveMarketStocks}
                 targetYield={targetYield}
               />
+              <Button
+                variant="outline"
+                className="gap-2 border-[4px] border-muted-foreground/50"
+                onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+              >
+                <Target className="w-4 h-4" />
+                Set Yield Target
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2 border-[4px] border-muted-foreground/50"
+                onClick={() => {
+                  const el = document.getElementById('replacement-suggestions-section');
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
+                <Sparkles className="w-4 h-4" />
+                Find Matching Stocks
+              </Button>
               {stocks.length > 0 && (
                 <>
                   <Button
