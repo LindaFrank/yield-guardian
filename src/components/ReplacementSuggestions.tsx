@@ -52,6 +52,7 @@ export function ReplacementSuggestions({
           <Sparkles className="w-5 h-5 text-primary" />
           <span className="font-medium">
             {isDefaultMode ? 'Matching Stocks' : 'Replacement Suggestions'}
+          </span>
         </div>
         <p className="text-muted-foreground">
           {isDefaultMode
