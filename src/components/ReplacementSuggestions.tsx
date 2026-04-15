@@ -61,7 +61,7 @@ export function ReplacementSuggestions({
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-primary" />
         <span className="font-medium">
-          {isDefaultMode ? 'Suggested Replacement Stocks' : 'Replacement Suggestions'}
+          {isDefaultMode ? 'Growth Opportunities' : 'Replacement Suggestions'}
         </span>
       </div>
       
