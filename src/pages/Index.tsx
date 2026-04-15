@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Target, FileDown, TrendingDown, Sparkles } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
@@ -208,15 +209,11 @@ const Index = () => {
     }
   };
 
+  const [replacementDialogOpen, setReplacementDialogOpen] = useState(false);
+
   const handleSelectUnderperformer = (stock: Stock) => {
-    setSelectedUnderperformer(
-      selectedUnderperformer?.ticker === stock.ticker ? null : stock
-    );
-    // Scroll to replacement suggestions section
-    setTimeout(() => {
-      const el = document.getElementById('replacement-suggestions-section');
-      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+    setSelectedUnderperformer(stock);
+    setReplacementDialogOpen(true);
   };
 
   return (
@@ -316,8 +313,8 @@ const Index = () => {
                 variant="outline"
                 className="gap-2 border-[4px] border-muted-foreground/50"
                 onClick={() => {
-                  const el = document.getElementById('replacement-suggestions-section');
-                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  setSelectedUnderperformer(null);
+                  setReplacementDialogOpen(true);
                 }}
               >
                 <Sparkles className="w-4 h-4" />
@@ -413,6 +410,7 @@ const Index = () => {
                         analysis={analysis}
                         sharesOwned={stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
                         onRemove={handleRemoveStock}
+                        onSelect={analysis.isUnderperforming ? handleSelectUnderperformer : undefined}
                         onUpdateShares={(ticker, shares) => {
                           if (user) updateShares.mutate({ ticker, shares });
                         }}
@@ -424,19 +422,27 @@ const Index = () => {
             </section>
           </div>
 
-          {!showStockFinder && (
-            <div className="mt-[54px]">
-              <HelpTooltip text="Displays recommended replacement stocks for the currently selected underperforming stock." side="left">
-                <section id="replacement-suggestions-section" className="animate-fade-in scroll-mt-[180px]" style={{ animationDelay: '500ms' }}>
-                  <ReplacementSuggestions
-                    removedStock={selectedUnderperformer}
-                    candidates={replacements}
-                    onAddStock={handleAddStock}
-                  />
-                </section>
-              </HelpTooltip>
-            </div>
-          )}
+          {/* Replacement Suggestions Dialog */}
+          <Dialog open={replacementDialogOpen} onOpenChange={setReplacementDialogOpen}>
+            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  {selectedUnderperformer
+                    ? `Replacements for ${selectedUnderperformer.ticker}`
+                    : 'Growth Opportunities'}
+                </DialogTitle>
+              </DialogHeader>
+              <ReplacementSuggestions
+                removedStock={selectedUnderperformer}
+                candidates={replacements}
+                onAddStock={(stock, shares) => {
+                  handleAddStock(stock, shares);
+                  setReplacementDialogOpen(false);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </main>
     </div>
