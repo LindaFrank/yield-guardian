@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Target, FileDown, TrendingDown } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
