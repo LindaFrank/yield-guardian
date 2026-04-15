@@ -430,7 +430,7 @@ const Index = () => {
                   <Sparkles className="w-5 h-5 text-primary" />
                   {selectedUnderperformer
                     ? `Replacements for ${selectedUnderperformer.ticker}`
-                    : 'Growth Opportunities'}
+                    : 'Matching Stocks'}
                 </DialogTitle>
               </DialogHeader>
               <ReplacementSuggestions

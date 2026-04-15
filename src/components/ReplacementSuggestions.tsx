@@ -51,12 +51,12 @@ export function ReplacementSuggestions({
         <div className="flex items-center justify-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-primary" />
           <span className="font-medium">
-            {isDefaultMode ? 'Growth Opportunities' : 'Replacement Suggestions'}
+            {isDefaultMode ? 'Matching Stocks' : 'Replacement Suggestions'}
           </span>
         </div>
         <p className="text-muted-foreground">
           {isDefaultMode
-            ? 'No growth opportunities currently exceed your target yield'
+            ? 'No matching stocks currently exceed your target yield'
             : 'No replacement stocks meet your current yield target'}
         </p>
       </div>
@@ -65,12 +65,6 @@ export function ReplacementSuggestions({
 
   return (
     <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:scale-[1.01] hover:-translate-y-1 active:scale-[0.98]">
-      <div className="flex items-center gap-2 mb-4">
-        <Sparkles className="w-5 h-5 text-primary" />
-        <span className="font-medium">
-          {isDefaultMode ? 'Growth Opportunities' : 'Replacement Suggestions'}
-        </span>
-      </div>
       
       {removedStock && (
         <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50">
