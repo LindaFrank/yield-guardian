@@ -310,7 +310,13 @@ const Index = () => {
               </Button>
               <ImportStocksModal
                 existingTickers={stocks.map((s) => s.ticker)}
+                existingShares={stocksWithShares?.map(s => ({ ticker: s.ticker, shares: s.shares_owned })) ?? []}
                 onAddStock={handleAddStock}
+                onUpdateShares={(ticker, shares) => {
+                  if (user) {
+                    updateShares.mutate({ ticker, shares });
+                  }
+                }}
               />
               <AddStockModal
                 existingTickers={stocks.map((s) => s.ticker)}
