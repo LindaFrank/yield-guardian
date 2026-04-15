@@ -313,8 +313,8 @@ const Index = () => {
                 variant="outline"
                 className="gap-2 border-[4px] border-muted-foreground/50"
                 onClick={() => {
-                  const el = document.getElementById('replacement-suggestions-section');
-                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  setSelectedUnderperformer(null);
+                  setReplacementDialogOpen(true);
                 }}
               >
                 <Sparkles className="w-4 h-4" />
