@@ -109,7 +109,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
       if (sortedReplacements.length > 0) {
         autoTable(doc, {
           startY: y,
-          head: [['Ticker', 'Name', 'Price/Share', '% Yield', 'Yield/Share ($)', 'Cost of\nReplacement\nStock', 'Num Repl.\nShares', 'Value\nUnderperf.\nRetained', 'Num\nUnderperf.\nShares\nRetained', 'Projected\nAnnual\nDividend\nYield ($)']],
+          head: [['Ticker', 'Name', 'Price/Share', '% Yield', 'Yield/Share\n(Dollars)', 'Cost of Replacement\nStock (YieldxN=Ann.Div)', 'Num Repl.\nShares', 'Value Underperf.\nRetained', 'Num Underperf.\nShares Retained', 'Projected Annual\nDividend Yield ($)']],
           body: sortedReplacements.map((r) => {
             const replDivPerShare = r.stock.annualDividend;
             const numReplShares = replDivPerShare > 0 ? Math.ceil(underTotalAnnualDiv / replDivPerShare) : 0;
