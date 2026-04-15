@@ -77,8 +77,9 @@ export function Header() {
                     <User className="w-3.5 h-3.5" />
                     {profile?.display_name || user.email}
                   </button>
-                  <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign out">
+                  <Button variant="outline" size="sm" onClick={handleSignOut} title="Sign out" className="border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary gap-1.5">
                     <LogOut className="w-4 h-4" />
+                    <span className="hidden sm:inline">Log out</span>
                   </Button>
                 </div>
               )}
