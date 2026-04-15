@@ -43,18 +43,20 @@ export function ReplacementSuggestions({
     setSharesInput('');
   };
 
+  const isDefaultMode = !removedStock;
+
   if (candidates.length === 0) {
     return (
       <div className="p-8 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 text-center transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 active:scale-[0.97]">
         <Sparkles className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
         <p className="text-muted-foreground">
-          No replacement stocks meet your current yield target
+          {isDefaultMode
+            ? 'No growth opportunities currently exceed your target yield'
+            : 'No replacement stocks meet your current yield target'}
         </p>
       </div>
     );
   }
-
-  const isDefaultMode = !removedStock;
 
   return (
     <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:scale-[1.01] hover:-translate-y-1 active:scale-[0.98]">
