@@ -58,7 +58,8 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
     }
   };
 
-  const handleSaveShares = () => {
+  const handleSaveShares = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     const val = parseFloat(sharesInput);
     onUpdateShares?.(stock.ticker, val > 0 ? val : null);
     setEditing(false);
