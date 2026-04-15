@@ -58,7 +58,8 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
     }
   };
 
-  const handleSaveShares = () => {
+  const handleSaveShares = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     const val = parseFloat(sharesInput);
     onUpdateShares?.(stock.ticker, val > 0 ? val : null);
     setEditing(false);
@@ -134,7 +135,7 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
                 autoFocus
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSaveShares(); if (e.key === 'Escape') setEditing(false); }}
               />
-              <button onClick={handleSaveShares} className="p-0.5 rounded hover:bg-primary/10 text-primary">
+              <button onClick={(e) => handleSaveShares(e)} className="p-0.5 rounded hover:bg-primary/10 text-primary">
                 <Check className="w-3.5 h-3.5" />
               </button>
             </div>
