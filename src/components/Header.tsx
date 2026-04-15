@@ -56,9 +56,11 @@ export function Header() {
               <div>
                 <h1 className="font-semibold text-lg">Yield Guardian</h1>
                 <div className="flex items-center gap-1 my-0.5">
-                  <span className="text-muted-foreground/70 text-[10px] leading-none">◂</span>
-                  <div className="h-[1px] w-24 bg-muted-foreground/40" />
-                  <span className="text-muted-foreground/70 text-[10px] leading-none">▸</span>
+                  <span className="text-muted-foreground/90 text-[10px] leading-none">◂</span>
+                  <div className="h-[2px] w-10 bg-muted-foreground/60" />
+                  <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
+                  <div className="h-[2px] w-10 bg-muted-foreground/60" />
+                  <span className="text-muted-foreground/90 text-[10px] leading-none">▸</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
               </div>
@@ -75,17 +77,20 @@ export function Header() {
                     <User className="w-3.5 h-3.5" />
                     {profile?.display_name || user.email}
                   </button>
-                  <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign out">
+                  <Button variant="outline" size="sm" onClick={handleSignOut} title="Sign out" className="border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary gap-1.5">
                     <LogOut className="w-4 h-4" />
+                    <span className="hidden sm:inline">Log out</span>
                   </Button>
                 </div>
               )}
             </div>
           </div>
           <div className="flex items-center justify-center gap-1 mt-3">
-            <span className="text-muted-foreground/60 text-[10px] leading-none">◂</span>
-            <div className="h-[1px] w-[90%] bg-muted-foreground/40" />
-            <span className="text-muted-foreground/60 text-[10px] leading-none">▸</span>
+            <span className="text-muted-foreground/80 text-[10px] leading-none">◂</span>
+            <div className="h-[2px] w-[44%] bg-muted-foreground/60" />
+            <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
+            <div className="h-[2px] w-[44%] bg-muted-foreground/60" />
+            <span className="text-muted-foreground/80 text-[10px] leading-none">▸</span>
           </div>
         </div>
       </header>

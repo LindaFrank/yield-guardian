@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Stock, StockAnalysis } from '@/types/portfolio';
 import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle, Pencil, Check } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle, Trash2, Pencil, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
@@ -58,7 +58,8 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
     }
   };
 
-  const handleSaveShares = () => {
+  const handleSaveShares = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     const val = parseFloat(sharesInput);
     onUpdateShares?.(stock.ticker, val > 0 ? val : null);
     setEditing(false);
@@ -102,10 +103,11 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
               e.stopPropagation();
               onRemove(stock.ticker);
             }}
-            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
+            className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
             aria-label="Remove stock"
+            title="Remove from portfolio"
           >
-            <XCircle className="w-4 h-4" />
+            <Trash2 className="w-4 h-4" />
           </button>
         )}
       </div>
@@ -122,19 +124,19 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
         <div>
           <p className="text-xs text-muted-foreground mb-1">Shares</p>
           {editing ? (
-            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
               <Input
                 type="number"
                 min="0"
                 step="1"
                 value={sharesInput}
                 onChange={(e) => setSharesInput(e.target.value)}
-                className="h-7 w-16 text-xs px-1.5"
+                className="h-7 w-14 text-xs px-1.5"
                 autoFocus
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSaveShares(); if (e.key === 'Escape') setEditing(false); }}
               />
-              <button onClick={handleSaveShares} className="p-0.5 rounded hover:bg-primary/10 text-primary">
-                <Check className="w-3.5 h-3.5" />
+              <button onClick={(e) => handleSaveShares(e)} className="p-1.5 rounded-md hover:bg-primary/10 text-primary">
+                <Check className="w-4 h-4" />
               </button>
             </div>
           ) : (

@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { TrendingUp, DollarSign, Target, ChevronRight, Check, Hash, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,24 +8,26 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Stock } from '@/types/portfolio';
 import { marketStocks } from '@/data/mockData';
+import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { useStockQuotes } from '@/hooks/useStockData';
 
 interface EmptyPortfolioProps {
   onSelectStocks: () => void;
   onSetYield: () => void;
-  onAddStock?: (stock: Stock, shares: number) => void;
+  onAddStock?: (stock: Stock, shares?: number) => void;
   onYieldChange?: (value: number) => void;
   currentYield?: number;
   onDone?: () => void;
   initialStep?: number;
   onCancel?: () => void;
+  existingTickers?: string[];
 }
 
 interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel }: EmptyPortfolioProps) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel, existingTickers = [] }: EmptyPortfolioProps) {
   const [step, setStep] = useState(initialStep);
 
   useEffect(() => {
@@ -76,16 +79,26 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
     selectedTickers.forEach((t) => { initial[t] = sharesMap[t] || ''; });
     setSharesMap(initial);
     setStep(3);
+    // Scroll to top so user sees the first stock in the shares list
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleConfirmAll = () => {
     setSubmitted(true);
-    // Validate all have valid shares
-    const allValid = selectedStocks.every((s) => {
+    // Find the first stock missing valid shares
+    const firstInvalid = selectedStocks.find((s) => {
       const val = parseFloat(sharesMap[s.ticker] || '');
-      return val > 0;
+      return !(val > 0);
     });
-    if (!allValid) return;
+    if (firstInvalid) {
+      // Scroll to the invalid card and show a toast
+      const el = document.getElementById(`shares-card-${firstInvalid.ticker}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      toast.error(`Please enter shares for ${firstInvalid.ticker}`, {
+        description: 'Every selected stock needs a valid number of shares.',
+      });
+      return;
+    }
 
     selectedStocks.forEach((stock) => {
       const shares = parseFloat(sharesMap[stock.ticker]);
@@ -110,14 +123,19 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             Let's build your dividend portfolio. We'll start by setting your desired yield target, then find stocks that match.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            {onCancel && (
-              <Button variant="outline" onClick={onCancel}>
-                Back to Portfolio
-              </Button>
-            )}
-            <Button size="lg" onClick={() => setStep(1)} className="gap-2">
-              Get Started <ChevronRight className="w-4 h-4" />
+            <Button onClick={() => setStep(1)} size="lg" className="gap-2">
+              <Target className="w-5 h-5" />
+              Set Yield
             </Button>
+            <Button size="lg" onClick={() => setStep(1)} className="gap-2">
+              Find Matching Stocks <ChevronRight className="w-4 h-4" />
+            </Button>
+            {onAddStock && (
+              <ImportStocksModal
+                existingTickers={existingTickers}
+                onAddStock={onAddStock}
+              />
+            )}
           </div>
         </div>
       )}
@@ -155,8 +173,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             </div>
           </Card>
           <div className="flex flex-wrap gap-3 justify-center">
-            {onCancel && (
-              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            {onAddStock && (
+              <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
             )}
             <Button variant="outline" onClick={() => setStep(0)}>Back</Button>
             <Button onClick={handleYieldConfirm} className="gap-2">
@@ -228,8 +246,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
           )}
 
           <div className="flex flex-wrap gap-3 justify-center">
-            {onCancel && (
-              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            {onAddStock && (
+              <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
             )}
             <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
             <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
@@ -261,7 +279,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               const numVal = parseFloat(val);
               const isInvalid = submitted && (!numVal || numVal <= 0);
               return (
-                <Card key={stock.ticker} className={`p-4 border-border/50 ${isInvalid ? 'border-destructive/50' : ''}`}>
+                <Card key={stock.ticker} id={`shares-card-${stock.ticker}`} className={`p-4 border-border/50 ${isInvalid ? 'border-yield-negative' : ''}`}>
                   <div className="flex items-center gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -297,8 +315,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
           )}
 
           <div className="flex flex-wrap gap-3 justify-center">
-            {onCancel && (
-              <Button variant="outline" onClick={onCancel}>Back to Portfolio</Button>
+            {onAddStock && (
+              <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
             )}
             <Button variant="outline" onClick={() => { setSubmitted(false); setStep(2); }}>
               Back to Selection

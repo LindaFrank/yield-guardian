@@ -102,24 +102,38 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
       // Replacement candidates sorted by price closest to underperformer
       const replacements = data.getReplacements(analysis.stock);
       const underPrice = analysis.stock.currentPrice;
+      const underDivPerShare = analysis.stock.annualDividend;
+      const underTotalAnnualDiv = underDivPerShare * underShares;
+      const underTotalValue = underPrice * underShares;
       const sortedReplacements = [...replacements].sort((a, b) => Math.abs(a.stock.currentPrice - underPrice) - Math.abs(b.stock.currentPrice - underPrice));
       if (sortedReplacements.length > 0) {
         autoTable(doc, {
           startY: y,
-          head: [['#', 'Ticker', 'Name', 'Price', 'Yield', 'Stability', 'Reason']],
-          body: sortedReplacements.map((r, idx) => [
-            (idx + 1).toString(),
-            r.stock.ticker,
-            r.stock.name,
-            formatCurrency(r.stock.currentPrice),
-            formatPercentage(r.yield),
-            r.stabilityScore >= 3 ? 'Stable' : r.stabilityScore >= 2 ? 'Warning' : 'Unstable',
-            r.matchReason,
-          ]),
-          styles: { fontSize: 7.5, cellPadding: 2.5 },
-          headStyles: { fillColor: [74, 111, 165], textColor: 255, fontStyle: 'bold' },
+          head: [['Ticker', 'Name', 'Price/Share', '% Yield', 'Yield/Share\n(Dollars)', 'Cost of Replacement\nStock (YieldxN=Ann.Div)', 'Num Repl.\nShares', 'Value Underperf.\nRetained', 'Num Underperf.\nShares Retained', 'Projected Annual\nDividend Yield ($)']],
+          body: sortedReplacements.map((r) => {
+            const replDivPerShare = r.stock.annualDividend;
+            const numReplShares = replDivPerShare > 0 ? Math.ceil(underTotalAnnualDiv / replDivPerShare) : 0;
+            const costOfReplacement = numReplShares * r.stock.currentPrice;
+            const valueRetained = Math.max(0, underTotalValue - costOfReplacement);
+            const sharesRetained = underPrice > 0 ? valueRetained / underPrice : 0;
+            const projectedAnnualDiv = (numReplShares * replDivPerShare) + (sharesRetained * underDivPerShare);
+            return [
+              r.stock.ticker,
+              r.stock.name,
+              formatCurrency(r.stock.currentPrice),
+              formatPercentage(r.yield),
+              formatCurrency(replDivPerShare),
+              formatCurrency(costOfReplacement),
+              numReplShares.toString(),
+              formatCurrency(valueRetained),
+              sharesRetained.toFixed(1),
+              formatCurrency(projectedAnnualDiv),
+            ];
+          }),
+          styles: { fontSize: 6.5, cellPadding: 2 },
+          headStyles: { fillColor: [74, 111, 165], textColor: 255, fontStyle: 'bold', fontSize: 6 },
           alternateRowStyles: { fillColor: [245, 248, 255] },
-          margin: { left: 18, right: 18 },
+          margin: { left: 14, right: 14 },
         });
         y = (doc as any).lastAutoTable.finalY + 10;
       } else {
