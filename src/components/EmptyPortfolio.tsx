@@ -123,8 +123,12 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             Let's build your dividend portfolio. We'll start by setting your desired yield target, then find stocks that match.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button onClick={() => setStep(1)} size="lg">
+            <Button onClick={() => setStep(1)} size="lg" className="gap-2">
               <Target className="w-5 h-5" />
+              Set Yield
+            </Button>
+            <Button size="lg" onClick={() => setStep(1)} className="gap-2">
+              Find Matching Stocks <ChevronRight className="w-4 h-4" />
             </Button>
             {onAddStock && (
               <ImportStocksModal
@@ -132,9 +136,6 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
                 onAddStock={onAddStock}
               />
             )}
-            <Button size="lg" onClick={() => setStep(1)} className="gap-2">
-              Find Matching Stocks <ChevronRight className="w-4 h-4" />
-            </Button>
           </div>
         </div>
       )}
