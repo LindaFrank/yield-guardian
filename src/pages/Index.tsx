@@ -185,9 +185,8 @@ const Index = () => {
         return b.yield - a.yield;
       });
 
-    // Prefer those meeting yield target, but show top candidates regardless
-    const meetsTarget = scored.filter((c) => c.yield >= targetYield);
-    return (meetsTarget.length > 0 ? meetsTarget : scored).slice(0, 5);
+    // In default mode (no underperformer), only show stocks above target yield
+    return scored.filter((c) => c.yield >= targetYield).slice(0, 5);
   }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks, candidatePool]);
 
   const handleRemoveStock = (ticker: string) => {
