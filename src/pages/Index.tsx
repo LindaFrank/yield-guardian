@@ -289,25 +289,13 @@ const Index = () => {
               WHAT WOULD YOU LIKE TO DO?
             </span>
             <div className="flex items-center justify-center gap-3 flex-wrap [&_button]:text-xs [&_button]:h-8 [&_button]:px-3">
-              <ImportStocksModal
-                existingTickers={stocks.map((s) => s.ticker)}
-                onAddStock={handleAddStock}
-              />
-              <AddStockModal
-                existingTickers={stocks.map((s) => s.ticker)}
-                onAddStock={handleAddStock}
-                open={addStockOpen}
-                onOpenChange={setAddStockOpen}
-                suggestedStocks={liveMarketStocks}
-                targetYield={targetYield}
-              />
               <Button
                 variant="outline"
                 className="gap-2 border-[4px] border-muted-foreground/50"
                 onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
               >
                 <Target className="w-4 h-4" />
-                Set Yield Target
+                Set Yield
               </Button>
               <Button
                 variant="outline"
@@ -320,6 +308,18 @@ const Index = () => {
                 <Sparkles className="w-4 h-4" />
                 Find Matching Stocks
               </Button>
+              <ImportStocksModal
+                existingTickers={stocks.map((s) => s.ticker)}
+                onAddStock={handleAddStock}
+              />
+              <AddStockModal
+                existingTickers={stocks.map((s) => s.ticker)}
+                onAddStock={handleAddStock}
+                open={addStockOpen}
+                onOpenChange={setAddStockOpen}
+                suggestedStocks={liveMarketStocks}
+                targetYield={targetYield}
+              />
               {stocks.length > 0 && (
                 <>
                   <Button
