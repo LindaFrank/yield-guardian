@@ -48,7 +48,12 @@ export function ReplacementSuggestions({
   if (candidates.length === 0) {
     return (
       <div className="p-8 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 text-center transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 active:scale-[0.97]">
-        <Sparkles className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Sparkles className="w-5 h-5 text-primary" />
+          <span className="font-medium">
+            {isDefaultMode ? 'Growth Opportunities' : 'Replacement Suggestions'}
+          </span>
+        </div>
         <p className="text-muted-foreground">
           {isDefaultMode
             ? 'No growth opportunities currently exceed your target yield'
