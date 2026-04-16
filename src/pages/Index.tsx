@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Target, FileDown, TrendingDown, Sparkles } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -58,6 +58,7 @@ const Index = () => {
   const [addStockOpen, setAddStockOpen] = useState(false);
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
+  const [actionBarExpanded, setActionBarExpanded] = useState(false);
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
@@ -284,88 +285,101 @@ const Index = () => {
 
         {/* Sticky Action Bar */}
         {wizardDone && (
-          <div className="sticky top-[100px] z-40 mb-6 flex flex-col gap-2 rounded-lg border-2 border-primary/30 bg-background px-4 py-2 shadow-glow animate-fade-in">
-            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/90 text-center">
-              WHAT WOULD YOU LIKE TO DO?
-            </span>
-            <div className="flex items-center justify-center gap-3 flex-wrap [&_button]:text-xs [&_button]:h-8 [&_button]:px-3">
-              <Button
-                variant="outline"
-                className="gap-2 border-[4px] border-muted-foreground/50"
-                onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-              >
-                <Target className="w-4 h-4" />
-                Set Yield
-              </Button>
-              <Button
-                variant="outline"
-                className="gap-2 border-[4px] border-muted-foreground/50"
-                onClick={() => {
-                  setSelectedUnderperformer(null);
-                  setReplacementDialogOpen(true);
-                }}
-              >
-                <Sparkles className="w-4 h-4" />
-                Find Matching Stocks
-              </Button>
-              <ImportStocksModal
-                existingTickers={stocks.map((s) => s.ticker)}
-                existingShares={stocksWithShares?.map(s => ({ ticker: s.ticker, shares: s.shares_owned })) ?? []}
-                onAddStock={handleAddStock}
-                onUpdateShares={(ticker, shares) => {
-                  if (user) {
-                    updateShares.mutate({ ticker, shares });
-                  }
-                }}
-              />
-              <AddStockModal
-                existingTickers={stocks.map((s) => s.ticker)}
-                onAddStock={handleAddStock}
-                open={addStockOpen}
-                onOpenChange={setAddStockOpen}
-                suggestedStocks={liveMarketStocks}
-                targetYield={targetYield}
-              />
-              {stocks.length > 0 && (
-                <>
-                  <Button
-                    variant="outline"
-                    className="gap-2 border-[4px] border-muted-foreground/50"
-                    onClick={() => {
-                      const el = document.getElementById('underperformers-section');
-                      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }}
-                  >
-                    <TrendingDown className="w-4 h-4" />
-                    Review Underperformers ({underperformers.length})
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="gap-2 border-[4px] border-muted-foreground/50"
-                    onClick={async () => {
-                      try {
-                        await generatePortfolioReport({
-                          stocks,
-                          sharesMap: Object.fromEntries(
-                            (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
-                          ),
-                          targetYield,
-                          underperformers,
-                          getReplacements: (stock) =>
-                            suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
-                        });
-                      } catch (err) {
-                        console.error('Report generation failed:', err);
-                        toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
-                      }
-                    }}
-                  >
-                    <FileDown className="w-4 h-4" />
-                    Generate Report
-                  </Button>
-                </>
-              )}
-            </div>
+          <div className="sticky top-[100px] z-40 mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-background px-3 py-2 shadow-glow animate-fade-in">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-1.5 h-auto shrink-0"
+              onClick={() => setActionBarExpanded((v) => !v)}
+              aria-label={actionBarExpanded ? 'Collapse actions' : 'Expand actions'}
+            >
+              {actionBarExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            </Button>
+            {!actionBarExpanded && (
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/90 whitespace-nowrap">
+                Actions
+              </span>
+            )}
+            {actionBarExpanded && (
+              <div className="flex items-center gap-2 flex-wrap overflow-hidden [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5">
+                <Button
+                  variant="outline"
+                  className="gap-1.5 border-[3px] border-muted-foreground/50"
+                  onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                >
+                  <Target className="w-3.5 h-3.5" />
+                  Set Yield
+                </Button>
+                <Button
+                  variant="outline"
+                  className="gap-1.5 border-[3px] border-muted-foreground/50"
+                  onClick={() => {
+                    setSelectedUnderperformer(null);
+                    setReplacementDialogOpen(true);
+                  }}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Find Stocks
+                </Button>
+                <ImportStocksModal
+                  existingTickers={stocks.map((s) => s.ticker)}
+                  existingShares={stocksWithShares?.map(s => ({ ticker: s.ticker, shares: s.shares_owned })) ?? []}
+                  onAddStock={handleAddStock}
+                  onUpdateShares={(ticker, shares) => {
+                    if (user) {
+                      updateShares.mutate({ ticker, shares });
+                    }
+                  }}
+                />
+                <AddStockModal
+                  existingTickers={stocks.map((s) => s.ticker)}
+                  onAddStock={handleAddStock}
+                  open={addStockOpen}
+                  onOpenChange={setAddStockOpen}
+                  suggestedStocks={liveMarketStocks}
+                  targetYield={targetYield}
+                />
+                {stocks.length > 0 && (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="gap-1.5 border-[3px] border-muted-foreground/50"
+                      onClick={() => {
+                        const el = document.getElementById('underperformers-section');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    >
+                      <TrendingDown className="w-3.5 h-3.5" />
+                      Underperformers ({underperformers.length})
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="gap-1.5 border-[3px] border-muted-foreground/50"
+                      onClick={async () => {
+                        try {
+                          await generatePortfolioReport({
+                            stocks,
+                            sharesMap: Object.fromEntries(
+                              (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                            ),
+                            targetYield,
+                            underperformers,
+                            getReplacements: (stock) =>
+                              suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
+                          });
+                        } catch (err) {
+                          console.error('Report generation failed:', err);
+                          toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
+                        }
+                      }}
+                    >
+                      <FileDown className="w-3.5 h-3.5" />
+                      Report
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         )}
 
