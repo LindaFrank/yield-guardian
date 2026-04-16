@@ -286,6 +286,11 @@ const Index = () => {
         {/* Sticky Action Bar */}
         {wizardDone && (
           <div className="sticky top-[100px] z-40 mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-background px-3 py-2 shadow-glow animate-fade-in">
+            {!actionBarExpanded && (
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/90 whitespace-nowrap">
+                What Do You Want To Do?
+              </span>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -295,11 +300,6 @@ const Index = () => {
             >
               {actionBarExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </Button>
-            {!actionBarExpanded && (
-              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/90 whitespace-nowrap">
-                What Do You Want To Do?
-              </span>
-            )}
             {actionBarExpanded && (
               <div className="flex items-center gap-2 flex-wrap overflow-hidden [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5">
                 <Button
