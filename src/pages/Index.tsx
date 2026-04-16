@@ -297,7 +297,7 @@ const Index = () => {
             </Button>
             {!actionBarExpanded && (
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/90 whitespace-nowrap">
-                Actions
+                What Do You Want To Do?
               </span>
             )}
             {actionBarExpanded && (
