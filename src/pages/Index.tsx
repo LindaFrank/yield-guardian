@@ -311,8 +311,7 @@ const Index = () => {
                   Set Yield
                 </Button>
                 <Button
-                  variant="outline"
-                  className="gap-1.5 border-[3px] border-muted-foreground/50"
+                  className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
                   onClick={() => {
                     setSelectedUnderperformer(null);
                     setReplacementDialogOpen(true);
