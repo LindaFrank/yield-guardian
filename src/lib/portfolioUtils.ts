@@ -25,31 +25,37 @@ export function checkDividendStability(
     paymentsByYear[year].push(payment.amount);
   });
   
-  const years = Object.keys(paymentsByYear).map(Number).sort((a, b) => b - a);
-  
-  if (years.length < yearsRequired) {
-    return { status: 'warning', yearsStable: years.length };
+  // Exclude the in-progress current calendar year — evaluate only completed years
+  const currentYear = new Date().getFullYear();
+  const completedYears = Object.keys(paymentsByYear)
+    .map(Number)
+    .filter((y) => y < currentYear)
+    .sort((a, b) => b - a);
+
+  if (completedYears.length < yearsRequired) {
+    return { status: 'warning', yearsStable: completedYears.length };
   }
-  
+
   let stableYears = 0;
   let hasDecline = false;
   let previousAnnual = 0;
-  
-  for (let i = 0; i < Math.min(yearsRequired, years.length); i++) {
-    const year = years[i];
+
+  // Iterate oldest → newest of the required completed years to compare year-over-year
+  const evalYears = completedYears.slice(0, yearsRequired).reverse();
+  for (const year of evalYears) {
     const yearPayments = paymentsByYear[year];
     const annualTotal = yearPayments.reduce((sum, p) => sum + p, 0);
-    
-    // Check if there were consistent quarterly payments
+
+    // Require consistent quarterly payments in each completed year
     if (yearPayments.length < 4) {
       hasDecline = true;
     }
-    
-    // Check for declining dividends
+
+    // Check for declining dividends year-over-year (>10% drop)
     if (previousAnnual > 0 && annualTotal < previousAnnual * 0.9) {
       hasDecline = true;
     }
-    
+
     previousAnnual = annualTotal;
     stableYears++;
   }
