@@ -76,7 +76,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
     doc.text('Underperforming Stocks & Replacement Suggestions', 14, y);
     y += 6;
 
-    for (const analysis of vettedUnderperformers) {
+    for (const analysis of data.underperformers) {
       if (y > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
         y = 20;
