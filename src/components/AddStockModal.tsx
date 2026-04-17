@@ -36,6 +36,14 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
   );
 
   // Yield-based suggestions removed — search-only modal
+  const toggleSelect = (result: SearchResult) => {
+    setSelected((prev) => {
+      const next = new Map(prev);
+      if (next.has(result.symbol)) next.delete(result.symbol);
+      else next.set(result.symbol, result);
+      return next;
+    });
+  };
 
   const handleProceedToShares = () => {
     const initial: Record<string, string> = {};
