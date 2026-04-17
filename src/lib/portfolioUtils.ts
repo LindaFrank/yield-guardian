@@ -25,38 +25,56 @@ export function checkDividendStability(
     paymentsByYear[year].push(payment.amount);
   });
   
-  const years = Object.keys(paymentsByYear).map(Number).sort((a, b) => b - a);
-  
-  if (years.length < yearsRequired) {
-    return { status: 'warning', yearsStable: years.length };
+  // Exclude the in-progress current calendar year — evaluate only completed years
+  const currentYear = new Date().getFullYear();
+  const completedYears = Object.keys(paymentsByYear)
+    .map(Number)
+    .filter((y) => y < currentYear)
+    .sort((a, b) => b - a);
+
+  if (completedYears.length < yearsRequired) {
+    return { status: 'warning', yearsStable: completedYears.length };
   }
-  
+
   let stableYears = 0;
   let hasDecline = false;
   let previousAnnual = 0;
-  
-  for (let i = 0; i < Math.min(yearsRequired, years.length); i++) {
-    const year = years[i];
+
+  // Iterate oldest → newest of the required completed years to compare year-over-year
+  const evalYears = completedYears.slice(0, yearsRequired).reverse();
+  for (const year of evalYears) {
     const yearPayments = paymentsByYear[year];
     const annualTotal = yearPayments.reduce((sum, p) => sum + p, 0);
-    
-    // Check if there were consistent quarterly payments
+
+    // Require consistent quarterly payments in each completed year
     if (yearPayments.length < 4) {
       hasDecline = true;
     }
-    
-    // Check for declining dividends
+
+    // Check for declining dividends year-over-year (>10% drop)
     if (previousAnnual > 0 && annualTotal < previousAnnual * 0.9) {
       hasDecline = true;
     }
-    
+
     previousAnnual = annualTotal;
     stableYears++;
   }
   
   // Calculate current yield stability
   const currentYield = calculateDividendYield(stock);
-  
+
+  // Confirm the stock is still actively paying: require a payment within the last 120 days
+  const mostRecentPaymentMs = payments.reduce((latest, p) => {
+    const t = new Date(p.date).getTime();
+    return t > latest ? t : latest;
+  }, 0);
+  const daysSinceLastPayment = (Date.now() - mostRecentPaymentMs) / (1000 * 60 * 60 * 24);
+  const isActivelyPaying = daysSinceLastPayment <= 120;
+
+  if (!isActivelyPaying) {
+    return { status: 'warning', yearsStable: stableYears };
+  }
+
   if (hasDecline) {
     return { status: 'warning', yearsStable: stableYears };
   }
@@ -102,48 +120,34 @@ export function suggestReplacements(
   targetMinYield: number,
   existingTickers: string[]
 ): ReplacementCandidate[] {
-  const scoredCandidates = marketData
+  const vettedCandidates = marketData
     .filter((stock) => !existingTickers.includes(stock.ticker))
     .map((stock) => {
       const currentYield = calculateDividendYield(stock);
       const stability = checkDividendStability(stock, 2, targetMinYield);
-      
-      let matchReason = '';
-      if (stock.sector === removedStock.sector && currentYield >= targetMinYield) {
-        matchReason = `Same sector (${stock.sector})`;
-      } else if (stock.sector === removedStock.sector) {
-        matchReason = `Closest same-sector option (${stock.sector})`;
-      } else if (currentYield > targetMinYield + 1) {
-        matchReason = 'High yield performer';
-      } else if (stability.status === 'stable') {
-        matchReason = 'Consistent dividend history';
-      } else if (currentYield >= targetMinYield) {
-        matchReason = 'Meets yield target';
-      } else {
-        matchReason = 'Closest available match';
-      }
-      
+      return { stock, currentYield, stability };
+    })
+    .filter(({ currentYield, stability }) =>
+      currentYield >= targetMinYield && stability.status === 'stable'
+    )
+    .map(({ stock, currentYield }) => {
+      const matchReason = stock.sector === removedStock.sector
+        ? `Same sector (${stock.sector}) — 2+ yrs stable`
+        : 'Vetted: 2+ yrs stable at target yield';
       return {
         stock,
         yield: currentYield,
-        stabilityScore: stability.status === 'stable' ? 3 : stability.status === 'warning' ? 2 : 1,
+        stabilityScore: 3,
         matchReason,
       };
     })
     .sort((a, b) => {
-      const aMetTarget = a.yield >= targetMinYield ? 1 : 0;
-      const bMetTarget = b.yield >= targetMinYield ? 1 : 0;
-      if (aMetTarget !== bMetTarget) return bMetTarget - aMetTarget;
       if (a.stock.sector === removedStock.sector && b.stock.sector !== removedStock.sector) return -1;
       if (b.stock.sector === removedStock.sector && a.stock.sector !== removedStock.sector) return 1;
       return b.yield - a.yield;
     });
 
-  const exactMatches = scoredCandidates.filter(
-    (candidate) => candidate.yield >= targetMinYield && candidate.stabilityScore >= 1
-  );
-
-  return (exactMatches.length > 0 ? exactMatches : scoredCandidates).slice(0, 5);
+  return vettedCandidates.slice(0, 5);
 }
 
 export function formatCurrency(value: number): string {
