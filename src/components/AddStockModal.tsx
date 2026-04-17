@@ -81,7 +81,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) resetAndClose(); else setOpen(true); }}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button variant="secondary" className="gap-2 border-[3px] border-muted-foreground/50">
           <Search className="w-4 h-4" />
           Search Stocks Generally
         </Button>
