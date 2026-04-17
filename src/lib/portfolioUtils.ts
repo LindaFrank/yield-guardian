@@ -102,48 +102,34 @@ export function suggestReplacements(
   targetMinYield: number,
   existingTickers: string[]
 ): ReplacementCandidate[] {
-  const scoredCandidates = marketData
+  const vettedCandidates = marketData
     .filter((stock) => !existingTickers.includes(stock.ticker))
     .map((stock) => {
       const currentYield = calculateDividendYield(stock);
       const stability = checkDividendStability(stock, 2, targetMinYield);
-      
-      let matchReason = '';
-      if (stock.sector === removedStock.sector && currentYield >= targetMinYield) {
-        matchReason = `Same sector (${stock.sector})`;
-      } else if (stock.sector === removedStock.sector) {
-        matchReason = `Closest same-sector option (${stock.sector})`;
-      } else if (currentYield > targetMinYield + 1) {
-        matchReason = 'High yield performer';
-      } else if (stability.status === 'stable') {
-        matchReason = 'Consistent dividend history';
-      } else if (currentYield >= targetMinYield) {
-        matchReason = 'Meets yield target';
-      } else {
-        matchReason = 'Closest available match';
-      }
-      
+      return { stock, currentYield, stability };
+    })
+    .filter(({ currentYield, stability }) =>
+      currentYield >= targetMinYield && stability.status === 'stable'
+    )
+    .map(({ stock, currentYield }) => {
+      const matchReason = stock.sector === removedStock.sector
+        ? `Same sector (${stock.sector}) — 2+ yrs stable`
+        : 'Vetted: 2+ yrs stable at target yield';
       return {
         stock,
         yield: currentYield,
-        stabilityScore: stability.status === 'stable' ? 3 : stability.status === 'warning' ? 2 : 1,
+        stabilityScore: 3,
         matchReason,
       };
     })
     .sort((a, b) => {
-      const aMetTarget = a.yield >= targetMinYield ? 1 : 0;
-      const bMetTarget = b.yield >= targetMinYield ? 1 : 0;
-      if (aMetTarget !== bMetTarget) return bMetTarget - aMetTarget;
       if (a.stock.sector === removedStock.sector && b.stock.sector !== removedStock.sector) return -1;
       if (b.stock.sector === removedStock.sector && a.stock.sector !== removedStock.sector) return 1;
       return b.yield - a.yield;
     });
 
-  const exactMatches = scoredCandidates.filter(
-    (candidate) => candidate.yield >= targetMinYield && candidate.stabilityScore >= 1
-  );
-
-  return (exactMatches.length > 0 ? exactMatches : scoredCandidates).slice(0, 5);
+  return vettedCandidates.slice(0, 5);
 }
 
 export function formatCurrency(value: number): string {
