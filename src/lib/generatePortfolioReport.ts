@@ -64,7 +64,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
   y += 32;
 
   // Underperformers section (lead the report with this)
-  if (vettedUnderperformers.length > 0) {
+  if (data.underperformers.length > 0) {
     // Check if we need a new page
     if (y > doc.internal.pageSize.getHeight() - 60) {
       doc.addPage();
