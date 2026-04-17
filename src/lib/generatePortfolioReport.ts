@@ -25,6 +25,11 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
   const pageWidth = doc.internal.pageSize.getWidth();
   let y = 20;
 
+  // Filter holdings to only those passing strict vetting (matches replacement-suggestion criteria)
+  const vettedStocks = data.stocks.filter(s => passesReportVetting(s, data.targetYield));
+  const excludedStocks = data.stocks.filter(s => !passesReportVetting(s, data.targetYield));
+  const vettedUnderperformers = data.underperformers.filter(a => passesReportVetting(a.stock, data.targetYield));
+
   // Title
   doc.setFontSize(20);
   doc.setTextColor(40, 40, 40);
