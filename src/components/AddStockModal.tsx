@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
-import { Plus, Search, Loader2, ChevronRight, Check, Sparkles } from 'lucide-react';
+import { Search, Loader2, ChevronRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AddStockModalProps {
@@ -117,14 +117,14 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
     <Dialog open={open} onOpenChange={(v) => { if (!v) resetAndClose(); else setOpen(true); }}>
       <DialogTrigger asChild>
         <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Add Stock
+          <Search className="w-4 h-4" />
+          Search Stocks Generally
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg border-[3px] border-muted-foreground/60">
         <DialogHeader>
           <DialogTitle>
-            {phase === 'search' ? 'Add Stocks to Portfolio' : 'Enter Shares'}
+            {phase === 'search' ? 'Search Stocks Generally' : 'Enter Shares'}
           </DialogTitle>
         </DialogHeader>
 
@@ -142,52 +142,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
             </div>
 
             <div className="max-h-72 overflow-y-auto space-y-2 mt-2">
-              {/* Show yield-based suggestions when not searching */}
-              {search.length === 0 && yieldSuggestions.length > 0 && (
-                <>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground px-1 pb-1">
-                    <Sparkles className="w-3.5 h-3.5 text-primary" />
-                    <span>Suggestions meeting your {formatPercentage(targetYield)} yield target</span>
-                  </div>
-                  {yieldSuggestions.map(({ stock, yield: stockYield }) => {
-                    const isChecked = selected.has(stock.ticker);
-                    return (
-                      <div
-                        key={stock.ticker}
-                        onClick={() => handleSelectSuggestion(stock)}
-                        role="button"
-                        className={cn(
-                          'w-full flex items-center gap-3 p-3 rounded-lg border-[4px] transition-colors text-left cursor-pointer',
-                          isChecked
-                            ? 'bg-primary/5 border-primary/40 ring-1 ring-primary/20'
-                            : 'bg-secondary/30 border-muted-foreground/50 hover:border-primary/30 hover:bg-secondary/50'
-                        )}
-                      >
-                        <Checkbox
-                          checked={isChecked}
-                          onCheckedChange={() => handleSelectSuggestion(stock)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-medium">{stock.ticker}</span>
-                            <span className={cn(
-                              'font-mono text-sm',
-                              stockYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning'
-                            )}>
-                              {formatPercentage(stockYield)}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-0.5">{stock.name}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </>
-              )}
-
-              {search.length === 0 && yieldSuggestions.length === 0 && (
+              {search.length === 0 && (
                 <p className="text-center text-muted-foreground py-8 text-sm">
                   Type a ticker or company name to search
                 </p>

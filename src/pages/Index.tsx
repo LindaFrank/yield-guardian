@@ -319,7 +319,7 @@ const Index = () => {
                   }}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  Find Stocks
+                  Stocks that meet Yield Target
                 </Button>
                 <ImportStocksModal
                   existingTickers={stocks.map((s) => s.ticker)}
