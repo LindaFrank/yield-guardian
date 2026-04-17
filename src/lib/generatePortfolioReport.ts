@@ -86,7 +86,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
   y += summaryHeight + 8;
 
   // Underperformers section (lead the report with this)
-  if (data.underperformers.length > 0) {
+  if (vettedUnderperformers.length > 0) {
     // Check if we need a new page
     if (y > doc.internal.pageSize.getHeight() - 60) {
       doc.addPage();
@@ -98,7 +98,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
     doc.text('Underperforming Stocks & Replacement Suggestions', 14, y);
     y += 6;
 
-    for (const analysis of data.underperformers) {
+    for (const analysis of vettedUnderperformers) {
       if (y > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
         y = 20;
