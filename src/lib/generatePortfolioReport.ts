@@ -31,30 +31,29 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
   doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, pageWidth / 2, y, { align: 'center' });
   y += 12;
 
-  // Summary box (based on vetted holdings only)
-  const totalValue = vettedStocks.reduce((sum, s) => {
+  // Summary box
+  const totalValue = data.stocks.reduce((sum, s) => {
     const shares = data.sharesMap[s.ticker] ?? 1;
     return sum + s.currentPrice * shares;
   }, 0);
-  const totalDividends = vettedStocks.reduce((sum, s) => {
+  const totalDividends = data.stocks.reduce((sum, s) => {
     const shares = data.sharesMap[s.ticker] ?? 1;
     return sum + s.annualDividend * shares;
   }, 0);
   const avgYield = totalValue > 0 ? (totalDividends / totalValue) * 100 : 0;
 
-  const summaryHeight = excludedStocks.length > 0 ? 34 : 24;
   doc.setFillColor(245, 247, 250);
-  doc.roundedRect(14, y, pageWidth - 28, summaryHeight, 3, 3, 'F');
+  doc.roundedRect(14, y, pageWidth - 28, 24, 3, 3, 'F');
 
   doc.setFontSize(9);
   doc.setTextColor(80, 80, 80);
   const summaryItems = [
-    `Total Stocks: ${vettedStocks.length}`,
+    `Total Stocks: ${data.stocks.length}`,
     `Portfolio Value: ${formatCurrency(totalValue)}`,
     `Annual Dividends: ${formatCurrency(totalDividends)}`,
     `Avg Yield: ${formatPercentage(avgYield)}`,
     `Target Yield: ${formatPercentage(data.targetYield)}`,
-    `Underperformers: ${vettedUnderperformers.length}`,
+    `Underperformers: ${data.underperformers.length}`,
   ];
   const colWidth = (pageWidth - 28) / 3;
   summaryItems.forEach((item, i) => {
@@ -62,18 +61,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
     const row = Math.floor(i / 3);
     doc.text(item, 20 + col * colWidth, y + 9 + row * 10);
   });
-
-  if (excludedStocks.length > 0) {
-    doc.setFontSize(7.5);
-    doc.setTextColor(140, 90, 60);
-    const excludedTickers = excludedStocks.map(s => s.ticker).join(', ');
-    doc.text(
-      `Excluded (failed vetting: <2 yrs stable or no payment in 120 days): ${excludedTickers}`,
-      20,
-      y + summaryHeight - 4
-    );
-  }
-  y += summaryHeight + 8;
+  y += 32;
 
   // Underperformers section (lead the report with this)
   if (vettedUnderperformers.length > 0) {
