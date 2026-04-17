@@ -1,5 +1,5 @@
 import { Stock, StockAnalysis, ReplacementCandidate } from '@/types/portfolio';
-import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
+import { formatCurrency, formatPercentage, checkDividendStability } from '@/lib/portfolioUtils';
 
 interface ReportData {
   stocks: Stock[];
@@ -7,6 +7,14 @@ interface ReportData {
   targetYield: number;
   underperformers: StockAnalysis[];
   getReplacements: (stock: Stock) => ReplacementCandidate[];
+}
+
+// Apply the same strict vetting used for suggested replacements:
+// require 2+ years of stable dividends AND a payment within the last 120 days.
+// Holdings that fail this (e.g. WBA after the merger halt) are hidden from the report.
+function passesReportVetting(stock: Stock, targetYield: number): boolean {
+  const { status } = checkDividendStability(stock, 2, targetYield);
+  return status === 'stable';
 }
 
 export async function generatePortfolioReport(data: ReportData): Promise<void> {
