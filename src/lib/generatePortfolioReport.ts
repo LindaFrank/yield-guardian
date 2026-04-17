@@ -17,6 +17,9 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
   const pageWidth = doc.internal.pageSize.getWidth();
   let y = 20;
 
+  // Note: vetting (2 yrs stable + 120-day active payment) only applies to suggested
+  // replacements, not to the user's actual holdings. Users decide what to keep or sell.
+
   // Title
   doc.setFontSize(20);
   doc.setTextColor(40, 40, 40);
