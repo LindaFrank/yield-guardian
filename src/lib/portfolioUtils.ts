@@ -62,7 +62,19 @@ export function checkDividendStability(
   
   // Calculate current yield stability
   const currentYield = calculateDividendYield(stock);
-  
+
+  // Confirm the stock is still actively paying: require a payment within the last 120 days
+  const mostRecentPaymentMs = payments.reduce((latest, p) => {
+    const t = new Date(p.date).getTime();
+    return t > latest ? t : latest;
+  }, 0);
+  const daysSinceLastPayment = (Date.now() - mostRecentPaymentMs) / (1000 * 60 * 60 * 24);
+  const isActivelyPaying = daysSinceLastPayment <= 120;
+
+  if (!isActivelyPaying) {
+    return { status: 'warning', yearsStable: stableYears };
+  }
+
   if (hasDecline) {
     return { status: 'warning', yearsStable: stableYears };
   }
