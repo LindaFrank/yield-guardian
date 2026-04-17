@@ -184,7 +184,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
   autoTable(doc, {
     startY: y,
     head: [['Ticker', 'Name', 'Sector', 'Price', 'Div/Share', 'Shares', 'Total Annual Div', 'Yield']],
-    body: data.stocks.map(s => {
+    body: vettedStocks.map(s => {
       const shares = data.sharesMap[s.ticker] ?? 1;
       const yld = s.currentPrice > 0 ? (s.annualDividend / s.currentPrice) * 100 : 0;
       return [
