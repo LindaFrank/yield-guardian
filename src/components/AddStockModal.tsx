@@ -1,7 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Stock } from '@/types/portfolio';
 import { useStockSearch, SearchResult } from '@/hooks/useStockData';
-import { calculateDividendYield, formatPercentage } from '@/lib/portfolioUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,41 +35,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
     (r) => !existingTickers.includes(r.symbol.toUpperCase())
   );
 
-  // Build yield-based suggestions from live candidate stocks
-  const yieldSuggestions = useMemo(() => {
-    if (!suggestedStocks) return [];
-    return suggestedStocks
-      .filter((s) => !existingTickers.includes(s.ticker))
-      .map((s) => ({
-        stock: s,
-        yield: s.currentYield > 0 ? s.currentYield : calculateDividendYield(s),
-      }))
-      .filter((s) => s.yield >= targetYield * 0.7)
-      .sort((a, b) => b.yield - a.yield)
-      .slice(0, 8);
-  }, [suggestedStocks, existingTickers, targetYield]);
-
-  const toggleSelect = (result: SearchResult) => {
-    setSelected((prev) => {
-      const next = new Map(prev);
-      if (next.has(result.symbol)) {
-        next.delete(result.symbol);
-      } else {
-        next.set(result.symbol, result);
-      }
-      return next;
-    });
-  };
-
-  const handleSelectSuggestion = (stock: Stock) => {
-    const result: SearchResult = {
-      symbol: stock.ticker,
-      name: stock.name,
-      currency: 'USD',
-      stockExchange: 'NYSE',
-    };
-    toggleSelect(result);
-  };
+  // Yield-based suggestions removed — search-only modal
 
   const handleProceedToShares = () => {
     const initial: Record<string, string> = {};
