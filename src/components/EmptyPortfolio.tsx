@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-import { TrendingUp, DollarSign, Target, ChevronRight, Check, Hash, Loader2 } from 'lucide-react';
+import { TrendingUp, DollarSign, Target, ChevronRight, Check, Hash, Loader2, Search } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
