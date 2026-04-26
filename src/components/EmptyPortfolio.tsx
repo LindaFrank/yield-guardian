@@ -130,6 +130,10 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             <Button size="lg" onClick={() => setStep(1)} className="gap-2">
               Find Matching Stocks <ChevronRight className="w-4 h-4" />
             </Button>
+            <Button size="lg" variant="outline" onClick={onSelectStocks} className="gap-2">
+              <Search className="w-5 h-5" />
+              General Stock Search
+            </Button>
             {onAddStock && (
               <ImportStocksModal
                 existingTickers={existingTickers}
