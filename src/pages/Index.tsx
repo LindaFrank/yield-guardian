@@ -59,6 +59,8 @@ const Index = () => {
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
   const [actionBarExpanded, setActionBarExpanded] = useState(false);
+  // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
+  const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
@@ -466,6 +468,17 @@ const Index = () => {
               <ReplacementSuggestions
                 removedStock={selectedUnderperformer}
                 candidates={replacements}
+                sharesYHeld={
+                  selectedUnderperformer
+                    ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                    : 0
+                }
+                targetYield={targetYield}
+                onIncomeDeltaChange={(ticker, delta) =>
+                  setIncomeDeltaByTicker((prev) =>
+                    prev[ticker] === delta ? prev : { ...prev, [ticker]: delta }
+                  )
+                }
                 onAddStock={(stock, shares) => {
                   handleAddStock(stock, shares);
                   setReplacementDialogOpen(false);
