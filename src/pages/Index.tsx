@@ -182,10 +182,8 @@ const Index = () => {
           matchReason,
         };
       })
-      .sort((a, b) => {
-        if (a.stabilityScore !== b.stabilityScore) return b.stabilityScore - a.stabilityScore;
-        return b.yield - a.yield;
-      });
+      // Order strictly by yield descending — highest-yield candidate first.
+      .sort((a, b) => b.yield - a.yield);
 
     // In default mode (no underperformer), only show stocks above target yield
     return scored.filter((c) => c.yield >= targetYield).slice(0, 5);
