@@ -134,6 +134,32 @@ const Index = () => {
     [stocks, targetYield]
   );
 
+  // Σ_total_gain = sum of latest IncomeDelta_Y across underperformers user has previewed
+  const totalIncomeGain = useMemo(() => {
+    const underTickers = new Set(underperformers.map((u) => u.stock.ticker));
+    return Object.entries(incomeDeltaByTicker).reduce(
+      (sum, [t, v]) => (underTickers.has(t) ? sum + v : sum),
+      0,
+    );
+  }, [incomeDeltaByTicker, underperformers]);
+
+  // Current portfolio dividend income & projected new yield after applying gains
+  const portfolioStats = useMemo(() => {
+    const sharesMap = Object.fromEntries(
+      (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+    );
+    let value = 0;
+    let income = 0;
+    stocks.forEach((s) => {
+      const sh = sharesMap[s.ticker] ?? 0;
+      value += sh * s.currentPrice;
+      income += sh * s.annualDividend;
+    });
+    const newIncome = income + totalIncomeGain;
+    const newYield = value > 0 ? (newIncome / value) * 100 : 0;
+    return { value, income, newIncome, newYield };
+  }, [stocks, stocksWithShares, totalIncomeGain]);
+
   // Build a live market stocks pool for replacement suggestions
   const liveMarketStocks = useMemo(() => {
     if (!liveCandidates || liveCandidates.length === 0) return [];
