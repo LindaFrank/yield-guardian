@@ -141,11 +141,8 @@ export function suggestReplacements(
         matchReason,
       };
     })
-    .sort((a, b) => {
-      if (a.stock.sector === removedStock.sector && b.stock.sector !== removedStock.sector) return -1;
-      if (b.stock.sector === removedStock.sector && a.stock.sector !== removedStock.sector) return 1;
-      return b.yield - a.yield;
-    });
+    // Order strictly by yield descending so index 0 is always highest-yield.
+    .sort((a, b) => b.yield - a.yield);
 
   return vettedCandidates.slice(0, 5);
 }

@@ -59,6 +59,8 @@ const Index = () => {
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
   const [actionBarExpanded, setActionBarExpanded] = useState(false);
+  // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
+  const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
@@ -132,6 +134,32 @@ const Index = () => {
     [stocks, targetYield]
   );
 
+  // Σ_total_gain = sum of latest IncomeDelta_Y across underperformers user has previewed
+  const totalIncomeGain = useMemo(() => {
+    const underTickers = new Set(underperformers.map((u) => u.stock.ticker));
+    return Object.entries(incomeDeltaByTicker).reduce(
+      (sum, [t, v]) => (underTickers.has(t) ? sum + v : sum),
+      0,
+    );
+  }, [incomeDeltaByTicker, underperformers]);
+
+  // Current portfolio dividend income & projected new yield after applying gains
+  const portfolioStats = useMemo(() => {
+    const sharesMap = Object.fromEntries(
+      (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+    );
+    let value = 0;
+    let income = 0;
+    stocks.forEach((s) => {
+      const sh = sharesMap[s.ticker] ?? 0;
+      value += sh * s.currentPrice;
+      income += sh * s.annualDividend;
+    });
+    const newIncome = income + totalIncomeGain;
+    const newYield = value > 0 ? (newIncome / value) * 100 : 0;
+    return { value, income, newIncome, newYield };
+  }, [stocks, stocksWithShares, totalIncomeGain]);
+
   // Build a live market stocks pool for replacement suggestions
   const liveMarketStocks = useMemo(() => {
     if (!liveCandidates || liveCandidates.length === 0) return [];
@@ -182,10 +210,8 @@ const Index = () => {
           matchReason,
         };
       })
-      .sort((a, b) => {
-        if (a.stabilityScore !== b.stabilityScore) return b.stabilityScore - a.stabilityScore;
-        return b.yield - a.yield;
-      });
+      // Order strictly by yield descending — highest-yield candidate first.
+      .sort((a, b) => b.yield - a.yield);
 
     // In default mode (no underperformer), only show stocks above target yield
     return scored.filter((c) => c.yield >= targetYield).slice(0, 5);
@@ -392,7 +418,34 @@ const Index = () => {
             </HelpTooltip>
           </div>
           {!showStockFinder && (
-            <div>
+            <div className="space-y-4">
+              {totalIncomeGain !== 0 && underperformers.length > 0 && (
+                <div className="p-4 rounded-xl border-[3px] border-primary/40 bg-primary/5 animate-fade-in">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Optimisation Preview
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-[11px] text-muted-foreground">Σ Total income gain</p>
+                      <p className={`font-mono font-semibold ${totalIncomeGain >= 0 ? 'text-yield-positive' : 'text-yield-negative'}`}>
+                        {totalIncomeGain >= 0 ? '+' : ''}${totalIncomeGain.toFixed(2)}/yr
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-muted-foreground">New portfolio yield</p>
+                      <p className="font-mono font-semibold text-primary">
+                        {portfolioStats.newYield.toFixed(2)}%
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-2">
+                    Based on the latest optimiser run for each underperformer you've reviewed.
+                  </p>
+                </div>
+              )}
               <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
                 <section id="underperformers-section" className="animate-fade-in scroll-mt-[180px]" style={{ animationDelay: '400ms' }}>
                   <UnderperformersList
@@ -468,6 +521,17 @@ const Index = () => {
               <ReplacementSuggestions
                 removedStock={selectedUnderperformer}
                 candidates={replacements}
+                sharesYHeld={
+                  selectedUnderperformer
+                    ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                    : 0
+                }
+                targetYield={targetYield}
+                onIncomeDeltaChange={(ticker, delta) =>
+                  setIncomeDeltaByTicker((prev) =>
+                    prev[ticker] === delta ? prev : { ...prev, [ticker]: delta }
+                  )
+                }
                 onAddStock={(stock, shares) => {
                   handleAddStock(stock, shares);
                   setReplacementDialogOpen(false);
