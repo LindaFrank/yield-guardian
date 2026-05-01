@@ -231,7 +231,7 @@ export function ReplacementSuggestions({
                         Income Δ
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-[260px]">
+                    <TooltipContent side="top" className="max-w-[260px] text-xs leading-snug">
                       Projected, not guaranteed. Based on current declared dividend rates, which issuers may cut, suspend, or change at any time.
                     </TooltipContent>
                   </Tooltip>
