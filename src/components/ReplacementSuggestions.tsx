@@ -14,6 +14,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -223,10 +224,17 @@ export function ReplacementSuggestions({
                   </span>
                 </div>
                 <div className="flex justify-between font-medium">
-                  <span className="flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3 text-yield-positive" />
-                    Income Δ
-                  </span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="flex items-center gap-1 cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
+                        <TrendingUp className="w-3 h-3 text-yield-positive" />
+                        Income Δ
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-[260px]">
+                      Projected, not guaranteed. Based on current declared dividend rates, which issuers may cut, suspend, or change at any time.
+                    </TooltipContent>
+                  </Tooltip>
                   <span className={cn(
                     'font-mono',
                     result.incomeDelta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
@@ -234,6 +242,9 @@ export function ReplacementSuggestions({
                     {result.incomeDelta >= 0 ? '+' : ''}{formatCurrency(result.incomeDelta)}/yr
                   </span>
                 </div>
+                <p className="text-[10px] italic text-muted-foreground leading-snug pt-1">
+                  Projection based on current declared dividend rates. Actual income may differ — issuers can cut, suspend, or change distributions at any time, and monthly cash flow depends on each holding's payment calendar.
+                </p>
               </div>
             )}
             {result && result.status === 'infeasible' && (
