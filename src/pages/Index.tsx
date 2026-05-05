@@ -313,7 +313,7 @@ const Index = () => {
         {wizardDone && (
           <div className="sticky top-[100px] z-40 mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-background px-3 py-2 shadow-glow animate-fade-in">
             {!actionBarExpanded && (
-              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/90 whitespace-nowrap">
+              <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
                 What Do You Want To Do?
               </span>
             )}
