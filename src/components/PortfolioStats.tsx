@@ -21,7 +21,7 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
     text: 'This is the total amount of dividend income the portfolio investment pays over one year.',
     side: 'bottom',
   },
-  'Your portfolio income rate': {
+  'Weighted Avg Yield': {
     text: 'Weighted Average (total dividends ÷ portfolio value × 100). This reflects the true portfolio yield based on position sizes.',
     side: 'bottom',
   },
@@ -58,8 +58,8 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
       color: 'text-yield-positive',
     },
     {
-      label: 'Your portfolio income rate',
-      subtitle: avgYield >= targetYield ? 'You are meeting your goal' : 'You are below your goal',
+      label: 'Weighted Avg Yield',
+      subtitle: 'total dividends ÷ portfolio value × 100',
       value: formatPercentage(avgYield),
       icon: Target,
       color: avgYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
@@ -84,13 +84,13 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
               <div className={cn('p-2 rounded-lg bg-secondary/50', stat.color)}>
                 <stat.icon className="w-4 h-4" />
               </div>
-              <span className="text-[18px] font-medium text-muted-foreground">{stat.label}</span>
+              <span className="text-sm text-muted-foreground">{stat.label}</span>
             </div>
             <p className={cn('font-mono font-semibold text-xl', stat.color)}>
               {stat.value}
             </p>
             {'subtitle' in stat && stat.subtitle && (
-              <p className="text-[16px] text-primary mt-1">{stat.subtitle}</p>
+              <p className="text-[10px] text-primary mt-1">{stat.subtitle}</p>
             )}
           </div>
         );
