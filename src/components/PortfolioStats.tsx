@@ -84,13 +84,13 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
               <div className={cn('p-2 rounded-lg bg-secondary/50', stat.color)}>
                 <stat.icon className="w-4 h-4" />
               </div>
-              <span className="text-sm text-muted-foreground">{stat.label}</span>
+              <span className="text-[16px] text-muted-foreground">{stat.label}</span>
             </div>
             <p className={cn('font-mono font-semibold text-xl', stat.color)}>
               {stat.value}
             </p>
             {'subtitle' in stat && stat.subtitle && (
-              <p className="text-[12px] text-primary mt-1">{stat.subtitle}</p>
+              <p className="text-[16px] text-primary mt-1">{stat.subtitle}</p>
             )}
           </div>
         );
