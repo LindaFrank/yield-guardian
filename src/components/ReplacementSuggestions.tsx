@@ -313,13 +313,25 @@ export function ReplacementSuggestions({
                   {row.stock.name}
                 </p>
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
-                {displayRows && row.shares > 0 && (
-                  <div className="text-[15px] text-muted-foreground mt-1">
-                    <p>Buying {row.shares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
-                    <p>Total invested: <span className="font-mono">{formatCurrency(row.cost)}</span></p>
-                    <p>Earn +{formatCurrency(row.income)} / year in additional income</p>
-                  </div>
-                )}
+                {displayRows && row.shares > 0 && (() => {
+                  const lostIncome = removedStock ? sharesYSold * removedStock.annualDividend : 0;
+                  const netIncome = row.income - lostIncome;
+                  return (
+                    <div className="text-[15px] text-muted-foreground mt-1">
+                      <p>Buying {row.shares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
+                      <p>Total invested: <span className="font-mono">{formatCurrency(row.cost)}</span></p>
+                      <p>Gross new income: +{formatCurrency(row.income)} / year</p>
+                      {removedStock && (
+                        <p className="text-[13px] italic">
+                          Net after selling {removedStock.ticker} (−{formatCurrency(lostIncome)}/yr):{' '}
+                          <span className={cn('font-mono not-italic', netIncome >= 0 ? 'text-yield-positive' : 'text-yield-negative')}>
+                            {netIncome >= 0 ? '+' : ''}{formatCurrency(netIncome)}/yr
+                          </span>
+                        </p>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
 
               {editingTicker === row.stock.ticker ? (
