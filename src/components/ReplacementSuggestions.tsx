@@ -314,9 +314,10 @@ export function ReplacementSuggestions({
                 </p>
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
                 {displayRows && row.shares > 0 && (
-                  <p className="text-[15px] text-muted-foreground mt-1 font-mono">
-                    {row.shares} × {formatCurrency(row.stock.currentPrice)} = {formatCurrency(row.cost)} · +{formatCurrency(row.income)}/yr
-                  </p>
+                  <div className="text-[15px] text-muted-foreground mt-1">
+                    <p>Buying {row.shares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
+                    <p>Total invested: <span className="font-mono">{formatCurrency(row.cost)}</span> · +{formatCurrency(row.income)}/yr</p>
+                  </div>
                 )}
               </div>
 
