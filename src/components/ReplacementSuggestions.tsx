@@ -162,7 +162,7 @@ export function ReplacementSuggestions({
                 Conservative
               </button>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-snug">
+            <p className="text-[15px] text-foreground leading-snug">
               {mode === 'aggressive'
                 ? 'Higher income focus, may include more price movement.'
                 : 'More stable choices, with lower but steadier income.'}
@@ -193,25 +193,26 @@ export function ReplacementSuggestions({
             {/* Diversification toggle */}
             <div className="flex items-center justify-between gap-2">
               <div>
-                <Label htmlFor="diversify-switch" className="text-xs">Force diversification</Label>
-                <p className="text-[14px] text-muted-foreground">Spread across multiple stocks to reduce risk.</p>
+                <Label htmlFor="diversify-switch" className="text-sm font-semibold">Force diversification</Label>
+                <p className="text-[12px] text-muted-foreground">Spread across multiple stocks to reduce risk.</p>
               </div>
               <Switch
                 id="diversify-switch"
                 checked={diversify}
                 onCheckedChange={setDiversify}
+                className="border-[4px] data-[state=unchecked]:border-muted-foreground/60 data-[state=unchecked]:bg-slate-700 [&>span]:bg-slate-600"
               />
             </div>
 
             {/* Result summary */}
             {result && result.status === 'ok' && (
-              <div className="pt-2 border-t border-border/50 space-y-1 text-[11px]">
+              <div className="pt-2 border-t border-border/50 space-y-1 text-[15px]">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Sell {result.sharesYSold} × {removedStock.ticker}</span>
+                  <span className="text-muted-foreground">Sell {result.sharesYSold} shares {removedStock.ticker}</span>
                   <span className="font-mono">{formatCurrency(result.investmentY)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Deploy</span>
+                  <span className="text-muted-foreground">Reallocate</span>
                   <span className="font-mono">{formatCurrency(result.totalCost)}{result.leftoverCash > 0.01 && ` (+${formatCurrency(result.leftoverCash)} cash)`}</span>
                 </div>
                 <div className="flex justify-between">
@@ -228,7 +229,7 @@ export function ReplacementSuggestions({
                     <TooltipTrigger asChild>
                       <span className="flex items-center gap-1 cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
                         <TrendingUp className="w-3 h-3 text-yield-positive" />
-                        Income Δ
+                        Estimated Annual Income Increase
                       </span>
                     </TooltipTrigger>
                     <TooltipContent
@@ -247,7 +248,7 @@ export function ReplacementSuggestions({
                     {result.incomeDelta >= 0 ? '+' : ''}{formatCurrency(result.incomeDelta)}/yr
                   </span>
                 </div>
-                <p className="text-[10px] italic text-muted-foreground leading-snug pt-1">
+                <p className="text-[12px] italic text-muted-foreground leading-snug pt-1">
                   Projection based on current declared dividend rates. Actual income may differ — issuers can cut, suspend, or change distributions at any time, and monthly cash flow depends on each holding's payment calendar.
                 </p>
               </div>
