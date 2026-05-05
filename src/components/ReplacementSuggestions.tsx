@@ -229,7 +229,7 @@ export function ReplacementSuggestions({
                     <TooltipTrigger asChild>
                       <span className="flex items-center gap-1 cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
                         <TrendingUp className="w-3 h-3 text-yield-positive" />
-                        Income Δ
+                        Estimated Annual Income Increase
                       </span>
                     </TooltipTrigger>
                     <TooltipContent
