@@ -200,13 +200,13 @@ export function ReplacementSuggestions({
                 id="diversify-switch"
                 checked={diversify}
                 onCheckedChange={setDiversify}
-                className="data-[state=unchecked]:border-muted-foreground/60"
+                className="border-[4px] data-[state=unchecked]:border-muted-foreground/60"
               />
             </div>
 
             {/* Result summary */}
             {result && result.status === 'ok' && (
-              <div className="pt-2 border-t border-border/50 space-y-1 text-[11px]">
+              <div className="pt-2 border-t border-border/50 space-y-1 text-[15px]">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Sell {result.sharesYSold} × {removedStock.ticker}</span>
                   <span className="font-mono">{formatCurrency(result.investmentY)}</span>
