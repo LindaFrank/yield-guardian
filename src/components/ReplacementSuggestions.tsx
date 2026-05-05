@@ -162,7 +162,7 @@ export function ReplacementSuggestions({
                 Conservative
               </button>
             </div>
-            <p className="text-[13px] text-muted-foreground/70 leading-snug">
+            <p className="text-[15px] text-muted-foreground leading-snug">
               {mode === 'aggressive'
                 ? 'Higher income focus, may include more price movement.'
                 : 'More stable choices, with lower but steadier income.'}
