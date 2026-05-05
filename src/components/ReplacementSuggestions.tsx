@@ -200,7 +200,7 @@ export function ReplacementSuggestions({
                 id="diversify-switch"
                 checked={diversify}
                 onCheckedChange={setDiversify}
-                className="border-[4px] data-[state=unchecked]:border-muted-foreground/60 data-[state=unchecked]:bg-slate-800 [&>span]:bg-slate-300"
+                className="border-[4px] data-[state=unchecked]:border-muted-foreground/60 [&>span]:bg-slate-300"
               />
             </div>
 
