@@ -194,7 +194,7 @@ export function ReplacementSuggestions({
             <div className="flex items-center justify-between gap-2">
               <div>
                 <Label htmlFor="diversify-switch" className="text-sm font-semibold">Force diversification</Label>
-                <p className="text-[10px] text-muted-foreground">Spread across multiple stocks to reduce risk.</p>
+                <p className="text-[12px] text-muted-foreground">Spread across multiple stocks to reduce risk.</p>
               </div>
               <Switch
                 id="diversify-switch"
@@ -208,11 +208,11 @@ export function ReplacementSuggestions({
             {result && result.status === 'ok' && (
               <div className="pt-2 border-t border-border/50 space-y-1 text-[15px]">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Sell {result.sharesYSold} × {removedStock.ticker}</span>
+                  <span className="text-muted-foreground">Sell {result.sharesYSold} shares {removedStock.ticker}</span>
                   <span className="font-mono">{formatCurrency(result.investmentY)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Deploy</span>
+                  <span className="text-muted-foreground">Reallocate</span>
                   <span className="font-mono">{formatCurrency(result.totalCost)}{result.leftoverCash > 0.01 && ` (+${formatCurrency(result.leftoverCash)} cash)`}</span>
                 </div>
                 <div className="flex justify-between">
@@ -248,7 +248,7 @@ export function ReplacementSuggestions({
                     {result.incomeDelta >= 0 ? '+' : ''}{formatCurrency(result.incomeDelta)}/yr
                   </span>
                 </div>
-                <p className="text-[10px] italic text-muted-foreground leading-snug pt-1">
+                <p className="text-[12px] italic text-muted-foreground leading-snug pt-1">
                   Projection based on current declared dividend rates. Actual income may differ — issuers can cut, suspend, or change distributions at any time, and monthly cash flow depends on each holding's payment calendar.
                 </p>
               </div>
