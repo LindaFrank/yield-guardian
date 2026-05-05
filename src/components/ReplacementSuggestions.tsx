@@ -164,7 +164,7 @@ export function ReplacementSuggestions({
             </div>
             <p className="text-[11px] text-muted-foreground leading-snug">
               {mode === 'aggressive'
-                ? 'Maximise dividend income gained from the swap given the shares you sell.'
+                ? 'Higher income focus, may include more price movement.'
                 : `Sell the smallest number of ${removedStock.ticker} shares that still hits ${targetYield.toFixed(2)}% yield on the new position.`}
             </p>
 
