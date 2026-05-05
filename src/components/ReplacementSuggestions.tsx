@@ -163,9 +163,9 @@ export function ReplacementSuggestions({
               </button>
             </div>
             <p className="text-[15px] text-foreground leading-snug">
-              {mode === 'aggressive'
-                ? 'Higher income focus, may include more price movement.'
-                : 'More stable choices, with lower but steadier income.'}
+                {mode === 'aggressive'
+                  ? 'Higher income focus.'
+                  : 'More stable choices, with lower but steadier income.'}
             </p>
 
             {/* Shares-to-sell slider (Aggressive only) */}
