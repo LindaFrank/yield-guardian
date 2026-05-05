@@ -293,18 +293,18 @@ export function ReplacementSuggestions({
                     {formatPercentage(yieldVal)}
                   </span>
                   {stabilityScore >= 3 ? (
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-emerald-500/50 text-emerald-500 gap-0.5">
+                    <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-emerald-500/50 text-emerald-500 gap-0.5">
                       <ShieldCheck className="w-3 h-3" />
                       Stable
                     </Badge>
                   ) : stabilityScore <= 1 ? (
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500/50 text-amber-500 gap-0.5">
+                    <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-amber-500/50 text-amber-500 gap-0.5">
                       <AlertTriangle className="w-3 h-3" />
                       Caution
                     </Badge>
                   ) : null}
                   {displayRows && row.shares > 0 && (
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/50 text-primary">
+                    <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-primary/50 text-primary">
                       Buy {row.shares}
                     </Badge>
                   )}
