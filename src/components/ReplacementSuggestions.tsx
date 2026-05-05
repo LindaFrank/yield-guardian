@@ -309,12 +309,12 @@ export function ReplacementSuggestions({
                     </Badge>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground truncate mt-0.5">
+                <p className="text-[15px] text-muted-foreground truncate mt-0.5">
                   {row.stock.name}
                 </p>
-                {matchReason && <p className="text-xs text-primary/80 mt-1">{matchReason}</p>}
+                {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
                 {displayRows && row.shares > 0 && (
-                  <p className="text-[11px] text-muted-foreground mt-1 font-mono">
+                  <p className="text-[15px] text-muted-foreground mt-1 font-mono">
                     {row.shares} × {formatCurrency(row.stock.currentPrice)} = {formatCurrency(row.cost)} · +{formatCurrency(row.income)}/yr
                   </p>
                 )}
