@@ -165,7 +165,7 @@ export function ReplacementSuggestions({
             <p className="text-[11px] text-muted-foreground leading-snug">
               {mode === 'aggressive'
                 ? 'Higher income focus, may include more price movement.'
-                : `Sell the smallest number of ${removedStock.ticker} shares that still hits ${targetYield.toFixed(2)}% yield on the new position.`}
+                : 'More stable choices, with lower but steadier income.'}
             </p>
 
             {/* Shares-to-sell slider (Aggressive only) */}
