@@ -193,7 +193,7 @@ export function ReplacementSuggestions({
             {/* Diversification toggle */}
             <div className="flex items-center justify-between gap-2">
               <div>
-                <Label htmlFor="diversify-switch" className="text-xs">Force diversification</Label>
+                <Label htmlFor="diversify-switch" className="text-sm font-semibold">Force diversification</Label>
                 <p className="text-[10px] text-muted-foreground">Spread across multiple stocks to reduce risk.</p>
               </div>
               <Switch
