@@ -21,7 +21,7 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
     text: 'This is the total amount of dividend income the portfolio investment pays over one year.',
     side: 'bottom',
   },
-  'Weighted Avg Yield': {
+  'Your portfolio income rate': {
     text: 'Weighted Average (total dividends ÷ portfolio value × 100). This reflects the true portfolio yield based on position sizes.',
     side: 'bottom',
   },
@@ -58,8 +58,8 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
       color: 'text-yield-positive',
     },
     {
-      label: 'Weighted Avg Yield',
-      subtitle: 'total dividends ÷ portfolio value × 100',
+      label: 'Your portfolio income rate',
+      subtitle: avgYield >= targetYield ? 'You are meeting your goal' : 'You are below your goal',
       value: formatPercentage(avgYield),
       icon: Target,
       color: avgYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
