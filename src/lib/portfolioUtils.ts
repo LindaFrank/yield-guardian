@@ -46,8 +46,11 @@ export function checkDividendStability(
     const yearPayments = paymentsByYear[year];
     const annualTotal = yearPayments.reduce((sum, p) => sum + p, 0);
 
-    // Require consistent quarterly payments in each completed year
-    if (yearPayments.length < 4) {
+    // Require the issuer actually paid that year (catches suspensions).
+    // We don't enforce exactly 4/year — MLPs, ADRs, and foreign payers often
+    // have 3 or 5 payments land in a calendar year due to timing, and that's
+    // fine as long as the annual total holds up (checked below).
+    if (yearPayments.length < 2) {
       hasDecline = true;
     }
 
