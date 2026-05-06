@@ -164,8 +164,8 @@ export function ReplacementSuggestions({
             </div>
             <p className="text-[15px] text-foreground leading-snug">
                 {mode === 'aggressive'
-                  ? 'Higher income focus.'
-                  : 'Small changes can improve income without rebuilding your whole portfolio.'}
+                  ? 'You want maximum income now.'
+                  : 'You want the smallest trade that hits your yield target.'}
             </p>
 
             {/* Shares-to-sell slider (Aggressive only) */}
