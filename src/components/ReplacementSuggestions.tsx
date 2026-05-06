@@ -314,21 +314,46 @@ export function ReplacementSuggestions({
                 </p>
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
                 {displayRows && row.shares > 0 && (() => {
-                  const lostIncome = removedStock ? sharesYSold * removedStock.annualDividend : 0;
-                  const netIncome = row.income - lostIncome;
+                  // Year-to-date proration based on today's date
+                  const now = new Date();
+                  const startOfYear = new Date(now.getFullYear(), 0, 1);
+                  const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+                  const yearMs = endOfYear.getTime() - startOfYear.getTime();
+                  const fracElapsed = (now.getTime() - startOfYear.getTime()) / yearMs;
+                  const fracRemain = 1 - fracElapsed;
+
+                  const oldAnnual = removedStock ? sharesYHeld * removedStock.annualDividend : 0;
+                  const remainingOldAnnual = removedStock
+                    ? Math.max(0, sharesYHeld - sharesYSold) * removedStock.annualDividend
+                    : 0;
+
+                  const incomeSoFar = oldAnnual * fracElapsed;
+                  const afterSwitchRest = (remainingOldAnnual + row.income) * fracRemain;
+                  const totalThisYear = incomeSoFar + afterSwitchRest;
+                  const nextFullYear = remainingOldAnnual + row.income;
+
                   return (
-                    <div className="text-[15px] text-muted-foreground mt-1">
+                    <div className="text-[15px] text-muted-foreground mt-1 space-y-0.5">
                       <p>Buying {row.shares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
                       <p>Total invested: <span className="font-mono">{formatCurrency(row.cost)}</span></p>
-                      <p>Gross new income: +{formatCurrency(row.income)} / year</p>
-                      {removedStock && (
-                        <p className="text-[13px] italic">
-                          Net after selling {removedStock.ticker} (−{formatCurrency(lostIncome)}/yr):{' '}
-                          <span className={cn('font-mono not-italic', netIncome >= 0 ? 'text-yield-positive' : 'text-yield-negative')}>
-                            {netIncome >= 0 ? '+' : ''}{formatCurrency(netIncome)}/yr
-                          </span>
+                      <div className="pt-1 mt-1 border-t border-border/40 space-y-0.5">
+                        <p className="flex justify-between gap-3">
+                          <span>Income this year (so far)</span>
+                          <span className="font-mono">{formatCurrency(incomeSoFar)}</span>
                         </p>
-                      )}
+                        <p className="flex justify-between gap-3">
+                          <span>After switch (rest of year)</span>
+                          <span className="font-mono">{formatCurrency(afterSwitchRest)}</span>
+                        </p>
+                        <p className="flex justify-between gap-3 font-medium text-foreground">
+                          <span>Total this year</span>
+                          <span className="font-mono">{formatCurrency(totalThisYear)}</span>
+                        </p>
+                        <p className="flex justify-between gap-3 font-medium">
+                          <span>Next full year income</span>
+                          <span className="font-mono text-yield-positive">{formatCurrency(nextFullYear)}</span>
+                        </p>
+                      </div>
                     </div>
                   );
                 })()}
