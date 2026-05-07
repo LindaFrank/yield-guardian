@@ -57,6 +57,10 @@ export interface OptimizerInput {
   mode: OptimizerMode;
   /** force every candidate to get at least 1 share */
   diversify: boolean;
+  /** total portfolio market value — required for conservative whole-portfolio solve */
+  portfolioValue?: number;
+  /** total portfolio annual dividend income — required for conservative whole-portfolio solve */
+  portfolioIncome?: number;
 }
 
 export interface OptimizerRow {
