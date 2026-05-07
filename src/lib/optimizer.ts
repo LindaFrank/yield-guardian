@@ -93,6 +93,8 @@ export interface OptimizerResult {
   incomeDelta: number;
   /** new yield on the position dollars (newIncome / investmentY) */
   newYield: number;
+  /** projected whole-portfolio yield AFTER the trade (decimal). Set when portfolioValue/Income provided. */
+  newPortfolioYield?: number;
 }
 
 const noTrade = (
