@@ -263,20 +263,32 @@ export function ReplacementSuggestions({
       )}
 
       <div className="space-y-3">
-        {(displayRows ? displayRows : candidates.map((c) => ({
-          stock: c.stock,
-          shares: 0,
-          cost: 0,
-          income: 0,
-        }))).map((row, idx) => {
+        {(() => {
+          const baseRows = displayRows
+            ? [...displayRows]
+            : candidates.map((c) => ({ stock: c.stock, shares: 0, cost: 0, income: 0 }));
+
+          // Conservative mode: show all candidates (up to 5), ordered ascending by yield
+          // so the stocks closest to the user's target appear first.
+          if (mode === 'conservative' && removedStock) {
+            baseRows.sort((a, b) => {
+              const yA = (a.stock.annualDividend / a.stock.currentPrice) * 100;
+              const yB = (b.stock.annualDividend / b.stock.currentPrice) * 100;
+              return yA - yB;
+            });
+          }
+
+          return baseRows;
+        })().map((row, idx) => {
           // Find matching ReplacementCandidate metadata for display badges
           const meta = candidates.find((c) => c.stock.ticker === row.stock.ticker);
           const yieldVal = meta?.yield ?? (row.stock.annualDividend / row.stock.currentPrice) * 100;
           const stabilityScore = meta?.stabilityScore ?? 2;
           const matchReason = meta?.matchReason;
 
-          // Hide rows where solver picked 0 unless diversification is on
-          if (displayRows && row.shares === 0 && !diversify) return null;
+          // Hide rows where solver picked 0 unless diversification is on,
+          // EXCEPT in conservative mode where we always show all candidates.
+          if (displayRows && row.shares === 0 && !diversify && mode !== 'conservative') return null;
 
           return (
             <div
