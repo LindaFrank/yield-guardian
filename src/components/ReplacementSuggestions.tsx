@@ -74,8 +74,10 @@ export function ReplacementSuggestions({
       targetYield: targetYield / 100,
       mode,
       diversify,
+      portfolioValue,
+      portfolioIncome,
     });
-  }, [removedStock, sharesYHeld, sharesYSold, optimizerCandidates, targetYield, mode, diversify]);
+  }, [removedStock, sharesYHeld, sharesYSold, optimizerCandidates, targetYield, mode, diversify, portfolioValue, portfolioIncome]);
 
   // Push IncomeDelta upward whenever it changes
   useEffect(() => {
