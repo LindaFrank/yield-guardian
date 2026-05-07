@@ -429,7 +429,7 @@ const Index = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-[11px] text-muted-foreground">Σ Total income gain</p>
+                      <p className="text-[11px] text-muted-foreground">Extra Income per year</p>
                       <p className={`font-mono font-semibold ${totalIncomeGain >= 0 ? 'text-yield-positive' : 'text-yield-negative'}`}>
                         {totalIncomeGain >= 0 ? '+' : ''}${totalIncomeGain.toFixed(2)}/yr
                       </p>
