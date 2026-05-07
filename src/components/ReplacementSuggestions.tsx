@@ -26,6 +26,10 @@ interface ReplacementSuggestionsProps {
   sharesYHeld?: number;
   /** target min yield (percent, e.g. 5 means 5%) */
   targetYield?: number;
+  /** total portfolio market value — drives Conservative whole-portfolio yield target */
+  portfolioValue?: number;
+  /** total portfolio annual dividend income — drives Conservative whole-portfolio yield target */
+  portfolioIncome?: number;
   /** notify parent of latest IncomeDelta_Y for portfolio-wide aggregation */
   onIncomeDeltaChange?: (ticker: string, incomeDelta: number) => void;
 }
@@ -36,6 +40,8 @@ export function ReplacementSuggestions({
   onAddStock,
   sharesYHeld = 0,
   targetYield = 5,
+  portfolioValue,
+  portfolioIncome,
   onIncomeDeltaChange,
 }: ReplacementSuggestionsProps) {
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
@@ -68,8 +74,10 @@ export function ReplacementSuggestions({
       targetYield: targetYield / 100,
       mode,
       diversify,
+      portfolioValue,
+      portfolioIncome,
     });
-  }, [removedStock, sharesYHeld, sharesYSold, optimizerCandidates, targetYield, mode, diversify]);
+  }, [removedStock, sharesYHeld, sharesYSold, optimizerCandidates, targetYield, mode, diversify, portfolioValue, portfolioIncome]);
 
   // Push IncomeDelta upward whenever it changes
   useEffect(() => {
@@ -216,14 +224,29 @@ export function ReplacementSuggestions({
                   <span className="font-mono">{formatCurrency(result.totalCost)}{result.leftoverCash > 0.01 && ` (+${formatCurrency(result.leftoverCash)} cash)`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">New yield on position</span>
+                  <span className="text-muted-foreground">
+                    {mode === 'conservative' && result.newPortfolioYield !== undefined
+                      ? 'New portfolio yield'
+                      : 'New yield on reallocated dollars'}
+                  </span>
                   <span className={cn(
                     'font-mono',
-                    result.newYield * 100 >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
+                    ((mode === 'conservative' && result.newPortfolioYield !== undefined
+                      ? result.newPortfolioYield
+                      : result.newYield) * 100) >= targetYield
+                      ? 'text-yield-positive'
+                      : 'text-yield-warning',
                   )}>
-                    {formatPercentage(result.newYield * 100)}
+                    {formatPercentage(
+                      (mode === 'conservative' && result.newPortfolioYield !== undefined
+                        ? result.newPortfolioYield
+                        : result.newYield) * 100,
+                    )}
                   </span>
                 </div>
+                {mode === 'conservative' && result.message && (
+                  <p className="text-[12px] text-amber-500 leading-snug pt-1">{result.message}</p>
+                )}
                 <div className="flex justify-between font-medium">
                   <Tooltip>
                     <TooltipTrigger asChild>
