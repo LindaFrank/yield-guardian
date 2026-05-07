@@ -26,7 +26,7 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
         step={0.5}
         className="w-full"
       />
-      <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+      <div className="flex justify-between mt-2 text-[15px] text-muted-foreground">
         <span>1%</span>
         <span>10%</span>
       </div>
