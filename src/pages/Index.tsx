@@ -424,7 +424,7 @@ const Index = () => {
                   <div className="flex items-center gap-2 mb-1">
                     <Sparkles className="w-4 h-4 text-primary" />
                     <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Optimisation Preview
+                      Income Impact
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
