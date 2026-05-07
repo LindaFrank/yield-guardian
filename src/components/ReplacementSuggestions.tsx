@@ -146,8 +146,8 @@ export function ReplacementSuggestions({
               <button
                 onClick={() => setMode('aggressive')}
                 className={cn(
-                  'flex-1 text-xs font-medium py-1.5 px-2 rounded transition-colors',
-                  mode === 'aggressive' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+                  'flex-1 text-xs font-medium py-1.5 px-2 rounded transition-colors border-2 border-muted-foreground/60',
+                  mode === 'aggressive' ? 'bg-primary text-primary-foreground' : 'text-white hover:text-foreground',
                 )}
               >
                 Aggressive
@@ -155,8 +155,8 @@ export function ReplacementSuggestions({
               <button
                 onClick={() => setMode('conservative')}
                 className={cn(
-                  'flex-1 text-xs font-medium py-1.5 px-2 rounded transition-colors',
-                  mode === 'conservative' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+                  'flex-1 text-xs font-medium py-1.5 px-2 rounded transition-colors border-2 border-muted-foreground/60',
+                  mode === 'conservative' ? 'bg-primary text-primary-foreground' : 'text-white hover:text-foreground',
                 )}
               >
                 Conservative
