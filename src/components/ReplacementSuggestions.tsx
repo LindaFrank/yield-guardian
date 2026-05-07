@@ -338,7 +338,7 @@ export function ReplacementSuggestions({
                       <p>Total invested: <span className="font-mono">{formatCurrency(row.cost)}</span></p>
                       <div className="pt-1 mt-1 border-t border-border/40 space-y-0.5">
                         <p className="flex justify-between gap-3">
-                          <span>Income this year (so far)</span>
+                          <span>Income this year (so far): {removedStock?.ticker}</span>
                           <span className="font-mono">{formatCurrency(incomeSoFar)}</span>
                         </p>
                         <p className="flex justify-between gap-3">
