@@ -423,7 +423,7 @@ const Index = () => {
                 <div className="p-4 rounded-xl border-[3px] border-primary/40 bg-primary/5 animate-fade-in">
                   <div className="flex items-center gap-2 mb-1">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-white">
                       Income Impact
                     </span>
                   </div>
