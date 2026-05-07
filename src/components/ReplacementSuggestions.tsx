@@ -224,14 +224,29 @@ export function ReplacementSuggestions({
                   <span className="font-mono">{formatCurrency(result.totalCost)}{result.leftoverCash > 0.01 && ` (+${formatCurrency(result.leftoverCash)} cash)`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">New yield on position</span>
+                  <span className="text-muted-foreground">
+                    {mode === 'conservative' && result.newPortfolioYield !== undefined
+                      ? 'New portfolio yield'
+                      : 'New yield on reallocated dollars'}
+                  </span>
                   <span className={cn(
                     'font-mono',
-                    result.newYield * 100 >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
+                    ((mode === 'conservative' && result.newPortfolioYield !== undefined
+                      ? result.newPortfolioYield
+                      : result.newYield) * 100) >= targetYield
+                      ? 'text-yield-positive'
+                      : 'text-yield-warning',
                   )}>
-                    {formatPercentage(result.newYield * 100)}
+                    {formatPercentage(
+                      (mode === 'conservative' && result.newPortfolioYield !== undefined
+                        ? result.newPortfolioYield
+                        : result.newYield) * 100,
+                    )}
                   </span>
                 </div>
+                {mode === 'conservative' && result.message && (
+                  <p className="text-[12px] text-amber-500 leading-snug pt-1">{result.message}</p>
+                )}
                 <div className="flex justify-between font-medium">
                   <Tooltip>
                     <TooltipTrigger asChild>
