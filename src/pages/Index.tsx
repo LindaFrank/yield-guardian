@@ -527,6 +527,8 @@ const Index = () => {
                     : 0
                 }
                 targetYield={targetYield}
+                portfolioValue={portfolioStats.value}
+                portfolioIncome={portfolioStats.income}
                 onIncomeDeltaChange={(ticker, delta) =>
                   setIncomeDeltaByTicker((prev) =>
                     prev[ticker] === delta ? prev : { ...prev, [ticker]: delta }
