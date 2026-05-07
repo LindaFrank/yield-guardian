@@ -315,11 +315,18 @@ export function ReplacementSuggestions({
                       Caution
                     </Badge>
                   ) : null}
-                  {displayRows && row.shares > 0 && (
-                    <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-primary/50 text-primary">
-                      Buy {row.shares}
-                    </Badge>
-                  )}
+                  {displayRows && (() => {
+                    let buyN = row.shares;
+                    if (buyN === 0 && mode === 'conservative' && result?.status === 'ok' && row.stock.currentPrice > 0) {
+                      buyN = Math.floor(result.investmentY / row.stock.currentPrice);
+                    }
+                    if (buyN <= 0) return null;
+                    return (
+                      <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-primary/50 text-primary">
+                        Buy {buyN}
+                      </Badge>
+                    );
+                  })()}
                 </div>
                 <p className="text-[15px] text-muted-foreground truncate mt-0.5">
                   {row.stock.name}
