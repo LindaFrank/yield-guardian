@@ -12,7 +12,7 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5 text-primary" />
-          <span className="font-medium">Target Minimum Yield</span>
+          <span className="font-medium">Income Goal</span>
         </div>
         <span className="font-mono font-semibold text-lg text-primary">
           {value.toFixed(1)}%
@@ -30,6 +30,9 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
         <span>1%</span>
         <span>10%</span>
       </div>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Choose the yearly income rate you want from your portfolio.
+      </p>
     </div>
   );
 }
