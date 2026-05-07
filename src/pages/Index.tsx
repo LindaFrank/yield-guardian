@@ -442,7 +442,7 @@ const Index = () => {
                     </div>
                   </div>
                   <p className="text-[13px] text-muted-foreground mt-2">
-                    Based on the latest optimiser run for each underperformer you've reviewed.
+                    Based on the latest recommendations you've reviewed.
                   </p>
                 </div>
               )}
