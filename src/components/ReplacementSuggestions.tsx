@@ -315,17 +315,37 @@ export function ReplacementSuggestions({
                       Caution
                     </Badge>
                   ) : null}
-                  {displayRows && row.shares > 0 && (
-                    <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-primary/50 text-primary">
-                      Buy {row.shares}
-                    </Badge>
-                  )}
+                  {displayRows && (() => {
+                    let buyN = row.shares;
+                    if (buyN === 0 && mode === 'conservative' && result?.status === 'ok' && row.stock.currentPrice > 0) {
+                      buyN = Math.floor(result.investmentY / row.stock.currentPrice);
+                    }
+                    if (buyN <= 0) return null;
+                    return (
+                      <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-primary/50 text-primary">
+                        Buy {buyN}
+                      </Badge>
+                    );
+                  })()}
                 </div>
                 <p className="text-[15px] text-muted-foreground truncate mt-0.5">
                   {row.stock.name}
                 </p>
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
-                {displayRows && row.shares > 0 && (() => {
+                {displayRows && (() => {
+                  // In conservative mode, project the same trade into THIS card's ticker
+                  // so every replacement shows the same income breakdown as the solver pick.
+                  let projShares = row.shares;
+                  let projCost = row.cost;
+                  let projIncome = row.income;
+                  if (row.shares === 0 && mode === 'conservative' && result?.status === 'ok') {
+                    projShares = Math.floor(result.investmentY / row.stock.currentPrice);
+                    if (projShares <= 0) return null;
+                    projCost = projShares * row.stock.currentPrice;
+                    projIncome = projShares * row.stock.annualDividend;
+                  }
+                  if (projShares <= 0) return null;
+
                   // Year-to-date proration based on today's date
                   const now = new Date();
                   const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -340,14 +360,14 @@ export function ReplacementSuggestions({
                     : 0;
 
                   const incomeSoFar = oldAnnual * fracElapsed;
-                  const afterSwitchRest = (remainingOldAnnual + row.income) * fracRemain;
+                  const afterSwitchRest = (remainingOldAnnual + projIncome) * fracRemain;
                   const totalThisYear = incomeSoFar + afterSwitchRest;
-                  const nextFullYear = remainingOldAnnual + row.income;
+                  const nextFullYear = remainingOldAnnual + projIncome;
 
                   return (
                     <div className="text-[15px] text-muted-foreground mt-1 space-y-0.5">
-                      <p>Buying {row.shares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
-                      <p>Total invested: <span className="font-mono">{formatCurrency(row.cost)}</span></p>
+                      <p>Buying {projShares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
+                      <p>Total invested: <span className="font-mono">{formatCurrency(projCost)}</span></p>
                       <div className="pt-1 mt-1 border-t border-border/40 space-y-0.5">
                         <p className="flex justify-between gap-3">
                           <span>Income this year (so far): {removedStock?.ticker}</span>
