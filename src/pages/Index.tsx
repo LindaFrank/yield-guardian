@@ -429,19 +429,19 @@ const Index = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-[13px] text-muted-foreground">Potential Income Increase</p>
+                      <p className="text-[14px] text-muted-foreground">Potential Income Increase</p>
                       <p className={`font-mono font-semibold ${totalIncomeGain >= 0 ? 'text-yield-positive' : 'text-yield-negative'}`}>
                         {totalIncomeGain >= 0 ? '+' : ''}${totalIncomeGain.toFixed(2)}/yr
                       </p>
                     </div>
                     <div>
-                      <p className="text-[13px] text-muted-foreground">New portfolio yield</p>
+                      <p className="text-[14px] text-muted-foreground">New portfolio yield</p>
                       <p className="font-mono font-semibold text-primary">
                         {portfolioStats.newYield.toFixed(2)}%
                       </p>
                     </div>
                   </div>
-                  <p className="text-[12px] text-muted-foreground mt-2">
+                  <p className="text-[13px] text-muted-foreground mt-2">
                     Based on the latest optimiser run for each underperformer you've reviewed.
                   </p>
                 </div>
