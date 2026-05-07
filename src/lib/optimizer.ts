@@ -226,7 +226,7 @@ function solveConservative(
   input: OptimizerInput,
   cands: OptimizerCandidate[],
 ): OptimizerResult {
-  const { underperformer, sharesYHeld, targetYield, diversify } = input;
+  const { underperformer, sharesYHeld, targetYield, diversify, portfolioValue, portfolioIncome } = input;
   const P_Y = underperformer.currentPrice;
   const A_Y = underperformer.annualDividend;
 
@@ -237,27 +237,70 @@ function solveConservative(
     };
   }
 
-  // Search smallest sharesYSold that satisfies the yield constraint.
+  // Whole-portfolio target mode: find smallest sale that brings the portfolio
+  // yield up to targetYield. Constraint:
+  //   (portfolioIncome + incomeDelta) / portfolioValue >= targetYield
+  // i.e. incomeDelta >= targetYield * portfolioValue - portfolioIncome.
+  // Note: a swap doesn't change portfolio market value (sale proceeds = buy cost + leftover cash, all stay invested at par).
+  const usePortfolioTarget =
+    typeof portfolioValue === 'number' && portfolioValue > 0 && typeof portfolioIncome === 'number';
+
+  const requiredDelta = usePortfolioTarget
+    ? targetYield * (portfolioValue as number) - (portfolioIncome as number)
+    : 0;
+
+  // Already at/above target — no trade needed.
+  if (usePortfolioTarget && requiredDelta <= 0) {
+    return {
+      ...noTrade(underperformer, 'conservative', 'Your portfolio yield already meets your income goal — no trade needed from this stock.'),
+      status: 'no-trade',
+    };
+  }
+
+  let bestFromThisStock: OptimizerResult | null = null;
+
   for (let sold = 1; sold <= Math.floor(sharesYHeld); sold++) {
     const investmentY = sold * P_Y;
     const sol = solveAggressive(cands, investmentY, diversify);
+    const lostIncome = A_Y * sold;
+    const incomeDelta = sol.income - lostIncome;
     const newYield = investmentY > 0 ? sol.income / investmentY : 0;
-    if (newYield >= targetYield) {
-      const lostIncome = A_Y * sold;
-      return {
-        status: 'ok',
-        mode: 'conservative',
-        rows: buildRows(cands, sol.n),
-        sharesYSold: sold,
-        investmentY,
-        totalCost: sol.cost,
-        leftoverCash: investmentY - sol.cost,
-        newIncome: sol.income,
-        lostIncome,
-        incomeDelta: sol.income - lostIncome,
-        newYield,
-      };
+
+    const result: OptimizerResult = {
+      status: 'ok',
+      mode: 'conservative',
+      rows: buildRows(cands, sol.n),
+      sharesYSold: sold,
+      investmentY,
+      totalCost: sol.cost,
+      leftoverCash: investmentY - sol.cost,
+      newIncome: sol.income,
+      lostIncome,
+      incomeDelta,
+      newYield,
+      newPortfolioYield: usePortfolioTarget
+        ? ((portfolioIncome as number) + incomeDelta) / (portfolioValue as number)
+        : undefined,
+    };
+
+    if (usePortfolioTarget) {
+      if (incomeDelta >= requiredDelta) return result;
+      bestFromThisStock = result; // selling everything is the best this single stock can do
+    } else {
+      // Legacy: position-yield target
+      if (newYield >= targetYield) return result;
     }
+  }
+
+  // Couldn't reach the goal from this stock alone. Surface the best partial result so the user
+  // can see how far it gets and address the next underperformer.
+  if (usePortfolioTarget && bestFromThisStock) {
+    const reached = (bestFromThisStock.newPortfolioYield ?? 0) * 100;
+    return {
+      ...bestFromThisStock,
+      status: 'ok',
+      message: `Selling all ${Math.floor(sharesYHeld)} shares of ${underperformer.ticker} lifts your portfolio yield to ${reached.toFixed(2)}%. Address the next underperformer to keep moving toward your goal.`,
+    };
   }
 
   return {
