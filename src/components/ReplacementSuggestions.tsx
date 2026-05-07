@@ -26,6 +26,10 @@ interface ReplacementSuggestionsProps {
   sharesYHeld?: number;
   /** target min yield (percent, e.g. 5 means 5%) */
   targetYield?: number;
+  /** total portfolio market value — drives Conservative whole-portfolio yield target */
+  portfolioValue?: number;
+  /** total portfolio annual dividend income — drives Conservative whole-portfolio yield target */
+  portfolioIncome?: number;
   /** notify parent of latest IncomeDelta_Y for portfolio-wide aggregation */
   onIncomeDeltaChange?: (ticker: string, incomeDelta: number) => void;
 }
@@ -36,6 +40,8 @@ export function ReplacementSuggestions({
   onAddStock,
   sharesYHeld = 0,
   targetYield = 5,
+  portfolioValue,
+  portfolioIncome,
   onIncomeDeltaChange,
 }: ReplacementSuggestionsProps) {
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
