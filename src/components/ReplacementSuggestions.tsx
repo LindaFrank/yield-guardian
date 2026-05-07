@@ -135,7 +135,7 @@ export function ReplacementSuggestions({
           </div>
 
           {/* Optimiser controls */}
-          <div className="mb-4 p-3 rounded-lg border-2 border-primary/30 bg-primary/5 space-y-3">
+          <div className="mb-4 p-3 rounded-lg border-4 border-primary/30 bg-primary/5 space-y-3">
             <div className="flex items-center gap-2">
               <Wand2 className="w-4 h-4 text-primary" />
               <span className="text-sm font-semibold">Optimiser</span>
