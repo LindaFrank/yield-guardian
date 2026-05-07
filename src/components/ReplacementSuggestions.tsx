@@ -359,8 +359,8 @@ export function ReplacementSuggestions({
 
                   return (
                     <div className="text-[15px] text-muted-foreground mt-1 space-y-0.5">
-                      <p>Buying {row.shares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
-                      <p>Total invested: <span className="font-mono">{formatCurrency(row.cost)}</span></p>
+                      <p>Buying {projShares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
+                      <p>Total invested: <span className="font-mono">{formatCurrency(projCost)}</span></p>
                       <div className="pt-1 mt-1 border-t border-border/40 space-y-0.5">
                         <p className="flex justify-between gap-3">
                           <span>Income this year (so far): {removedStock?.ticker}</span>
