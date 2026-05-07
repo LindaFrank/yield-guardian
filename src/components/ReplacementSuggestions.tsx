@@ -325,7 +325,20 @@ export function ReplacementSuggestions({
                   {row.stock.name}
                 </p>
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
-                {displayRows && row.shares > 0 && (() => {
+                {displayRows && (() => {
+                  // In conservative mode, project the same trade into THIS card's ticker
+                  // so every replacement shows the same income breakdown as the solver pick.
+                  let projShares = row.shares;
+                  let projCost = row.cost;
+                  let projIncome = row.income;
+                  if (row.shares === 0 && mode === 'conservative' && result?.status === 'ok') {
+                    projShares = Math.floor(result.investmentY / row.stock.currentPrice);
+                    if (projShares <= 0) return null;
+                    projCost = projShares * row.stock.currentPrice;
+                    projIncome = projShares * row.stock.annualDividend;
+                  }
+                  if (projShares <= 0) return null;
+
                   // Year-to-date proration based on today's date
                   const now = new Date();
                   const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -340,9 +353,9 @@ export function ReplacementSuggestions({
                     : 0;
 
                   const incomeSoFar = oldAnnual * fracElapsed;
-                  const afterSwitchRest = (remainingOldAnnual + row.income) * fracRemain;
+                  const afterSwitchRest = (remainingOldAnnual + projIncome) * fracRemain;
                   const totalThisYear = incomeSoFar + afterSwitchRest;
-                  const nextFullYear = remainingOldAnnual + row.income;
+                  const nextFullYear = remainingOldAnnual + projIncome;
 
                   return (
                     <div className="text-[15px] text-muted-foreground mt-1 space-y-0.5">
