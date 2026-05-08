@@ -553,6 +553,15 @@ const Index = () => {
               />
             </DialogContent>
           </Dialog>
+
+          <AddStockModal
+            existingTickers={stocks.map((s) => s.ticker)}
+            onAddStock={handleAddStock}
+            open={addStockOpen}
+            onOpenChange={setAddStockOpen}
+            suggestedStocks={liveMarketStocks}
+            targetYield={targetYield}
+          />
         </div>
       </main>
     </div>
