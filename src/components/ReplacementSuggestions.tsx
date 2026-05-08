@@ -430,12 +430,12 @@ export function ReplacementSuggestions({
                                         Execute in your brokerage
                                       </span>
                                     </div>
-                                    <PopoverPrimitiveClose
+                                    <PopoverClose
                                       className="rounded-sm p-0.5 text-yellow-950/70 hover:bg-yellow-300/60 hover:text-yellow-950 transition-colors"
                                       aria-label="Close"
                                     >
                                       <X className="w-4 h-4" />
-                                    </PopoverPrimitiveClose>
+                                    </PopoverClose>
                                   </div>
                                   <p className="text-xs">
                                     Log in to your brokerage account and place these two trades:
