@@ -378,7 +378,10 @@ export function ReplacementSuggestions({
                           </Button>
                         )}
                         {removedStock && (() => {
-                          const sellShares = Math.max(1, Math.floor(sharesYHeld));
+                          const sellShares = Math.max(
+                            1,
+                            Math.floor(result?.sharesYSold ?? sharesYHeld),
+                          );
                           const subject = `Brokerage swap: sell ${removedStock.ticker}, buy ${row.stock.ticker}`;
                           const bodyText =
                             `Execute in your brokerage:\n\n` +
