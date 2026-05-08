@@ -372,7 +372,7 @@ export function ReplacementSuggestions({
                                 className={cn(
                                   'flex items-center gap-1 px-2 py-1 rounded-md shadow-elevated',
                                   'bg-yellow-200 text-yellow-950 border-2 border-yellow-500/70',
-                                  'rotate-3 hover:rotate-0 hover:scale-110 transition-all',
+                                  'hover:scale-110 transition-all',
                                   'text-[11px] font-semibold uppercase tracking-wide',
                                 )}
                                 aria-label={`How to execute swap to ${row.stock.ticker}`}
