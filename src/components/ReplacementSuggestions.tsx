@@ -375,21 +375,22 @@ export function ReplacementSuggestions({
                             `Once trades settle, return to Yield Guardian and click "Next" to update your portfolio.`;
                           const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
                           const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+                          const outlookUrl = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
                           const handleEmail = async (e: React.MouseEvent) => {
                             e.stopPropagation();
-                            // Try to open default mail client; if nothing handles mailto: this is a no-op,
-                            // so we also copy the message to the clipboard and open Gmail compose as a fallback.
                             try {
-                              await navigator.clipboard.writeText(`${subject}\n\n${bodyText}`);
+                              await navigator.clipboard.writeText(`Subject: ${subject}\n\n${bodyText}`);
                               toast.success('Instructions copied to clipboard', {
-                                description: 'Opening Gmail — paste into the message body if needed.',
+                                description: 'Paste into any email — or use the Gmail/Outlook links below.',
+                                action: {
+                                  label: 'Open Gmail',
+                                  onClick: () => window.open(gmailUrl, '_blank', 'noopener,noreferrer'),
+                                },
+                                duration: 8000,
                               });
                             } catch {
-                              // clipboard not available — proceed silently
+                              toast.error('Could not copy. Try Print instead.');
                             }
-                            window.open(gmailUrl, '_blank', 'noopener,noreferrer');
-                            // Also fire mailto for users with a desktop mail client configured
-                            window.location.href = mailto;
                           };
                           const handlePrint = (e: React.MouseEvent) => {
                             e.stopPropagation();
