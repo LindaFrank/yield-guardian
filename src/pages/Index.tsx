@@ -538,6 +538,11 @@ const Index = () => {
                   handleAddStock(stock, shares);
                   setReplacementDialogOpen(false);
                 }}
+                onSwap={(candidate, buyShares, removeTicker) => {
+                  handleAddStock(candidate, buyShares);
+                  handleRemoveStock(removeTicker);
+                  setReplacementDialogOpen(false);
+                }}
               />
             </DialogContent>
           </Dialog>
