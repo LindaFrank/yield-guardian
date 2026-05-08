@@ -498,12 +498,10 @@ export function ReplacementSuggestions({
                                       size="sm"
                                       variant="outline"
                                       className="flex-1 h-8 text-xs gap-1 bg-white"
-                                      asChild
+                                      onClick={handleEmail}
                                     >
-                                      <a href={mailto} onClick={(e) => e.stopPropagation()}>
-                                        <Mail className="w-3.5 h-3.5" />
-                                        Email
-                                      </a>
+                                      <Mail className="w-3.5 h-3.5" />
+                                      Email
                                     </Button>
                                   </div>
                                 </div>
