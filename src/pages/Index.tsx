@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft, Search } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -363,14 +363,14 @@ const Index = () => {
                     }
                   }}
                 />
-                <AddStockModal
-                  existingTickers={stocks.map((s) => s.ticker)}
-                  onAddStock={handleAddStock}
-                  open={addStockOpen}
-                  onOpenChange={setAddStockOpen}
-                  suggestedStocks={liveMarketStocks}
-                  targetYield={targetYield}
-                />
+                <Button
+                  variant="secondary"
+                  className="gap-1.5 border-[3px] border-muted-foreground/50"
+                  onClick={() => setAddStockOpen(true)}
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  Search Stocks Generally
+                </Button>
                 {stocks.length > 0 && (
                   <>
                     <Button
@@ -553,6 +553,15 @@ const Index = () => {
               />
             </DialogContent>
           </Dialog>
+
+          <AddStockModal
+            existingTickers={stocks.map((s) => s.ticker)}
+            onAddStock={handleAddStock}
+            open={addStockOpen}
+            onOpenChange={setAddStockOpen}
+            suggestedStocks={liveMarketStocks}
+            targetYield={targetYield}
+          />
         </div>
       </main>
     </div>
