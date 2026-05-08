@@ -348,9 +348,23 @@ export function ReplacementSuggestions({
                     }
                     if (buyN <= 0) return null;
                     return (
-                      <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-primary/50 text-primary">
-                        Buy {buyN}
-                      </Badge>
+                      <>
+                        <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-primary/50 text-primary">
+                          Buy {buyN}
+                        </Badge>
+                        {removedStock && onSwap && (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              onSwap(row.stock, buyN, removedStock.ticker);
+                            }}
+                            className="h-7 px-2.5 text-xs gap-1"
+                          >
+                            Next
+                            <ArrowRightCircle className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
+                      </>
                     );
                   })()}
                 </div>
