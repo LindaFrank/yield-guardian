@@ -363,14 +363,14 @@ const Index = () => {
                     }
                   }}
                 />
-                <AddStockModal
-                  existingTickers={stocks.map((s) => s.ticker)}
-                  onAddStock={handleAddStock}
-                  open={addStockOpen}
-                  onOpenChange={setAddStockOpen}
-                  suggestedStocks={liveMarketStocks}
-                  targetYield={targetYield}
-                />
+                <Button
+                  variant="secondary"
+                  className="gap-1.5 border-[3px] border-muted-foreground/50"
+                  onClick={() => setAddStockOpen(true)}
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  Search Stocks Generally
+                </Button>
                 {stocks.length > 0 && (
                   <>
                     <Button
