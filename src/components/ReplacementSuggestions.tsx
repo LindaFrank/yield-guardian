@@ -374,6 +374,23 @@ export function ReplacementSuggestions({
                             `2. Purchase ${buyN.toLocaleString()} shares of ${row.stock.ticker} (${row.stock.name}).\n\n` +
                             `Once trades settle, return to Yield Guardian and click "Next" to update your portfolio.`;
                           const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+                          const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+                          const handleEmail = async (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            // Try to open default mail client; if nothing handles mailto: this is a no-op,
+                            // so we also copy the message to the clipboard and open Gmail compose as a fallback.
+                            try {
+                              await navigator.clipboard.writeText(`${subject}\n\n${bodyText}`);
+                              toast.success('Instructions copied to clipboard', {
+                                description: 'Opening Gmail — paste into the message body if needed.',
+                              });
+                            } catch {
+                              // clipboard not available — proceed silently
+                            }
+                            window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+                            // Also fire mailto for users with a desktop mail client configured
+                            window.location.href = mailto;
+                          };
                           const handlePrint = (e: React.MouseEvent) => {
                             e.stopPropagation();
                             const w = window.open('', '_blank', 'width=600,height=700');
