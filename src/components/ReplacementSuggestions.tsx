@@ -7,8 +7,8 @@ import {
   OptimizerMode,
   OptimizerResult,
 } from '@/lib/optimizer';
-import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote, Printer, Mail } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
