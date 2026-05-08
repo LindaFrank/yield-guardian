@@ -22,6 +22,8 @@ interface ReplacementSuggestionsProps {
   removedStock: Stock | null;
   candidates: ReplacementCandidate[];
   onAddStock: (stock: Stock, shares?: number) => void;
+  /** Swap action: buy `buyShares` of `candidate` and remove `removeTicker` from portfolio. */
+  onSwap?: (candidate: Stock, buyShares: number, removeTicker: string) => void;
   /** total shares of the underperformer the user holds (for slider cap) */
   sharesYHeld?: number;
   /** target min yield (percent, e.g. 5 means 5%) */
