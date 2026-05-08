@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft, Search } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
