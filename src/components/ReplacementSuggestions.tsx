@@ -227,6 +227,18 @@ export function ReplacementSuggestions({
                   <span className="text-muted-foreground">Reallocate</span>
                   <span className="font-mono">{formatCurrency(result.totalCost)}{result.leftoverCash > 0.01 && ` (+${formatCurrency(result.leftoverCash)} cash)`}</span>
                 </div>
+                {(() => {
+                  const picks = result.rows.filter((r) => r.shares > 0);
+                  if (picks.length === 0) return null;
+                  return (
+                    <div className="flex justify-between gap-3">
+                      <span className="text-muted-foreground shrink-0">Allocation breakdown</span>
+                      <span className="font-mono text-right">
+                        {picks.map((r) => `Buy ${r.shares} ${r.stock.ticker}`).join(' + ')}
+                      </span>
+                    </div>
+                  );
+                })()}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
                     {mode === 'conservative' && result.newPortfolioYield !== undefined
