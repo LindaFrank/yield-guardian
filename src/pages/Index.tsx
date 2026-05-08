@@ -501,23 +501,6 @@ const Index = () => {
                           }
                         }}
                       />
-                      {analysis.isUnderperforming && (() => {
-                        const sharesHeld = stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned ?? 0;
-                        const reps = suggestReplacements(analysis.stock, liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks, targetYield, stocks.map(s => s.ticker));
-                        const top = reps[0]?.stock ?? null;
-                        return (
-                          <StockCardDirectionsNote
-                            underperformer={analysis.stock}
-                            sharesHeld={sharesHeld}
-                            topCandidate={top}
-                            targetYield={targetYield}
-                            onSwap={(candidate, buyShares, removeTicker) => {
-                              handleAddStock(candidate, buyShares);
-                              handleRemoveStock(removeTicker);
-                            }}
-                          />
-                        );
-                      })()}
                     </div>
                   ))}
                 </div>
