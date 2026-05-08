@@ -365,6 +365,76 @@ export function ReplacementSuggestions({
                             <ArrowRightCircle className="w-3.5 h-3.5" />
                           </Button>
                         )}
+                        {removedStock && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                className={cn(
+                                  'flex items-center gap-1 px-2 py-1 rounded-md shadow-elevated',
+                                  'bg-yellow-200 text-yellow-950 border-2 border-yellow-500/70',
+                                  'rotate-3 hover:rotate-0 hover:scale-110 transition-all',
+                                  'text-[11px] font-semibold uppercase tracking-wide',
+                                )}
+                                aria-label={`How to execute swap to ${row.stock.ticker}`}
+                                title="Click for brokerage directions"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <StickyNote className="w-3 h-3" />
+                                How to fix
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              align="end"
+                              side="bottom"
+                              className="w-80 p-0 border-2 border-yellow-500/70 bg-yellow-50 text-yellow-950 shadow-elevated"
+                            >
+                              <div className="p-4 space-y-3">
+                                <div className="flex items-center gap-2 pb-2 border-b border-yellow-500/40">
+                                  <StickyNote className="w-4 h-4" />
+                                  <span className="text-sm font-bold uppercase tracking-wide">
+                                    Execute in your brokerage
+                                  </span>
+                                </div>
+                                <p className="text-xs">
+                                  Log in to your brokerage account and place these two trades:
+                                </p>
+                                <ol className="space-y-2 text-sm">
+                                  <li className="flex gap-2">
+                                    <span className="font-bold">1.</span>
+                                    <span>
+                                      Liquidate{' '}
+                                      <span className="font-mono font-semibold">
+                                        {Math.max(1, Math.floor(sharesYHeld))}
+                                      </span>{' '}
+                                      shares of underperforming{' '}
+                                      <span className="font-mono font-semibold">
+                                        {removedStock.ticker}
+                                      </span>{' '}
+                                      ({removedStock.name}).
+                                    </span>
+                                  </li>
+                                  <li className="flex gap-2">
+                                    <span className="font-bold">2.</span>
+                                    <span>
+                                      Purchase{' '}
+                                      <span className="font-mono font-semibold">
+                                        {buyN.toLocaleString()}
+                                      </span>{' '}
+                                      shares of{' '}
+                                      <span className="font-mono font-semibold">
+                                        {row.stock.ticker}
+                                      </span>{' '}
+                                      ({row.stock.name}).
+                                    </span>
+                                  </li>
+                                </ol>
+                                <p className="text-[11px] italic opacity-80 pt-1 border-t border-yellow-500/40">
+                                  Once your brokerage trades settle, click "Next" to update your portfolio here.
+                                </p>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        )}
                       </>
                     );
                   })()}
