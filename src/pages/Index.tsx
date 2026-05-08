@@ -16,6 +16,7 @@ import { Header } from '@/components/Header';
 import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
 import { StockCard } from '@/components/StockCard';
+import { StockCardDirectionsNote } from '@/components/StockCardDirectionsNote';
 import { UnderperformersList } from '@/components/UnderperformersList';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { AddStockModal } from '@/components/AddStockModal';
