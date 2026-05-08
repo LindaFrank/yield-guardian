@@ -223,6 +223,9 @@ const Index = () => {
     if (selectedUnderperformer?.ticker === ticker) {
       setSelectedUnderperformer(null);
     }
+    // Any previously-previewed income deltas referenced the prior portfolio
+    // composition; invalidate them so "New portfolio yield" stays accurate.
+    setIncomeDeltaByTicker({});
     if (user) {
       removeTicker.mutate(ticker);
     }
@@ -231,6 +234,9 @@ const Index = () => {
   const handleAddStock = (stock: Stock, shares?: number) => {
     if (!stocks.find((s) => s.ticker === stock.ticker)) {
       setStocks((prev) => [...prev, stock]);
+      // Invalidate stale projected gains — they were computed against the
+      // previous portfolio value/income.
+      setIncomeDeltaByTicker({});
       if (user) {
         addTicker.mutate({ ticker: stock.ticker, shares });
       }
