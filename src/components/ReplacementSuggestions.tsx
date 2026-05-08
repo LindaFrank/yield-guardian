@@ -40,6 +40,7 @@ export function ReplacementSuggestions({
   removedStock,
   candidates,
   onAddStock,
+  onSwap,
   sharesYHeld = 0,
   targetYield = 5,
   portfolioValue,
