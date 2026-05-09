@@ -441,6 +441,12 @@ const Index = () => {
                       </p>
                     </div>
                   </div>
+                  <div className="flex justify-between items-center mt-3 pt-3 border-t border-primary/30">
+                    <span className="text-[14px] text-muted-foreground">New annual income</span>
+                    <span className="font-mono font-semibold text-yield-positive">
+                      ${portfolioStats.newIncome.toFixed(2)}/yr
+                    </span>
+                  </div>
                   <p className="text-[13px] text-muted-foreground mt-2">
                     Based on the latest recommendations you've reviewed.
                   </p>
