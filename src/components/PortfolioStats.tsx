@@ -40,6 +40,14 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
     const shares = sharesMap[s.ticker] ?? 1;
     return sum + s.annualDividend * shares;
   }, 0);
+  const currentYear = new Date().getFullYear();
+  const ytdDividends = stocks.reduce((sum, s) => {
+    const shares = sharesMap[s.ticker] ?? 1;
+    const ytdPerShare = (s.dividendHistory ?? [])
+      .filter((p) => new Date(p.date).getFullYear() === currentYear)
+      .reduce((a, p) => a + p.amount, 0);
+    return sum + ytdPerShare * shares;
+  }, 0);
   const avgYield = totalValue > 0
     ? (totalDividends / totalValue) * 100
     : 0;
@@ -53,6 +61,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
     },
     {
       label: 'Annual Dividends',
+      subtitle: `Earned YTD ${currentYear}: ${formatCurrency(ytdDividends)}`,
       value: formatCurrency(totalDividends),
       icon: TrendingUp,
       color: 'text-yield-positive',
