@@ -271,6 +271,14 @@ export function ReplacementSuggestions({
                     {result.incomeDelta >= 0 ? '+' : ''}{formatCurrency(result.incomeDelta)}/yr
                   </span>
                 </div>
+                {typeof portfolioIncome === 'number' && (
+                  <div className="flex justify-between font-medium pt-1 border-t border-border/50">
+                    <span className="text-foreground">New annual income</span>
+                    <span className="font-mono text-yield-positive">
+                      {formatCurrency(portfolioIncome + result.incomeDelta)}/yr
+                    </span>
+                  </div>
+                )}
                 <p className="text-[12px] italic text-muted-foreground leading-snug pt-1">
                   Projection based on current declared dividend rates. Actual income may differ — issuers can cut, suspend, or change distributions at any time, and monthly cash flow depends on each holding's payment calendar.
                 </p>
