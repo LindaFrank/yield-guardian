@@ -61,6 +61,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
     },
     {
       label: 'Annual Dividends',
+      subtitle: `Earned YTD ${currentYear}: ${formatCurrency(ytdDividends)}`,
       value: formatCurrency(totalDividends),
       icon: TrendingUp,
       color: 'text-yield-positive',
