@@ -223,6 +223,54 @@ export function ReplacementSuggestions({
                   <span className="text-muted-foreground">Sell {result.sharesYSold} shares {removedStock.ticker}</span>
                   <span className="font-mono">{formatCurrency(result.investmentY)}</span>
                 </div>
+
+                {/* Side-by-side: rest-of-year dividends, Keep vs Switch */}
+                {(() => {
+                  const now = new Date();
+                  const yearEnd = new Date(now.getFullYear(), 11, 31);
+                  const startOfYear = new Date(now.getFullYear(), 0, 1);
+                  const fracRemaining = Math.max(
+                    0,
+                    Math.min(1, (yearEnd.getTime() - now.getTime()) / (yearEnd.getTime() - startOfYear.getTime())),
+                  );
+                  const keepIncome = result.sharesYSold * removedStock.annualDividend * fracRemaining;
+                  const switchIncome = result.newIncome * fracRemaining;
+                  const picks = result.rows.filter((r) => r.shares > 0);
+                  const switchLabel = picks.length === 1
+                    ? `${picks[0].shares} ${picks[0].stock.ticker}`
+                    : picks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+                  const delta = switchIncome - keepIncome;
+                  return (
+                    <div className="my-2 grid grid-cols-2 gap-2">
+                      <div className="p-2 rounded-md border-2 border-muted-foreground/40 bg-secondary/30">
+                        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                          Keep {result.sharesYSold} {removedStock.ticker}
+                        </div>
+                        <div className="font-mono font-semibold text-base mt-0.5">
+                          {formatCurrency(keepIncome)}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">rest-of-year div</div>
+                      </div>
+                      <div className={cn(
+                        'p-2 rounded-md border-2 bg-secondary/30',
+                        delta >= 0 ? 'border-yield-positive/60' : 'border-yield-negative/60',
+                      )}>
+                        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                          Switch to {switchLabel}
+                        </div>
+                        <div className={cn(
+                          'font-mono font-semibold text-base mt-0.5',
+                          delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
+                        )}>
+                          {formatCurrency(switchIncome)}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">
+                          rest-of-year div ({delta >= 0 ? '+' : ''}{formatCurrency(delta)})
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Reallocate</span>
                   <span className="font-mono">{formatCurrency(result.totalCost)}{result.leftoverCash > 0.01 && ` (+${formatCurrency(result.leftoverCash)} cash)`}</span>
