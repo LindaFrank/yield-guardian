@@ -110,13 +110,13 @@ export function IncomeImpact({
           icon={<ShieldCheck className="w-6 h-6" />}
           title="Conservative Approach"
           description="Sell the fewest shares needed to bring my annual yield to my target goal."
-          accent="positive"
+          accent="conservative"
         />
         <ApproachHeader
           icon={<Rocket className="w-6 h-6" />}
           title="Aggressive Approach"
           description="Capture the largest income gain possible by selling an underperformer."
-          accent="primary"
+          accent="aggressive"
         />
       </div>
 
@@ -125,8 +125,8 @@ export function IncomeImpact({
       </p>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <ModeCard summary={conservative} accent="positive" />
-        <ModeCard summary={aggressive} accent="primary" />
+        <ModeCard summary={conservative} accent="conservative" />
+        <ModeCard summary={aggressive} accent="aggressive" />
       </div>
 
       <div className="flex items-center gap-2 mt-4 text-[13px] text-muted-foreground">
@@ -137,6 +137,21 @@ export function IncomeImpact({
   );
 }
 
+type Accent = 'conservative' | 'aggressive';
+
+const ACCENT_STYLES: Record<Accent, { text: string; border: string; bg: string }> = {
+  conservative: {
+    text: 'text-approach-conservative',
+    border: 'border-approach-conservative/40',
+    bg: 'bg-approach-conservative/5',
+  },
+  aggressive: {
+    text: 'text-approach-aggressive',
+    border: 'border-approach-aggressive/40',
+    bg: 'bg-approach-aggressive/5',
+  },
+};
+
 function ApproachHeader({
   icon,
   title,
@@ -146,29 +161,26 @@ function ApproachHeader({
   icon: React.ReactNode;
   title: string;
   description: string;
-  accent: 'positive' | 'primary';
+  accent: Accent;
 }) {
-  const colorClass = accent === 'positive' ? 'text-yield-positive' : 'text-primary';
-  const borderClass = accent === 'positive' ? 'border-yield-positive/40' : 'border-primary/40';
-  const bgClass = accent === 'positive' ? 'bg-yield-positive/5' : 'bg-primary/5';
+  const s = ACCENT_STYLES[accent];
   return (
-    <div className={cn('p-4 rounded-lg border-[3px]', borderClass, bgClass)}>
+    <div className={cn('p-4 rounded-lg border-[3px]', s.border, s.bg)}>
       <div className="flex items-center gap-2 mb-2">
-        <span className={colorClass}>{icon}</span>
-        <span className={cn('font-bold uppercase tracking-wider text-sm', colorClass)}>{title}</span>
+        <span className={s.text}>{icon}</span>
+        <span className={cn('font-bold uppercase tracking-wider text-sm', s.text)}>{title}</span>
       </div>
       <p className="text-[13px] text-muted-foreground leading-snug">{description}</p>
     </div>
   );
 }
 
-function ModeCard({ summary, accent }: { summary: ModeSummary; accent: 'positive' | 'primary' }) {
-  const colorClass = accent === 'positive' ? 'text-yield-positive' : 'text-primary';
-  const borderClass = accent === 'positive' ? 'border-yield-positive/40' : 'border-primary/40';
+function ModeCard({ summary, accent }: { summary: ModeSummary; accent: Accent }) {
+  const s = ACCENT_STYLES[accent];
 
   if (summary.status !== 'ok' || !summary.topTicker) {
     return (
-      <div className={cn('p-4 rounded-lg border-[3px] text-center text-sm text-muted-foreground', borderClass)}>
+      <div className={cn('p-4 rounded-lg border-[3px] text-center text-sm text-muted-foreground', s.border)}>
         No replacement available.
       </div>
     );
@@ -186,16 +198,17 @@ function ModeCard({ summary, accent }: { summary: ModeSummary; accent: 'positive
   ];
 
   return (
-    <div className={cn('p-4 rounded-lg border-[3px] divide-y divide-border/40', borderClass)}>
+    <div className={cn('p-4 rounded-lg border-[3px] divide-y divide-border/40', s.border)}>
       {rows.map(({ icon: Icon, label, value }) => (
         <div key={label} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0 gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <Icon className={cn('w-4 h-4 shrink-0', colorClass)} />
+            <Icon className={cn('w-4 h-4 shrink-0', s.text)} />
             <span className="text-[14px] text-muted-foreground truncate">{label}</span>
           </div>
-          <span className={cn('font-mono font-bold text-sm whitespace-nowrap', colorClass)}>{value}</span>
+          <span className={cn('font-mono font-bold text-sm whitespace-nowrap', s.text)}>{value}</span>
         </div>
       ))}
     </div>
   );
 }
+
