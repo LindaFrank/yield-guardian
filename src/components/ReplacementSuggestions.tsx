@@ -670,9 +670,14 @@ export function ReplacementSuggestions({
                     : 0;
 
                   const incomeSoFar = oldAnnual * fracElapsed;
-                  const afterSwitchRest = (remainingOldAnnual + projIncome) * fracRemain;
+                  const keptOldRest = remainingOldAnnual * fracRemain;
+                  const newRest = projIncome * fracRemain;
+                  const afterSwitchRest = keptOldRest + newRest;
                   const totalThisYear = incomeSoFar + afterSwitchRest;
                   const nextFullYear = remainingOldAnnual + projIncome;
+                  const lastYearAnnual = oldAnnual; // baseline = full holding's annual div
+                  const sharesKept = removedStock ? Math.max(0, sharesYHeld - sharesYSold) : 0;
+                  const meetsLastYear = nextFullYear >= lastYearAnnual;
 
                   return (
                     <div className="text-[15px] text-muted-foreground mt-1 space-y-0.5">
