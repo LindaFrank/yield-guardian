@@ -297,7 +297,7 @@ export function ReplacementSuggestions({
                             }}
                             className="text-xs font-mono bg-secondary/40 border-2 border-muted-foreground/40 rounded px-1.5 py-1 text-foreground hover:border-primary/50 focus:outline-none focus:border-primary"
                           >
-                            <option value="__optimizer__">Optimizer pick</option>
+                            <option value="__optimizer__">Smart pick</option>
                             {allTickers.map((t) => (
                               <option key={t} value={t}>{t}</option>
                             ))}
