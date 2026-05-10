@@ -223,7 +223,37 @@ export function ReplacementSuggestions({
             </div>
 
             {/* Result summary */}
-            {result && result.status === 'ok' && (
+            {result && result.status === 'ok' && (() => {
+              // Compute override values when user picks a single comparison stock
+              const optimizerPicks = result.rows.filter((r) => r.shares > 0);
+              const selectedRow = compareTicker
+                ? result.rows.find((r) => r.stock.ticker === compareTicker)
+                : null;
+              const compareStock = selectedRow?.stock ?? optimizerPicks[0]?.stock ?? result.rows[0]?.stock ?? null;
+
+              // When user explicitly chose a stock, recompute as buying max shares of just that one
+              const isOverride = !!compareTicker && !!compareStock;
+              const overrideShares = isOverride
+                ? Math.floor(result.investmentY / compareStock!.currentPrice)
+                : 0;
+              const overrideCost = isOverride ? overrideShares * compareStock!.currentPrice : 0;
+              const overrideIncome = isOverride ? overrideShares * compareStock!.annualDividend : 0;
+
+              const effectiveTotalCost = isOverride ? overrideCost : result.totalCost;
+              const effectiveLeftover = isOverride ? result.investmentY - overrideCost : result.leftoverCash;
+              const effectiveNewIncome = isOverride ? overrideIncome : result.newIncome;
+              const effectiveIncomeDelta = effectiveNewIncome - result.lostIncome;
+              const effectiveNewYield = result.investmentY > 0 ? effectiveNewIncome / result.investmentY : 0;
+              const effectiveNewPortfolioYield =
+                result.newPortfolioYield !== undefined && portfolioValue && portfolioIncome !== undefined
+                  ? (portfolioIncome + effectiveIncomeDelta) / portfolioValue
+                  : result.newPortfolioYield;
+
+              const allocationPicks = isOverride
+                ? [{ stock: compareStock!, shares: overrideShares }]
+                : optimizerPicks.map((r) => ({ stock: r.stock, shares: r.shares }));
+
+              return (
               <div className="pt-2 border-t border-border/50 space-y-1 text-[15px]">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Sell {result.sharesYSold} shares {removedStock.ticker}</span>
@@ -240,35 +270,17 @@ export function ReplacementSuggestions({
                     Math.min(1, (yearEnd.getTime() - now.getTime()) / (yearEnd.getTime() - startOfYear.getTime())),
                   );
                   const keepIncome = result.sharesYSold * removedStock.annualDividend * fracRemaining;
+                  const switchIncome = effectiveNewIncome * fracRemaining;
 
-                  // Determine the comparison stock: user-selected or optimizer's top pick
-                  const optimizerPicks = result.rows.filter((r) => r.shares > 0);
-                  const defaultPick = optimizerPicks[0] ?? result.rows[0];
-                  const selectedRow = compareTicker
-                    ? result.rows.find((r) => r.stock.ticker === compareTicker)
-                    : null;
-                  const compareStock = selectedRow?.stock ?? defaultPick?.stock ?? null;
-
-                  if (!compareStock) return null;
-
-                  // If a single stock is selected, recompute shares as max buyable from proceeds
-                  const compareShares = compareTicker
-                    ? Math.floor(result.investmentY / compareStock.currentPrice)
+                  const switchLabel = isOverride
+                    ? `${overrideShares} ${compareStock!.ticker}`
                     : optimizerPicks.length === 1
-                      ? optimizerPicks[0].shares
-                      : null; // multi-stock optimizer pick — show combined
-
-                  const switchIncome = compareShares !== null
-                    ? compareShares * compareStock.annualDividend * fracRemaining
-                    : result.newIncome * fracRemaining;
-
-                  const switchLabel = compareShares !== null
-                    ? `${compareShares} ${compareStock.ticker}`
-                    : optimizerPicks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+                      ? `${optimizerPicks[0].shares} ${optimizerPicks[0].stock.ticker}`
+                      : optimizerPicks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
 
                   const delta = switchIncome - keepIncome;
                   const allTickers = result.rows.map((r) => r.stock.ticker);
-                  const activeTicker = compareTicker ?? (compareShares !== null ? compareStock.ticker : '__optimizer__');
+                  const activeTicker = compareTicker ?? '__optimizer__';
 
                   return (
                     <div className="my-2 space-y-2">
@@ -325,38 +337,34 @@ export function ReplacementSuggestions({
                 })()}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Reallocate</span>
-                  <span className="font-mono">{formatCurrency(result.totalCost)}{result.leftoverCash > 0.01 && ` (+${formatCurrency(result.leftoverCash)} cash)`}</span>
+                  <span className="font-mono">{formatCurrency(effectiveTotalCost)}{effectiveLeftover > 0.01 && ` (+${formatCurrency(effectiveLeftover)} cash)`}</span>
                 </div>
-                {(() => {
-                  const picks = result.rows.filter((r) => r.shares > 0);
-                  if (picks.length === 0) return null;
-                  return (
-                    <div className="flex justify-between gap-3">
-                      <span className="text-muted-foreground shrink-0">Allocation breakdown</span>
-                      <span className="font-mono text-right">
-                        {picks.map((r) => `Buy ${r.shares} ${r.stock.ticker}`).join(' + ')}
-                      </span>
-                    </div>
-                  );
-                })()}
+                {allocationPicks.length > 0 && (
+                  <div className="flex justify-between gap-3">
+                    <span className="text-muted-foreground shrink-0">Allocation breakdown</span>
+                    <span className="font-mono text-right">
+                      {allocationPicks.map((r) => `Buy ${r.shares} ${r.stock.ticker}`).join(' + ')}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    {mode === 'conservative' && result.newPortfolioYield !== undefined
+                    {mode === 'conservative' && effectiveNewPortfolioYield !== undefined
                       ? 'New portfolio yield'
                       : 'New yield on reallocated dollars'}
                   </span>
                   <span className={cn(
                     'font-mono',
-                    ((mode === 'conservative' && result.newPortfolioYield !== undefined
-                      ? result.newPortfolioYield
-                      : result.newYield) * 100) >= targetYield
+                    ((mode === 'conservative' && effectiveNewPortfolioYield !== undefined
+                      ? effectiveNewPortfolioYield
+                      : effectiveNewYield) * 100) >= targetYield
                       ? 'text-yield-positive'
                       : 'text-yield-warning',
                   )}>
                     {formatPercentage(
-                      (mode === 'conservative' && result.newPortfolioYield !== undefined
-                        ? result.newPortfolioYield
-                        : result.newYield) * 100,
+                      (mode === 'conservative' && effectiveNewPortfolioYield !== undefined
+                        ? effectiveNewPortfolioYield
+                        : effectiveNewYield) * 100,
                     )}
                   </span>
                 </div>
@@ -382,16 +390,17 @@ export function ReplacementSuggestions({
                   </Tooltip>
                   <span className={cn(
                     'font-mono',
-                    result.incomeDelta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
+                    effectiveIncomeDelta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
                   )}>
-                    {result.incomeDelta >= 0 ? '+' : ''}{formatCurrency(result.incomeDelta)}/yr
+                    {effectiveIncomeDelta >= 0 ? '+' : ''}{formatCurrency(effectiveIncomeDelta)}/yr
                   </span>
                 </div>
                 <p className="text-[12px] italic text-muted-foreground leading-snug pt-1">
                   Projection based on current declared dividend rates. Actual income may differ — issuers can cut, suspend, or change distributions at any time, and monthly cash flow depends on each holding's payment calendar.
                 </p>
               </div>
-            )}
+              );
+            })()}
             {result && result.status === 'infeasible' && (
               <div className="pt-2 border-t border-border/50">
                 <p className="text-[11px] text-yield-negative">{result.message}</p>
