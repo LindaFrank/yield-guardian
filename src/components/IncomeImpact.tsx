@@ -21,6 +21,8 @@ interface ModeSummary {
   totalShares: number;
   newPortfolioYield: number; // percent
   incomeIncrease: number;
+  /** Reason to show when status !== 'ok' (e.g. portfolio already meets target). */
+  emptyMessage?: string;
 }
 
 function summarizeMode(
