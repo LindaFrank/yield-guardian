@@ -50,12 +50,18 @@ export function ReplacementSuggestions({
 }: ReplacementSuggestionsProps) {
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
   const [sharesInput, setSharesInput] = useState('');
+  const [compareTicker, setCompareTicker] = useState<string | null>(null);
 
   // Per-card optimiser controls
   const [mode, setMode] = useState<OptimizerMode>('aggressive');
   const [diversify, setDiversify] = useState(false);
   const sliderMax = Math.max(1, Math.floor(sharesYHeld));
   const [sharesYSold, setSharesYSold] = useState<number>(sliderMax);
+
+  // Reset comparison ticker when underperformer changes
+  useEffect(() => {
+    setCompareTicker(null);
+  }, [removedStock?.ticker]);
 
   // Reset slider when underperformer changes
   useEffect(() => {
@@ -234,38 +240,84 @@ export function ReplacementSuggestions({
                     Math.min(1, (yearEnd.getTime() - now.getTime()) / (yearEnd.getTime() - startOfYear.getTime())),
                   );
                   const keepIncome = result.sharesYSold * removedStock.annualDividend * fracRemaining;
-                  const switchIncome = result.newIncome * fracRemaining;
-                  const picks = result.rows.filter((r) => r.shares > 0);
-                  const switchLabel = picks.length === 1
-                    ? `${picks[0].shares} ${picks[0].stock.ticker}`
-                    : picks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+
+                  // Determine the comparison stock: user-selected or optimizer's top pick
+                  const optimizerPicks = result.rows.filter((r) => r.shares > 0);
+                  const defaultPick = optimizerPicks[0] ?? result.rows[0];
+                  const selectedRow = compareTicker
+                    ? result.rows.find((r) => r.stock.ticker === compareTicker)
+                    : null;
+                  const compareStock = selectedRow?.stock ?? defaultPick?.stock ?? null;
+
+                  if (!compareStock) return null;
+
+                  // If a single stock is selected, recompute shares as max buyable from proceeds
+                  const compareShares = compareTicker
+                    ? Math.floor(result.investmentY / compareStock.currentPrice)
+                    : optimizerPicks.length === 1
+                      ? optimizerPicks[0].shares
+                      : null; // multi-stock optimizer pick — show combined
+
+                  const switchIncome = compareShares !== null
+                    ? compareShares * compareStock.annualDividend * fracRemaining
+                    : result.newIncome * fracRemaining;
+
+                  const switchLabel = compareShares !== null
+                    ? `${compareShares} ${compareStock.ticker}`
+                    : optimizerPicks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+
                   const delta = switchIncome - keepIncome;
+                  const allTickers = result.rows.map((r) => r.stock.ticker);
+                  const activeTicker = compareTicker ?? (compareShares !== null ? compareStock.ticker : '__optimizer__');
+
                   return (
-                    <div className="my-2 grid grid-cols-2 gap-2">
-                      <div className="p-2 rounded-md border-2 border-muted-foreground/40 bg-secondary/30">
-                        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                          Keep {result.sharesYSold} {removedStock.ticker}
+                    <div className="my-2 space-y-2">
+                      {allTickers.length > 1 && (
+                        <div className="flex items-center gap-2">
+                          <label className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                            Compare against
+                          </label>
+                          <select
+                            value={activeTicker}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setCompareTicker(v === '__optimizer__' ? null : v);
+                            }}
+                            className="text-xs font-mono bg-secondary/40 border-2 border-muted-foreground/40 rounded px-1.5 py-1 text-foreground hover:border-primary/50 focus:outline-none focus:border-primary"
+                          >
+                            <option value="__optimizer__">Optimizer pick</option>
+                            {allTickers.map((t) => (
+                              <option key={t} value={t}>{t}</option>
+                            ))}
+                          </select>
                         </div>
-                        <div className="font-mono font-semibold text-base mt-0.5">
-                          {formatCurrency(keepIncome)}
-                        </div>
-                        <div className="text-[11px] text-muted-foreground">rest-of-year div</div>
-                      </div>
-                      <div className={cn(
-                        'p-2 rounded-md border-2 bg-secondary/30',
-                        delta >= 0 ? 'border-yield-positive/60' : 'border-yield-negative/60',
-                      )}>
-                        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                          Switch to {switchLabel}
+                      )}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="p-2 rounded-md border-2 border-muted-foreground/40 bg-secondary/30">
+                          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                            Keep {result.sharesYSold} {removedStock.ticker}
+                          </div>
+                          <div className="font-mono font-semibold text-base mt-0.5">
+                            {formatCurrency(keepIncome)}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">rest-of-year div</div>
                         </div>
                         <div className={cn(
-                          'font-mono font-semibold text-base mt-0.5',
-                          delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
+                          'p-2 rounded-md border-2 bg-secondary/30',
+                          delta >= 0 ? 'border-yield-positive/60' : 'border-yield-negative/60',
                         )}>
-                          {formatCurrency(switchIncome)}
-                        </div>
-                        <div className="text-[11px] text-muted-foreground">
-                          rest-of-year div ({delta >= 0 ? '+' : ''}{formatCurrency(delta)})
+                          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                            Switch to {switchLabel}
+                          </div>
+                          <div className={cn(
+                            'font-mono font-semibold text-base mt-0.5',
+                            delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
+                          )}>
+                            {formatCurrency(switchIncome)}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            rest-of-year div ({delta >= 0 ? '+' : ''}{formatCurrency(delta)})
+                          </div>
                         </div>
                       </div>
                     </div>
