@@ -38,12 +38,20 @@ function summarizeMode(
   const tickerShares: Record<string, number> = {};
   let totalDelta = 0;
   let anyOk = false;
+  let firstNonOkMessage: string | undefined;
+  let allAlreadyMeetTarget = underperformers.length > 0;
 
   underperformers.forEach((u) => {
     const sharesHeld = sharesMap[u.stock.ticker] ?? 0;
-    if (sharesHeld <= 0) return;
+    if (sharesHeld <= 0) {
+      allAlreadyMeetTarget = false;
+      return;
+    }
     const candidates = suggestReplacements(u.stock, marketPool, targetYieldPct, portfolioTickers);
-    if (candidates.length === 0) return;
+    if (candidates.length === 0) {
+      allAlreadyMeetTarget = false;
+      return;
+    }
     const result = optimizeReplacement({
       underperformer: u.stock,
       sharesYHeld: sharesHeld,
@@ -55,7 +63,16 @@ function summarizeMode(
       portfolioValue,
       portfolioIncome,
     });
-    if (result.status !== 'ok') return;
+    if (result.status !== 'ok') {
+      if (!firstNonOkMessage && result.message) firstNonOkMessage = result.message;
+      // For conservative mode, "no-trade" means this stock's portfolio already meets target.
+      // Any other non-ok status (infeasible, missing candidates) breaks the "all met" assumption.
+      if (!(mode === 'conservative' && result.status === 'no-trade')) {
+        allAlreadyMeetTarget = false;
+      }
+      return;
+    }
+    allAlreadyMeetTarget = false;
     anyOk = true;
     totalDelta += result.incomeDelta;
     result.rows.forEach((r) => {
@@ -69,12 +86,19 @@ function summarizeMode(
   const totalShares = Object.values(tickerShares).reduce((s, n) => s + n, 0);
   const newYield = portfolioValue > 0 ? ((portfolioIncome + totalDelta) / portfolioValue) * 100 : 0;
 
+  const emptyMessage = !anyOk
+    ? mode === 'conservative' && allAlreadyMeetTarget
+      ? 'No trade needed — your portfolio yield already meets your target.'
+      : firstNonOkMessage
+    : undefined;
+
   return {
     status: anyOk ? 'ok' : 'no-trade',
     topTicker: topEntry ? topEntry[0] : null,
     totalShares,
     newPortfolioYield: newYield,
     incomeIncrease: totalDelta,
+    emptyMessage,
   };
 }
 
