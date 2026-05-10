@@ -688,9 +688,15 @@ export function ReplacementSuggestions({
                           <span>Income this year (so far): {removedStock?.ticker}</span>
                           <span className="font-mono">{formatCurrency(incomeSoFar)}</span>
                         </p>
+                        {sharesKept > 0 && (
+                          <p className="flex justify-between gap-3">
+                            <span>Kept {sharesKept} {removedStock?.ticker} (rest of year)</span>
+                            <span className="font-mono">{formatCurrency(keptOldRest)}</span>
+                          </p>
+                        )}
                         <p className="flex justify-between gap-3">
-                          <span>After switch (rest of year): {row.stock.ticker}</span>
-                          <span className="font-mono">{formatCurrency(projIncome * fracRemain)}</span>
+                          <span>New {projShares.toLocaleString()} {row.stock.ticker} (rest of year)</span>
+                          <span className="font-mono">{formatCurrency(newRest)}</span>
                         </p>
                         <p className="flex justify-between gap-3 font-medium text-foreground">
                           <span>Total this year</span>
@@ -698,7 +704,13 @@ export function ReplacementSuggestions({
                         </p>
                         <p className="flex justify-between gap-3 font-medium">
                           <span>Next full year income</span>
-                          <span className="font-mono text-yield-positive">{formatCurrency(nextFullYear)}</span>
+                          <span className={`font-mono ${meetsLastYear ? 'text-yield-positive' : 'text-yield-negative'}`}>{formatCurrency(nextFullYear)}</span>
+                        </p>
+                        <p className="flex justify-between gap-3 text-[13px]">
+                          <span className="text-muted-foreground">vs last year ({formatCurrency(lastYearAnnual)})</span>
+                          <span className={`font-mono ${meetsLastYear ? 'text-yield-positive' : 'text-yield-negative'}`}>
+                            {nextFullYear - lastYearAnnual >= 0 ? '+' : ''}{formatCurrency(nextFullYear - lastYearAnnual)}
+                          </span>
                         </p>
                       </div>
                     </div>
