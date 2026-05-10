@@ -257,50 +257,121 @@ function solveConservative(
     };
   }
 
-  let bestFromThisStock: OptimizerResult | null = null;
+  /**
+   * Conservative semantics:
+   *   - Pick ONE replacement candidate.
+   *   - Buy only the MINIMUM whole shares of it needed to push the portfolio
+   *     yield up to (or above) the target — never overshoot to fill the budget.
+   *   - Sell only the MINIMUM shares of Y that fund that purchase.
+   *
+   * For each candidate i, given any sold count `s` (shares of Y to sell):
+   *   minNi(s) = ceil( (requiredDelta + A_Y · s) / A_i )           [meets target]
+   *   feasibility: minNi(s) · P_i ≤ s · P_Y                         [fits budget]
+   * We sweep s from 1..sharesYHeld and take the first feasible s per candidate;
+   * the winning candidate is the one with the smallest sold count
+   * (ties → smallest cost).
+   */
+  type PerCand = { idx: number; sold: number; buy: number; cost: number; income: number };
+  const perCand: PerCand[] = [];
 
-  for (let sold = 1; sold <= Math.floor(sharesYHeld); sold++) {
-    const investmentY = sold * P_Y;
+  if (usePortfolioTarget) {
+    for (let i = 0; i < cands.length; i++) {
+      const c = cands[i];
+      if (c.A <= 0 || c.P <= 0) continue;
+      const heldMax = Math.floor(sharesYHeld);
+      // Closed-form lower bound on `sold`: smallest s such that
+      //   ceil((rd + A_Y·s)/A_i) ≤ s·P_Y/P_i  (ignoring ceil)  →  s ≥ rd / (A_i·P_Y/P_i − A_Y)
+      const denom = c.A * (P_Y / c.P) - A_Y;
+      let startS = 1;
+      if (denom > 0) startS = Math.max(1, Math.floor(requiredDelta / denom));
+      // Also need enough buy income alone: A_i · n ≥ rd + A_Y·s; n integer ≥ 1.
+      let found: PerCand | null = null;
+      for (let s = startS; s <= heldMax; s++) {
+        const need = requiredDelta + A_Y * s;
+        const n = Math.max(1, Math.ceil(need / c.A));
+        const cost = n * c.P;
+        if (cost <= s * P_Y) {
+          found = { idx: i, sold: s, buy: n, cost, income: n * c.A };
+          break;
+        }
+      }
+      if (found) perCand.push(found);
+    }
+  }
+
+  if (perCand.length > 0) {
+    // Pick smallest sale; tie → smallest cost; tie → highest income.
+    perCand.sort(
+      (a, b) => a.sold - b.sold || a.cost - b.cost || b.income - a.income,
+    );
+    const win = perCand[0];
+    const investmentY = win.sold * P_Y;
+    const n = new Array(cands.length).fill(0);
+    n[win.idx] = win.buy;
+    const lostIncome = A_Y * win.sold;
+    const incomeDelta = win.income - lostIncome;
+    return {
+      status: 'ok',
+      mode: 'conservative',
+      rows: buildRows(cands, n),
+      sharesYSold: win.sold,
+      investmentY,
+      totalCost: win.cost,
+      leftoverCash: investmentY - win.cost,
+      newIncome: win.income,
+      lostIncome,
+      incomeDelta,
+      newYield: investmentY > 0 ? win.income / investmentY : 0,
+      newPortfolioYield: ((portfolioIncome as number) + incomeDelta) / (portfolioValue as number),
+    };
+  }
+
+  // No single-candidate solution — fall back: report the best partial (sell all of Y into highest-yield candidate).
+  if (usePortfolioTarget) {
+    const heldMax = Math.floor(sharesYHeld);
+    const investmentY = heldMax * P_Y;
     const sol = solveAggressive(cands, investmentY, diversify);
-    const lostIncome = A_Y * sold;
+    const lostIncome = A_Y * heldMax;
     const incomeDelta = sol.income - lostIncome;
-    const newYield = investmentY > 0 ? sol.income / investmentY : 0;
-
-    const result: OptimizerResult = {
+    const reached = ((portfolioIncome as number) + incomeDelta) / (portfolioValue as number) * 100;
+    return {
       status: 'ok',
       mode: 'conservative',
       rows: buildRows(cands, sol.n),
-      sharesYSold: sold,
+      sharesYSold: heldMax,
       investmentY,
       totalCost: sol.cost,
       leftoverCash: investmentY - sol.cost,
       newIncome: sol.income,
       lostIncome,
       incomeDelta,
-      newYield,
-      newPortfolioYield: usePortfolioTarget
-        ? ((portfolioIncome as number) + incomeDelta) / (portfolioValue as number)
-        : undefined,
+      newYield: investmentY > 0 ? sol.income / investmentY : 0,
+      newPortfolioYield: ((portfolioIncome as number) + incomeDelta) / (portfolioValue as number),
+      message: `Selling all ${heldMax} shares of ${underperformer.ticker} lifts your portfolio yield to ${reached.toFixed(2)}%. Address the next underperformer to keep moving toward your goal.`,
     };
-
-    if (usePortfolioTarget) {
-      if (incomeDelta >= requiredDelta) return result;
-      bestFromThisStock = result; // selling everything is the best this single stock can do
-    } else {
-      // Legacy: position-yield target
-      if (newYield >= targetYield) return result;
-    }
   }
 
-  // Couldn't reach the goal from this stock alone. Surface the best partial result so the user
-  // can see how far it gets and address the next underperformer.
-  if (usePortfolioTarget && bestFromThisStock) {
-    const reached = (bestFromThisStock.newPortfolioYield ?? 0) * 100;
-    return {
-      ...bestFromThisStock,
-      status: 'ok',
-      message: `Selling all ${Math.floor(sharesYHeld)} shares of ${underperformer.ticker} lifts your portfolio yield to ${reached.toFixed(2)}%. Address the next underperformer to keep moving toward your goal.`,
-    };
+  // Legacy position-yield path (fallback, rarely used)
+  for (let sold = 1; sold <= Math.floor(sharesYHeld); sold++) {
+    const investmentY = sold * P_Y;
+    const sol = solveAggressive(cands, investmentY, diversify);
+    const newYield = investmentY > 0 ? sol.income / investmentY : 0;
+    if (newYield >= targetYield) {
+      const lostIncome = A_Y * sold;
+      return {
+        status: 'ok',
+        mode: 'conservative',
+        rows: buildRows(cands, sol.n),
+        sharesYSold: sold,
+        investmentY,
+        totalCost: sol.cost,
+        leftoverCash: investmentY - sol.cost,
+        newIncome: sol.income,
+        lostIncome,
+        incomeDelta: sol.income - lostIncome,
+        newYield,
+      };
+    }
   }
 
   return {
