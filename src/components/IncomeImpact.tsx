@@ -212,7 +212,7 @@ function ModeCard({ summary, accent }: { summary: ModeSummary; accent: Accent })
   if (summary.status !== 'ok' || !summary.topTicker) {
     return (
       <div className={cn('p-4 rounded-lg border-[3px] text-center text-sm text-muted-foreground', s.border)}>
-        No replacement available.
+        {summary.emptyMessage ?? 'No replacement available.'}
       </div>
     );
   }
