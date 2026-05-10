@@ -44,6 +44,10 @@
     --yield-negative: 0 80% 45%;
     --yield-neutral: 215 20% 55%;
 
+    /* Approach accents */
+    --approach-aggressive: 270 75% 65%;
+    --approach-conservative: 38 92% 55%;
+
     /* Gradients */
     --gradient-card: linear-gradient(135deg, hsl(222 47% 10%) 0%, hsl(222 47% 8%) 100%);
     --gradient-primary: linear-gradient(135deg, hsl(165 82% 51%) 0%, hsl(158 64% 52%) 100%);
