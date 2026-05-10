@@ -17,7 +17,7 @@ const STAT_HELP: Record<string, { text: string; side: 'top' | 'bottom' | 'left' 
     text: 'These are the total market value of all investments in the portfolio at a given time.',
     side: 'bottom',
   },
-  'Estimated Annual Dividends': {
+  'Expected Annual Dividends': {
     text: 'This is the total amount of dividend income the portfolio investment pays over one year.',
     side: 'bottom',
   },
@@ -52,7 +52,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
       color: 'text-foreground',
     },
     {
-      label: 'Estimated Annual Dividends',
+      label: 'Expected Annual Dividends',
       value: formatCurrency(totalDividends),
       icon: TrendingUp,
       color: 'text-yield-positive',
