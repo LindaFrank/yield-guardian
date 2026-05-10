@@ -680,7 +680,7 @@ export function ReplacementSuggestions({
                   const totalThisYear = incomeSoFar + afterSwitchRest;
                   const nextFullYear = remainingOldAnnual + projIncome;
                   const lastYearAnnual = oldAnnual; // baseline = full holding's annual div
-                  const sharesKept = removedStock ? Math.max(0, sharesYHeld - sharesYSold) : 0;
+                  const sharesKept = removedStock ? Math.max(0, sharesYHeld - effectiveSold) : 0;
                   const meetsLastYear = nextFullYear >= lastYearAnnual;
 
                   return (
