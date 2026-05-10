@@ -427,32 +427,18 @@ const Index = () => {
           </div>
           {!showStockFinder && (
             <div className="space-y-4">
-              {totalIncomeGain !== 0 && underperformers.length > 0 && (
-                <div className="p-4 rounded-xl border-[3px] border-primary/40 bg-primary/5 animate-fade-in">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    <span className="text-xs font-semibold uppercase tracking-wide text-white">
-                      Income Impact
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <p className="text-[14px] text-muted-foreground">Potential Income Increase</p>
-                      <p className={`font-mono font-semibold ${totalIncomeGain >= 0 ? 'text-yield-positive' : 'text-yield-negative'}`}>
-                        {totalIncomeGain >= 0 ? '+' : ''}${totalIncomeGain.toFixed(2)}/yr
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[14px] text-muted-foreground">New portfolio yield</p>
-                      <p className="font-mono font-semibold text-primary">
-                        {portfolioStats.newYield.toFixed(2)}%
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-[13px] text-muted-foreground mt-2">
-                    Based on the latest recommendations you've reviewed.
-                  </p>
-                </div>
+              {underperformers.length > 0 && (
+                <IncomeImpact
+                  underperformers={underperformers}
+                  sharesMap={Object.fromEntries(
+                    (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+                  )}
+                  marketPool={liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks}
+                  portfolioTickers={stocks.map((s) => s.ticker)}
+                  targetYield={targetYield}
+                  portfolioValue={portfolioStats.value}
+                  portfolioIncome={portfolioStats.income}
+                />
               )}
               <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
                 <section id="underperformers-section" className="animate-fade-in scroll-mt-[180px]" style={{ animationDelay: '400ms' }}>
