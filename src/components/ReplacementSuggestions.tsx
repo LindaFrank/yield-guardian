@@ -575,8 +575,8 @@ export function ReplacementSuggestions({
                           <span className="font-mono">{formatCurrency(incomeSoFar)}</span>
                         </p>
                         <p className="flex justify-between gap-3">
-                          <span>After switch (rest of year)</span>
-                          <span className="font-mono">{formatCurrency(afterSwitchRest)}</span>
+                          <span>After switch (rest of year): {row.stock.ticker}</span>
+                          <span className="font-mono">{formatCurrency(projIncome * fracRemain)}</span>
                         </p>
                         <p className="flex justify-between gap-3 font-medium text-foreground">
                           <span>Total this year</span>
