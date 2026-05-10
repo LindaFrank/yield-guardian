@@ -664,9 +664,13 @@ export function ReplacementSuggestions({
                   const fracElapsed = (now.getTime() - startOfYear.getTime()) / yearMs;
                   const fracRemain = 1 - fracElapsed;
 
+                  // In conservative mode the solver picks its own sharesYSold; honor that over the slider.
+                  const effectiveSold = mode === 'conservative' && result?.status === 'ok'
+                    ? result.sharesYSold
+                    : sharesYSold;
                   const oldAnnual = removedStock ? sharesYHeld * removedStock.annualDividend : 0;
                   const remainingOldAnnual = removedStock
-                    ? Math.max(0, sharesYHeld - sharesYSold) * removedStock.annualDividend
+                    ? Math.max(0, sharesYHeld - effectiveSold) * removedStock.annualDividend
                     : 0;
 
                   const incomeSoFar = oldAnnual * fracElapsed;
@@ -676,7 +680,7 @@ export function ReplacementSuggestions({
                   const totalThisYear = incomeSoFar + afterSwitchRest;
                   const nextFullYear = remainingOldAnnual + projIncome;
                   const lastYearAnnual = oldAnnual; // baseline = full holding's annual div
-                  const sharesKept = removedStock ? Math.max(0, sharesYHeld - sharesYSold) : 0;
+                  const sharesKept = removedStock ? Math.max(0, sharesYHeld - effectiveSold) : 0;
                   const meetsLastYear = nextFullYear >= lastYearAnnual;
 
                   return (
