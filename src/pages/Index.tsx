@@ -19,6 +19,7 @@ import { StockCard } from '@/components/StockCard';
 import { StockCardDirectionsNote } from '@/components/StockCardDirectionsNote';
 import { UnderperformersList } from '@/components/UnderperformersList';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
+import { IncomeImpact } from '@/components/IncomeImpact';
 import { AddStockModal } from '@/components/AddStockModal';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
