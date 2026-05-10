@@ -50,12 +50,18 @@ export function ReplacementSuggestions({
 }: ReplacementSuggestionsProps) {
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
   const [sharesInput, setSharesInput] = useState('');
+  const [compareTicker, setCompareTicker] = useState<string | null>(null);
 
   // Per-card optimiser controls
   const [mode, setMode] = useState<OptimizerMode>('aggressive');
   const [diversify, setDiversify] = useState(false);
   const sliderMax = Math.max(1, Math.floor(sharesYHeld));
   const [sharesYSold, setSharesYSold] = useState<number>(sliderMax);
+
+  // Reset comparison ticker when underperformer changes
+  useEffect(() => {
+    setCompareTicker(null);
+  }, [removedStock?.ticker]);
 
   // Reset slider when underperformer changes
   useEffect(() => {
