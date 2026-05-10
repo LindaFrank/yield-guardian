@@ -20,6 +20,7 @@ import { StockCardDirectionsNote } from '@/components/StockCardDirectionsNote';
 import { UnderperformersList } from '@/components/UnderperformersList';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { IncomeImpact } from '@/components/IncomeImpact';
+import { IncomeYTD } from '@/components/IncomeYTD';
 import { AddStockModal } from '@/components/AddStockModal';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
@@ -418,7 +419,8 @@ const Index = () => {
 
         {/* Row 1: Yield slider + Underperformers */}
         <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-4">
+            <IncomeYTD annualIncome={portfolioStats.income} />
             <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
               <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
