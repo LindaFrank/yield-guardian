@@ -121,7 +121,12 @@ export function IncomeImpact({
   );
 
   if (underperformers.length === 0) return null;
-  if (conservative.status !== 'ok' && aggressive.status !== 'ok') return null;
+  if (
+    conservative.status !== 'ok' &&
+    aggressive.status !== 'ok' &&
+    !conservative.emptyMessage &&
+    !aggressive.emptyMessage
+  ) return null;
 
   return (
     <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-yield-positive/40 animate-fade-in">
