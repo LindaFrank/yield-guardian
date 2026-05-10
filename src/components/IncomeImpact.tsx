@@ -109,13 +109,13 @@ export function IncomeImpact({
         <ApproachHeader
           icon={<ShieldCheck className="w-6 h-6" />}
           title="Conservative Approach"
-          description="Lower share count, lower risk, steady and reliable income."
+          description="Sell the fewest shares needed to bring my annual yield to my target goal."
           accent="positive"
         />
         <ApproachHeader
           icon={<Rocket className="w-6 h-6" />}
           title="Aggressive Approach"
-          description="Higher share count, higher potential income, with increased risk."
+          description="Capture the largest income gain possible by selling an underperformer."
           accent="primary"
         />
       </div>
