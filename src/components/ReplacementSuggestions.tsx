@@ -23,8 +23,8 @@ interface ReplacementSuggestionsProps {
   removedStock: Stock | null;
   candidates: ReplacementCandidate[];
   onAddStock: (stock: Stock, shares?: number) => void;
-  /** Swap action: buy `buyShares` of `candidate` and remove `removeTicker` from portfolio. */
-  onSwap?: (candidate: Stock, buyShares: number, removeTicker: string) => void;
+  /** Swap action: buy `buyShares` of `candidate` and sell `sellShares` of `removeTicker`. */
+  onSwap?: (candidate: Stock, buyShares: number, removeTicker: string, sellShares?: number) => void;
   /** total shares of the underperformer the user holds (for slider cap) */
   sharesYHeld?: number;
   /** target min yield (percent, e.g. 5 means 5%) */
@@ -478,7 +478,7 @@ export function ReplacementSuggestions({
                           <Button
                             size="sm"
                             onClick={() => {
-                              onSwap(row.stock, buyN, removedStock.ticker);
+                              onSwap(row.stock, buyN, removedStock.ticker, result?.sharesYSold ?? sharesYHeld);
                             }}
                             className="h-7 px-2.5 text-xs gap-1"
                           >
