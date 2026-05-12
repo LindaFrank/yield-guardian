@@ -233,6 +233,19 @@ const Index = () => {
     }
   };
 
+  const handleSellShares = (ticker: string, sellShares: number) => {
+    const currentShares = stocksWithShares?.find((s) => s.ticker === ticker)?.shares_owned ?? 0;
+    const remainingShares = Math.max(0, currentShares - Math.floor(sellShares));
+
+    setIncomeDeltaByTicker({});
+    if (remainingShares > 0) {
+      if (user) updateShares.mutate({ ticker, shares: remainingShares });
+      return;
+    }
+
+    handleRemoveStock(ticker);
+  };
+
   const handleAddStock = (stock: Stock, shares?: number) => {
     if (!stocks.find((s) => s.ticker === stock.ticker)) {
       setStocks((prev) => [...prev, stock]);
@@ -539,9 +552,9 @@ const Index = () => {
                   handleAddStock(stock, shares);
                   setReplacementDialogOpen(false);
                 }}
-                onSwap={(candidate, buyShares, removeTicker) => {
+                onSwap={(candidate, buyShares, removeTicker, sellShares) => {
                   handleAddStock(candidate, buyShares);
-                  handleRemoveStock(removeTicker);
+                  handleSellShares(removeTicker, sellShares ?? 0);
                   setReplacementDialogOpen(false);
                 }}
               />
