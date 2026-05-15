@@ -326,28 +326,56 @@ function solveConservative(
     };
   }
 
-  // No single-candidate solution — fall back: report the best partial (sell all of Y into highest-yield candidate).
+  // No single-candidate solution that fully reaches target.
+  // Conservative fallback: find the SMALLEST sale that gives the best
+  // income-delta-per-share-sold (efficiency). Never default to selling all —
+  // that would mimic Aggressive.
   if (usePortfolioTarget) {
     const heldMax = Math.floor(sharesYHeld);
-    const investmentY = heldMax * P_Y;
-    const sol = solveAggressive(cands, investmentY, diversify);
-    const lostIncome = A_Y * heldMax;
-    const incomeDelta = sol.income - lostIncome;
-    const reached = ((portfolioIncome as number) + incomeDelta) / (portfolioValue as number) * 100;
+    let best: { sold: number; sol: AggressiveSolve; delta: number; eff: number } | null = null;
+    for (let sold = 1; sold <= heldMax; sold++) {
+      const investmentY = sold * P_Y;
+      const sol = solveAggressive(cands, investmentY, diversify);
+      const delta = sol.income - A_Y * sold;
+      if (delta <= 0) continue;
+      const eff = delta / sold;
+      if (
+        !best ||
+        eff > best.eff + 1e-9 ||
+        (Math.abs(eff - best.eff) < 1e-9 && sold < best.sold)
+      ) {
+        best = { sold, sol, delta, eff };
+      }
+    }
+    if (best) {
+      const investmentY = best.sold * P_Y;
+      const lostIncome = A_Y * best.sold;
+      const reached =
+        (((portfolioIncome as number) + best.delta) / (portfolioValue as number)) * 100;
+      return {
+        status: 'ok',
+        mode: 'conservative',
+        rows: buildRows(cands, best.sol.n),
+        sharesYSold: best.sold,
+        investmentY,
+        totalCost: best.sol.cost,
+        leftoverCash: investmentY - best.sol.cost,
+        newIncome: best.sol.income,
+        lostIncome,
+        incomeDelta: best.delta,
+        newYield: investmentY > 0 ? best.sol.income / investmentY : 0,
+        newPortfolioYield:
+          ((portfolioIncome as number) + best.delta) / (portfolioValue as number),
+        message: `Selling ${best.sold} shares of ${underperformer.ticker} lifts your portfolio yield to ${reached.toFixed(2)}% — short of your target, but the most efficient partial step. Address the next underperformer to keep moving toward your goal.`,
+      };
+    }
     return {
-      status: 'ok',
-      mode: 'conservative',
-      rows: buildRows(cands, sol.n),
-      sharesYSold: heldMax,
-      investmentY,
-      totalCost: sol.cost,
-      leftoverCash: investmentY - sol.cost,
-      newIncome: sol.income,
-      lostIncome,
-      incomeDelta,
-      newYield: investmentY > 0 ? sol.income / investmentY : 0,
-      newPortfolioYield: ((portfolioIncome as number) + incomeDelta) / (portfolioValue as number),
-      message: `Selling all ${heldMax} shares of ${underperformer.ticker} lifts your portfolio yield to ${reached.toFixed(2)}%. Address the next underperformer to keep moving toward your goal.`,
+      ...noTrade(
+        underperformer,
+        'conservative',
+        'No partial sale of this stock improves income — try Aggressive or lower your yield target.',
+      ),
+      status: 'no-trade',
     };
   }
 
