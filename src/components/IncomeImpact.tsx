@@ -203,7 +203,7 @@ function ApproachHeader({
     <div className={cn('p-4 rounded-lg border-[3px]', s.border, s.bg)}>
       <div className="flex items-center gap-2 mb-2">
         <span className={s.text}>{icon}</span>
-        <span className={cn('font-bold uppercase tracking-wider text-xs', s.text)}>{title}</span>
+        <span className={cn('font-bold uppercase tracking-wide text-[11px]', s.text)}>{title}</span>
       </div>
       <p className="text-[13px] text-muted-foreground leading-snug">{description}</p>
     </div>
