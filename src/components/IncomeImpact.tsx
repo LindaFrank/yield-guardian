@@ -206,7 +206,7 @@ function ApproachHeader({
   );
 }
 
-function ModeCard({ summary, accent }: { summary: ModeSummary; accent: Accent }) {
+function ModeCard({ summary, accent, portfolioValue, portfolioIncome }: { summary: ModeSummary; accent: Accent; portfolioValue: number; portfolioIncome: number }) {
   const s = ACCENT_STYLES[accent];
 
   if (summary.status !== 'ok' || !summary.topTicker) {
