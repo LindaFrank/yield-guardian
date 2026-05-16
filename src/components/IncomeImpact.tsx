@@ -156,8 +156,8 @@ export function IncomeImpact({
       </p>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <ModeCard summary={conservative} accent="conservative" />
-        <ModeCard summary={aggressive} accent="aggressive" />
+        <ModeCard summary={conservative} accent="conservative" portfolioValue={portfolioValue} portfolioIncome={portfolioIncome} />
+        <ModeCard summary={aggressive} accent="aggressive" portfolioValue={portfolioValue} portfolioIncome={portfolioIncome} />
       </div>
 
       <div className="flex items-center gap-2 mt-4 text-[13px] text-muted-foreground">
