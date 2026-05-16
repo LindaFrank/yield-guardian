@@ -130,10 +130,14 @@ export function IncomeImpact({
 
   return (
     <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-yield-positive/40 animate-fade-in">
-      <div className="flex items-center gap-2 mb-5">
+      <div className="flex items-center gap-2 mb-3">
         <Sparkles className="w-5 h-5 text-yield-positive" />
         <h3 className="text-base font-bold uppercase tracking-wider text-foreground">Income Impact</h3>
       </div>
+
+      <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
+        Income Impact compares full-year income going forward, not a calendar-year blend of dividends already collected + dividends yet to come.
+      </p>
 
       {/* Approach headers */}
       <div className="grid md:grid-cols-2 gap-4 mb-5">
