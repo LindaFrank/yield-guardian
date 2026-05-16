@@ -228,6 +228,12 @@ function ModeCard({ summary, accent }: { summary: ModeSummary; accent: Accent })
     },
   ];
 
+  // Flag the yield-up / income-down tradeoff (Conservative only).
+  const yieldUpIncomeDown =
+    accent === 'conservative' &&
+    summary.incomeIncrease < 0 &&
+    summary.newPortfolioYield > (portfolioValue > 0 ? (portfolioIncome / portfolioValue) * 100 : 0);
+
   return (
     <div className={cn('p-4 rounded-lg border-[3px] divide-y divide-border/40', s.border)}>
       {rows.map(({ icon: Icon, label, value }) => (
@@ -239,6 +245,18 @@ function ModeCard({ summary, accent }: { summary: ModeSummary; accent: Accent })
           <span className={cn('font-mono font-bold text-sm whitespace-nowrap', s.text)}>{value}</span>
         </div>
       ))}
+      {yieldUpIncomeDown && (
+        <div className="pt-3 mt-1 flex gap-2 text-[12px] text-muted-foreground leading-snug">
+          <Info className={cn('w-4 h-4 shrink-0 mt-0.5', s.text)} />
+          <span>
+            Heads up: this swap raises your <span className="font-semibold">yield %</span> toward
+            your target, but lowers your <span className="font-semibold">total annual dividend dollars</span>.
+            The replacement is a cheaper stock with a higher yield rate, so each dollar invested
+            earns more — but the shares you can buy with the proceeds pay fewer dollars overall
+            than what you're selling.
+          </span>
+        </div>
+      )}
     </div>
   );
 }
