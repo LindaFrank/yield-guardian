@@ -255,6 +255,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             )}
             <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
             <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
+            <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
             {selectedTickers.size > 0 && (
               <Button className="gap-2" onClick={handleProceedToShares}>
                 Enter Shares for {selectedTickers.size} Stock{selectedTickers.size !== 1 ? 's' : ''} <ChevronRight className="w-4 h-4" />
