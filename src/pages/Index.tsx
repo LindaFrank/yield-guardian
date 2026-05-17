@@ -356,7 +356,7 @@ const Index = () => {
                   onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                 >
                   <Target className="w-3.5 h-3.5" />
-                  Income Goal
+                  Desired Dividend Yield
                 </Button>
                 <Button
                   className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
