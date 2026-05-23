@@ -506,8 +506,9 @@ const Index = () => {
         )}
 
         {/* Row 2: Portfolio cards + Suggested stocks */}
-        <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8 mt-8`}>
-          <div className="lg:col-span-2">
+        <div className="mt-8">
+          <div>
+
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
                 <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
