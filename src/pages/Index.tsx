@@ -18,6 +18,7 @@ import { YieldTargetSlider } from '@/components/YieldTargetSlider';
 import { StockCard } from '@/components/StockCard';
 import { StockCardDirectionsNote } from '@/components/StockCardDirectionsNote';
 import { UnderperformersList } from '@/components/UnderperformersList';
+import { UnderperformersPanel } from '@/components/UnderperformersPanel';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
 import { IncomeImpact } from '@/components/IncomeImpact';
 import { IncomeYTD } from '@/components/IncomeYTD';
