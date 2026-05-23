@@ -431,21 +431,19 @@ const Index = () => {
           </div>
         )}
 
-        {/* Row 1: Yield slider + Underperformers */}
-        <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
-          <div className="lg:col-span-2 space-y-4">
-            <IncomeYTD
-              stocks={stocks}
-              sharesMap={Object.fromEntries(
-                (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
-              )}
-            />
-            <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
-              <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-                <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
-              </section>
-            </HelpTooltip>
-          </div>
+        {/* Row 1: Income YTD + Yield slider */}
+        <div className="space-y-4">
+          <IncomeYTD
+            stocks={stocks}
+            sharesMap={Object.fromEntries(
+              (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+            )}
+          />
+          <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
+            <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+              <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
+            </section>
+          </HelpTooltip>
         </div>
 
         {/* Combined Underperformers + Replacements panel (above Income Impact) */}
