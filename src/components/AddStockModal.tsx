@@ -183,9 +183,6 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
 
         {phase === 'shares' && (
           <>
-            <p className="text-sm text-muted-foreground">
-              How many shares of each stock do you own?
-            </p>
 
             <div className="max-h-72 overflow-y-auto space-y-3 mt-2">
               {Array.from(selected.values()).map((result, idx) => {
