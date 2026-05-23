@@ -446,34 +446,66 @@ const Index = () => {
               </section>
             </HelpTooltip>
           </div>
-          {!showStockFinder && (
-            <div className="space-y-4">
-              {underperformers.length > 0 && (
-                <IncomeImpact
-                  underperformers={underperformers}
-                  sharesMap={Object.fromEntries(
-                    (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
-                  )}
-                  marketPool={liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks}
-                  portfolioTickers={stocks.map((s) => s.ticker)}
-                  targetYield={targetYield}
-                  portfolioValue={portfolioStats.value}
-                  portfolioIncome={portfolioStats.income}
-                />
-              )}
-              <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
-                <section id="underperformers-section" className="animate-fade-in scroll-mt-[180px]" style={{ animationDelay: '400ms' }}>
-                  <UnderperformersList
-                    underperformers={underperformers}
-                    selectedStock={selectedUnderperformer}
-                    onSelectStock={handleSelectUnderperformer}
-                    targetYield={targetYield}
-                  />
-                </section>
-              </HelpTooltip>
-            </div>
-          )}
         </div>
+
+        {/* Combined Underperformers + Replacements panel (above Income Impact) */}
+        {!showStockFinder && underperformers.length > 0 && (
+          <section className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
+            <UnderperformersPanel
+              underperformers={underperformers}
+              selectedStock={selectedUnderperformer}
+              onSelectStock={(stock) => setSelectedUnderperformer(stock)}
+              targetYield={targetYield}
+              candidates={replacements}
+              sharesYHeld={
+                selectedUnderperformer
+                  ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                  : 0
+              }
+              portfolioValue={portfolioStats.value}
+              portfolioIncome={portfolioStats.income}
+              onIncomeDeltaChange={(ticker, delta) =>
+                setIncomeDeltaByTicker((prev) =>
+                  prev[ticker] === delta ? prev : { ...prev, [ticker]: delta }
+                )
+              }
+              onAddStock={(stock, shares) => handleAddStock(stock, shares)}
+              onSwap={(candidate, buyShares, removeTicker, sellShares) => {
+                handleAddStock(candidate, buyShares);
+                handleSellShares(removeTicker, sellShares ?? 0);
+              }}
+            />
+          </section>
+        )}
+
+        {/* Income Impact (full width, below combined panel) */}
+        {!showStockFinder && underperformers.length > 0 && (
+          <section className="mt-8 animate-fade-in" style={{ animationDelay: '350ms' }}>
+            <IncomeImpact
+              underperformers={underperformers}
+              sharesMap={Object.fromEntries(
+                (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+              )}
+              marketPool={liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks}
+              portfolioTickers={stocks.map((s) => s.ticker)}
+              targetYield={targetYield}
+              portfolioValue={portfolioStats.value}
+              portfolioIncome={portfolioStats.income}
+            />
+          </section>
+        )}
+
+        {/* "All meeting target" message when there are no underperformers */}
+        {!showStockFinder && stocks.length > 0 && underperformers.length === 0 && (
+          <section className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
+            <UnderperformersList
+              underperformers={underperformers}
+              selectedStock={selectedUnderperformer}
+              onSelectStock={(stock) => setSelectedUnderperformer(stock)}
+              targetYield={targetYield}
+            />
+          </section>
+        )}
 
         {/* Row 2: Portfolio cards + Suggested stocks */}
         <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8 mt-8`}>
