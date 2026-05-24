@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { StockAnalysis, Stock, ReplacementCandidate } from '@/types/portfolio';
+import { formatPercentage } from '@/lib/portfolioUtils';
 import { UnderperformersList } from './UnderperformersList';
 import { ReplacementSuggestions } from './ReplacementSuggestions';
-import { TrendingDown, MousePointerClick } from 'lucide-react';
+import { TrendingDown, MousePointerClick, AlertTriangle } from 'lucide-react';
 
 interface UnderperformersPanelProps {
   underperformers: StockAnalysis[];
