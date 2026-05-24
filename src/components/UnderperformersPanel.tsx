@@ -43,6 +43,16 @@ export function UnderperformersPanel({
     );
   }
 
+  const isSingle = underperformers.length === 1;
+  const soleStock = isSingle ? underperformers[0].stock : null;
+
+  // Auto-select when there's only one underperformer
+  useEffect(() => {
+    if (isSingle && soleStock && selectedStock?.ticker !== soleStock.ticker) {
+      onSelectStock(soleStock);
+    }
+  }, [isSingle, soleStock, selectedStock, onSelectStock]);
+
   return (
     <section
       id="underperformers-section"
@@ -56,21 +66,21 @@ export function UnderperformersPanel({
         <span className="ml-auto text-sm font-mono">{underperformers.length}</span>
       </div>
 
-      <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
-        Click a ticker on the left to see curated replacement suggestions on the right.
-      </p>
+      {isSingle && soleStock ? (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border-[2px] border-yield-negative/60">
+            <AlertTriangle className="w-5 h-5 text-yield-negative" />
+            <span className="font-mono font-medium">{soleStock.ticker}</span>
+            <span className="text-sm font-mono text-yield-negative">
+              {formatPercentage(underperformers[0].currentYield)}
+            </span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              Below your {formatPercentage(targetYield)} target
+            </span>
+          </div>
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        <UnderperformersList
-          underperformers={underperformers}
-          selectedStock={selectedStock}
-          onSelectStock={onSelectStock}
-          targetYield={targetYield}
-        />
-
-        {selectedStock ? (
           <ReplacementSuggestions
-            removedStock={selectedStock}
+            removedStock={soleStock}
             candidates={candidates}
             sharesYHeld={sharesYHeld}
             targetYield={targetYield}
@@ -80,15 +90,44 @@ export function UnderperformersPanel({
             onAddStock={onAddStock}
             onSwap={onSwap}
           />
-        ) : (
-          <div className="p-8 rounded-xl border-[4px] border-dashed border-muted-foreground/40 flex flex-col items-center justify-center text-center text-muted-foreground min-h-[200px]">
-            <MousePointerClick className="w-8 h-8 mb-3 opacity-60" />
-            <p className="text-sm font-medium">
-              Select an underperforming stock to see replacement suggestions
-            </p>
+        </div>
+      ) : (
+        <>
+          <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
+            Click a ticker on the left to see curated replacement suggestions on the right.
+          </p>
+
+          <div className="grid lg:grid-cols-2 gap-4">
+            <UnderperformersList
+              underperformers={underperformers}
+              selectedStock={selectedStock}
+              onSelectStock={onSelectStock}
+              targetYield={targetYield}
+            />
+
+            {selectedStock ? (
+              <ReplacementSuggestions
+                removedStock={selectedStock}
+                candidates={candidates}
+                sharesYHeld={sharesYHeld}
+                targetYield={targetYield}
+                portfolioValue={portfolioValue}
+                portfolioIncome={portfolioIncome}
+                onIncomeDeltaChange={onIncomeDeltaChange}
+                onAddStock={onAddStock}
+                onSwap={onSwap}
+              />
+            ) : (
+              <div className="p-8 rounded-xl border-[4px] border-dashed border-muted-foreground/40 flex flex-col items-center justify-center text-center text-muted-foreground min-h-[200px]">
+                <MousePointerClick className="w-8 h-8 mb-3 opacity-60" />
+                <p className="text-sm font-medium">
+                  Select an underperforming stock to see replacement suggestions
+                </p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </section>
   );
 }
