@@ -308,24 +308,27 @@ export function ReplacementSuggestions({
                         </div>
                       )}
                       <div className="grid grid-cols-2 gap-2">
-                        <div className="p-2 rounded-md border-2 border-muted-foreground/40 bg-secondary/30">
-                          <div className="text-[11px] uppercase tracking-wide text-red-500 font-semibold">
-                            IF YOU KEEP {removedStock.ticker}
+                        <div className="p-3 rounded-md border-[3px] border-yield-negative/70 bg-yield-negative/10 shadow-card">
+                          <div className="text-[13px] uppercase tracking-wide text-yield-negative font-bold leading-tight">
+                            IF YOU KEEP<br/>{removedStock.ticker}
                           </div>
-                          <div className="font-mono font-semibold text-base mt-0.5">
+                          <div className="font-mono font-bold text-lg mt-1 text-yield-negative">
                             {formatCurrency(keepIncome)}
                           </div>
                           <div className="text-[11px] text-foreground/80 font-medium">rest-of-year div</div>
                         </div>
                         <div className={cn(
-                          'p-2 rounded-md border-2 bg-secondary/30',
-                          delta >= 0 ? 'border-yield-positive/60' : 'border-yield-negative/60',
+                          'p-3 rounded-md border-[3px] shadow-card',
+                          delta >= 0 ? 'border-yield-positive/70 bg-yield-positive/10' : 'border-yield-negative/70 bg-yield-negative/10',
                         )}>
-                          <div className="text-[11px] uppercase tracking-wide text-yield-positive font-semibold">
-                            IF YOU SWITCH TO {switchLabel}
+                          <div className={cn(
+                            'text-[13px] uppercase tracking-wide font-bold leading-tight',
+                            delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
+                          )}>
+                            IF YOU SWITCH TO<br/>{switchLabel}
                           </div>
                           <div className={cn(
-                            'font-mono font-semibold text-base mt-0.5',
+                            'font-mono font-bold text-lg mt-1',
                             delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
                           )}>
                             {formatCurrency(switchIncome)}
@@ -335,6 +338,7 @@ export function ReplacementSuggestions({
                           </div>
                         </div>
                       </div>
+
                     </div>
                   );
                 })()}
