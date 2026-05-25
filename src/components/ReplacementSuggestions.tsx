@@ -479,21 +479,6 @@ export function ReplacementSuggestions({
                     if (buyN <= 0) return null;
                     return (
                       <>
-                        <Badge variant="outline" className="text-[14px] px-1.5 py-0 border-primary/50 text-primary">
-                          Buy {buyN}
-                        </Badge>
-                        {removedStock && onSwap && (
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              onSwap(row.stock, buyN, removedStock.ticker, result?.sharesYSold ?? sharesYHeld);
-                            }}
-                            className="h-7 px-2.5 text-xs gap-1"
-                          >
-                            Next
-                            <ArrowRightCircle className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
                         {removedStock && (() => {
                           const sellShares = Math.max(
                             1,
@@ -559,12 +544,12 @@ export function ReplacementSuggestions({
                                     'hover:scale-110 transition-all',
                                     'text-[11px] font-semibold uppercase tracking-wide',
                                   )}
-                                  aria-label={`How to execute swap to ${row.stock.ticker}`}
-                                  title="Click for brokerage directions"
+                                  aria-label={`Complete transaction for swap to ${row.stock.ticker}`}
+                                  title="Click for transaction directions"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <StickyNote className="w-3 h-3" />
-                                  How to fix
+                                  Complete Transaction
                                 </button>
                               </PopoverTrigger>
                               <PopoverContent
@@ -642,6 +627,18 @@ export function ReplacementSuggestions({
                             </Popover>
                           );
                         })()}
+                        {removedStock && onSwap && (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              onSwap(row.stock, buyN, removedStock.ticker, result?.sharesYSold ?? sharesYHeld);
+                            }}
+                            className="h-7 px-2.5 text-xs gap-1"
+                          >
+                            Next
+                            <ArrowRightCircle className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
                       </>
                     );
                   })()}
