@@ -483,7 +483,7 @@ export function ReplacementSuggestions({
                       className="text-[14px] px-1.5 py-0 border-amber-500/50 text-amber-500 gap-0.5"
                       title="You already own this ticker. Diversification across different holdings is preferred, but you can add more if you'd like."
                     >
-                      Already held — diversify preferred
+                      Already held–diversification preferred
                     </Badge>
                   )}
                   {displayRows && (() => {
