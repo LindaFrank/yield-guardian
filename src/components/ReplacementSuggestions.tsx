@@ -635,7 +635,7 @@ export function ReplacementSuggestions({
                             }}
                             className="h-7 px-2.5 text-xs gap-1"
                           >
-                            Next
+                            Complete Transaction
                             <ArrowRightCircle className="w-3.5 h-3.5" />
                           </Button>
                         )}
