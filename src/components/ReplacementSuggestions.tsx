@@ -544,12 +544,12 @@ export function ReplacementSuggestions({
                                     'hover:scale-110 transition-all',
                                     'text-[11px] font-semibold uppercase tracking-wide',
                                   )}
-                                  aria-label={`Complete transaction for swap to ${row.stock.ticker}`}
-                                  title="Click for transaction directions"
+                                  aria-label={`Instructions to broker for swap to ${row.stock.ticker}`}
+                                  title="Click for brokerage directions"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <StickyNote className="w-3 h-3" />
-                                  Complete Transaction
+                                  Instructions to Broker
                                 </button>
                               </PopoverTrigger>
                               <PopoverContent
@@ -635,7 +635,7 @@ export function ReplacementSuggestions({
                             }}
                             className="h-7 px-2.5 text-xs gap-1"
                           >
-                            Next
+                            Complete Transaction
                             <ArrowRightCircle className="w-3.5 h-3.5" />
                           </Button>
                         )}
