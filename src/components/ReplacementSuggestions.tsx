@@ -441,6 +441,7 @@ export function ReplacementSuggestions({
           const yieldVal = meta?.yield ?? (row.stock.annualDividend / row.stock.currentPrice) * 100;
           const stabilityScore = meta?.stabilityScore ?? 2;
           const matchReason = meta?.matchReason;
+          const alreadyHeld = meta?.alreadyHeld ?? false;
 
           // Hide rows where solver picked 0 unless diversification is on,
           // EXCEPT in conservative mode where we always show all candidates.
@@ -471,6 +472,15 @@ export function ReplacementSuggestions({
                       Caution
                     </Badge>
                   ) : null}
+                  {alreadyHeld && (
+                    <Badge
+                      variant="outline"
+                      className="text-[14px] px-1.5 py-0 border-amber-500/50 text-amber-500 gap-0.5"
+                      title="You already own this ticker. Diversification across different holdings is preferred, but you can add more if you'd like."
+                    >
+                      Already held — diversify preferred
+                    </Badge>
+                  )}
                   {displayRows && (() => {
                     let buyN = row.shares;
                     if (buyN === 0 && mode === 'conservative' && result?.status === 'ok' && row.stock.currentPrice > 0) {

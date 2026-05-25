@@ -185,10 +185,16 @@ const Index = () => {
 
   const replacements = useMemo(() => {
     if (selectedUnderperformer) {
-      const pool = liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks;
+      const marketPool = liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks;
+      // Merge currently-held stocks into the pool so they can appear as
+      // "add more of what you own" options (flagged as alreadyHeld).
+      const merged = [...marketPool];
+      stocks.forEach((s) => {
+        if (!merged.find((m) => m.ticker === s.ticker)) merged.push(s);
+      });
       return suggestReplacements(
         selectedUnderperformer,
-        pool,
+        merged,
         targetYield,
         stocks.map((s) => s.ticker)
       );
