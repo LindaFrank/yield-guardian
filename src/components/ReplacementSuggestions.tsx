@@ -334,7 +334,7 @@ export function ReplacementSuggestions({
                             {formatCurrency(switchIncome)}
                           </div>
                           <div className="text-[11px] text-foreground/80 font-medium">
-                            rest-of-year div (<span className={cn('font-bold', delta >= 0 ? 'text-yield-positive' : 'text-yield-negative')}>{delta >= 0 ? '+' : ''}{formatCurrency(delta)}</span>)
+                            rest-of-year div (<span className={cn('font-bold text-[13px]', delta >= 0 ? 'text-yield-positive' : 'text-yield-negative')}>{delta >= 0 ? '+' : ''}{formatCurrency(delta)}</span>)
                           </div>
 
                         </div>
