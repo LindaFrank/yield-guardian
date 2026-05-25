@@ -403,6 +403,17 @@ const Index = () => {
                     <Button
                       variant="outline"
                       className="gap-1.5 border-[3px] border-muted-foreground/50"
+                      onClick={() => {
+                        const el = document.getElementById('replacement-suggestions-section');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Jump to Suggestions
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="gap-1.5 border-[3px] border-muted-foreground/50"
                       onClick={async () => {
                         try {
                           await generatePortfolioReport({
@@ -448,7 +459,7 @@ const Index = () => {
 
         {/* Combined Underperformers + Replacements panel (above Income Impact) */}
         {!showStockFinder && underperformers.length > 0 && (
-          <section className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
+          <section id="replacement-suggestions-section" className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
             <UnderperformersPanel
               underperformers={underperformers}
               selectedStock={selectedUnderperformer}
