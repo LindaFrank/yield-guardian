@@ -448,7 +448,7 @@ const Index = () => {
 
         {/* Combined Underperformers + Replacements panel (above Income Impact) */}
         {!showStockFinder && underperformers.length > 0 && (
-          <section className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
+          <section id="replacement-suggestions-section" className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
             <UnderperformersPanel
               underperformers={underperformers}
               selectedStock={selectedUnderperformer}
