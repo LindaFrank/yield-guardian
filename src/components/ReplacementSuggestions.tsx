@@ -441,6 +441,7 @@ export function ReplacementSuggestions({
           const yieldVal = meta?.yield ?? (row.stock.annualDividend / row.stock.currentPrice) * 100;
           const stabilityScore = meta?.stabilityScore ?? 2;
           const matchReason = meta?.matchReason;
+          const alreadyHeld = meta?.alreadyHeld ?? false;
 
           // Hide rows where solver picked 0 unless diversification is on,
           // EXCEPT in conservative mode where we always show all candidates.
