@@ -284,6 +284,9 @@ export function ReplacementSuggestions({
 
                   return (
                     <div className="my-2 space-y-2">
+                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground text-center">
+                        Rest-of-year dividend comparison
+                      </div>
                       {allTickers.length > 1 && (
                         <div className="flex items-center gap-2">
                           <label className="text-[11px] uppercase tracking-wide text-muted-foreground">
@@ -306,8 +309,8 @@ export function ReplacementSuggestions({
                       )}
                       <div className="grid grid-cols-2 gap-2">
                         <div className="p-2 rounded-md border-2 border-muted-foreground/40 bg-secondary/30">
-                          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                            Keep {result.sharesYSold} {removedStock.ticker}
+                          <div className="text-[11px] uppercase tracking-wide text-red-500 font-semibold">
+                            IF YOU KEEP {removedStock.ticker}
                           </div>
                           <div className="font-mono font-semibold text-base mt-0.5">
                             {formatCurrency(keepIncome)}
@@ -318,8 +321,8 @@ export function ReplacementSuggestions({
                           'p-2 rounded-md border-2 bg-secondary/30',
                           delta >= 0 ? 'border-yield-positive/60' : 'border-yield-negative/60',
                         )}>
-                          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                            Switch to {switchLabel}
+                          <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+                            IF YOU SWITCH TO {switchLabel}
                           </div>
                           <div className={cn(
                             'font-mono font-semibold text-base mt-0.5',
