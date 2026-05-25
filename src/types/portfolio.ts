@@ -33,4 +33,6 @@ export interface ReplacementCandidate {
   yield: number;
   stabilityScore: number;
   matchReason: string;
+  /** True when this ticker is already in the user's portfolio (add-more option). */
+  alreadyHeld?: boolean;
 }
