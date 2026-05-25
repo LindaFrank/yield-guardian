@@ -315,13 +315,13 @@ export function ReplacementSuggestions({
                           <div className="font-mono font-semibold text-base mt-0.5">
                             {formatCurrency(keepIncome)}
                           </div>
-                          <div className="text-[11px] text-muted-foreground">rest-of-year div</div>
+                          <div className="text-[11px] text-foreground/80 font-medium">rest-of-year div</div>
                         </div>
                         <div className={cn(
                           'p-2 rounded-md border-2 bg-secondary/30',
                           delta >= 0 ? 'border-yield-positive/60' : 'border-yield-negative/60',
                         )}>
-                          <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+                          <div className="text-[11px] uppercase tracking-wide text-yield-positive font-semibold">
                             IF YOU SWITCH TO {switchLabel}
                           </div>
                           <div className={cn(
@@ -330,7 +330,7 @@ export function ReplacementSuggestions({
                           )}>
                             {formatCurrency(switchIncome)}
                           </div>
-                          <div className="text-[11px] text-muted-foreground">
+                          <div className="text-[11px] text-foreground/80 font-medium">
                             rest-of-year div ({delta >= 0 ? '+' : ''}{formatCurrency(delta)})
                           </div>
                         </div>
