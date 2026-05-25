@@ -157,7 +157,12 @@ export function suggestReplacements(
       return b.yield - a.yield;
     });
 
-  return vettedCandidates.slice(0, 5);
+  // Take top 5 fresh picks (diversification preferred), then append all
+  // viable already-held tickers so the user can still choose "add more of
+  // what I own" — e.g. ARCC stays selectable even when 5 fresh picks exist.
+  const fresh = vettedCandidates.filter((c) => !c.alreadyHeld).slice(0, 5);
+  const held = vettedCandidates.filter((c) => c.alreadyHeld);
+  return [...fresh, ...held];
 }
 
 export function formatCurrency(value: number): string {
