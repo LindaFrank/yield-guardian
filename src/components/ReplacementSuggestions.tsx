@@ -720,9 +720,6 @@ export function ReplacementSuggestions({
                         </p>
                         <p className="flex justify-between gap-3 text-[13px]">
                           <span className="text-muted-foreground">vs last year ({formatCurrency(lastYearAnnual)})</span>
-                          <span className={`font-mono ${meetsLastYear ? 'text-yield-positive' : 'text-yield-negative'}`}>
-                            {nextFullYear - lastYearAnnual >= 0 ? '+' : ''}{formatCurrency(nextFullYear - lastYearAnnual)}
-                          </span>
                         </p>
                       </div>
                     </div>
