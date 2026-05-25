@@ -123,8 +123,10 @@ export function suggestReplacements(
   targetMinYield: number,
   existingTickers: string[]
 ): ReplacementCandidate[] {
+  const heldSet = new Set(existingTickers);
   const vettedCandidates = marketData
-    .filter((stock) => !existingTickers.includes(stock.ticker))
+    // Always exclude the underperformer itself — replacing it with itself is a no-op.
+    .filter((stock) => stock.ticker !== removedStock.ticker)
     .map((stock) => {
       const currentYield = calculateDividendYield(stock);
       const stability = checkDividendStability(stock, 2, targetMinYield);
@@ -134,18 +136,26 @@ export function suggestReplacements(
       currentYield >= targetMinYield && stability.status === 'stable'
     )
     .map(({ stock, currentYield }) => {
-      const matchReason = stock.sector === removedStock.sector
-        ? `Same sector (${stock.sector}) — 2+ yrs stable`
-        : 'Vetted: 2+ yrs stable at target yield';
+      const alreadyHeld = heldSet.has(stock.ticker);
+      const matchReason = alreadyHeld
+        ? 'Already in your portfolio — diversification preferred'
+        : stock.sector === removedStock.sector
+          ? `Same sector (${stock.sector}) — 2+ yrs stable`
+          : 'Vetted: 2+ yrs stable at target yield';
       return {
         stock,
         yield: currentYield,
         stabilityScore: 3,
         matchReason,
+        alreadyHeld,
       };
     })
-    // Order strictly by yield descending so index 0 is always highest-yield.
-    .sort((a, b) => b.yield - a.yield);
+    // Prefer diversification: new tickers first, then add-more options. Within each
+    // group, order by yield descending so the highest-yield candidate is on top.
+    .sort((a, b) => {
+      if (!!a.alreadyHeld !== !!b.alreadyHeld) return a.alreadyHeld ? 1 : -1;
+      return b.yield - a.yield;
+    });
 
   return vettedCandidates.slice(0, 5);
 }
