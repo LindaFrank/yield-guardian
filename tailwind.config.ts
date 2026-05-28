@@ -58,6 +58,10 @@ export default {
           negative: "hsl(var(--yield-negative))",
           neutral: "hsl(var(--yield-neutral))",
         },
+        approach: {
+          aggressive: "hsl(var(--approach-aggressive))",
+          conservative: "hsl(var(--approach-conservative))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft, Search } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,12 @@ import { Header } from '@/components/Header';
 import { PortfolioStats } from '@/components/PortfolioStats';
 import { YieldTargetSlider } from '@/components/YieldTargetSlider';
 import { StockCard } from '@/components/StockCard';
+import { StockCardDirectionsNote } from '@/components/StockCardDirectionsNote';
 import { UnderperformersList } from '@/components/UnderperformersList';
+import { UnderperformersPanel } from '@/components/UnderperformersPanel';
 import { ReplacementSuggestions } from '@/components/ReplacementSuggestions';
+import { IncomeImpact } from '@/components/IncomeImpact';
+import { IncomeYTD } from '@/components/IncomeYTD';
 import { AddStockModal } from '@/components/AddStockModal';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
@@ -59,6 +63,8 @@ const Index = () => {
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
   const [actionBarExpanded, setActionBarExpanded] = useState(false);
+  // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
+  const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
@@ -132,6 +138,32 @@ const Index = () => {
     [stocks, targetYield]
   );
 
+  // Σ_total_gain = sum of latest IncomeDelta_Y across underperformers user has previewed
+  const totalIncomeGain = useMemo(() => {
+    const underTickers = new Set(underperformers.map((u) => u.stock.ticker));
+    return Object.entries(incomeDeltaByTicker).reduce(
+      (sum, [t, v]) => (underTickers.has(t) ? sum + v : sum),
+      0,
+    );
+  }, [incomeDeltaByTicker, underperformers]);
+
+  // Current portfolio dividend income & projected new yield after applying gains
+  const portfolioStats = useMemo(() => {
+    const sharesMap = Object.fromEntries(
+      (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+    );
+    let value = 0;
+    let income = 0;
+    stocks.forEach((s) => {
+      const sh = sharesMap[s.ticker] ?? 0;
+      value += sh * s.currentPrice;
+      income += sh * s.annualDividend;
+    });
+    const newIncome = income + totalIncomeGain;
+    const newYield = value > 0 ? (newIncome / value) * 100 : 0;
+    return { value, income, newIncome, newYield };
+  }, [stocks, stocksWithShares, totalIncomeGain]);
+
   // Build a live market stocks pool for replacement suggestions
   const liveMarketStocks = useMemo(() => {
     if (!liveCandidates || liveCandidates.length === 0) return [];
@@ -153,10 +185,16 @@ const Index = () => {
 
   const replacements = useMemo(() => {
     if (selectedUnderperformer) {
-      const pool = liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks;
+      const marketPool = liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks;
+      // Merge currently-held stocks into the pool so they can appear as
+      // "add more of what you own" options (flagged as alreadyHeld).
+      const merged = [...marketPool];
+      stocks.forEach((s) => {
+        if (!merged.find((m) => m.ticker === s.ticker)) merged.push(s);
+      });
       return suggestReplacements(
         selectedUnderperformer,
-        pool,
+        merged,
         targetYield,
         stocks.map((s) => s.ticker)
       );
@@ -182,10 +220,8 @@ const Index = () => {
           matchReason,
         };
       })
-      .sort((a, b) => {
-        if (a.stabilityScore !== b.stabilityScore) return b.stabilityScore - a.stabilityScore;
-        return b.yield - a.yield;
-      });
+      // Order strictly by yield descending — highest-yield candidate first.
+      .sort((a, b) => b.yield - a.yield);
 
     // In default mode (no underperformer), only show stocks above target yield
     return scored.filter((c) => c.yield >= targetYield).slice(0, 5);
@@ -196,14 +232,33 @@ const Index = () => {
     if (selectedUnderperformer?.ticker === ticker) {
       setSelectedUnderperformer(null);
     }
+    // Any previously-previewed income deltas referenced the prior portfolio
+    // composition; invalidate them so "New portfolio yield" stays accurate.
+    setIncomeDeltaByTicker({});
     if (user) {
       removeTicker.mutate(ticker);
     }
   };
 
+  const handleSellShares = (ticker: string, sellShares: number) => {
+    const currentShares = stocksWithShares?.find((s) => s.ticker === ticker)?.shares_owned ?? 0;
+    const remainingShares = Math.max(0, currentShares - Math.floor(sellShares));
+
+    setIncomeDeltaByTicker({});
+    if (remainingShares > 0) {
+      if (user) updateShares.mutate({ ticker, shares: remainingShares });
+      return;
+    }
+
+    handleRemoveStock(ticker);
+  };
+
   const handleAddStock = (stock: Stock, shares?: number) => {
     if (!stocks.find((s) => s.ticker === stock.ticker)) {
       setStocks((prev) => [...prev, stock]);
+      // Invalidate stale projected gains — they were computed against the
+      // previous portfolio value/income.
+      setIncomeDeltaByTicker({});
       if (user) {
         addTicker.mutate({ ticker: stock.ticker, shares });
       }
@@ -287,7 +342,7 @@ const Index = () => {
         {wizardDone && (
           <div className="sticky top-[100px] z-40 mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-background px-3 py-2 shadow-glow animate-fade-in">
             {!actionBarExpanded && (
-              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/90 whitespace-nowrap">
+              <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
                 What Do You Want To Do?
               </span>
             )}
@@ -308,7 +363,7 @@ const Index = () => {
                   onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                 >
                   <Target className="w-3.5 h-3.5" />
-                  Set Yield
+                  Desired Dividend Yield
                 </Button>
                 <Button
                   className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
@@ -330,14 +385,14 @@ const Index = () => {
                     }
                   }}
                 />
-                <AddStockModal
-                  existingTickers={stocks.map((s) => s.ticker)}
-                  onAddStock={handleAddStock}
-                  open={addStockOpen}
-                  onOpenChange={setAddStockOpen}
-                  suggestedStocks={liveMarketStocks}
-                  targetYield={targetYield}
-                />
+                <Button
+                  variant="secondary"
+                  className="gap-1.5 border-[3px] border-muted-foreground/50"
+                  onClick={() => setAddStockOpen(true)}
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  Search Stocks Generally
+                </Button>
                 {stocks.length > 0 && (
                   <>
                     <Button
@@ -350,6 +405,17 @@ const Index = () => {
                     >
                       <TrendingDown className="w-3.5 h-3.5" />
                       Review Underperformers ({underperformers.length})
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="gap-1.5 border-[3px] border-muted-foreground/50"
+                      onClick={() => {
+                        const el = document.getElementById('replacement-suggestions-section');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Jump to Suggestions
                     </Button>
                     <Button
                       variant="outline"
@@ -382,34 +448,84 @@ const Index = () => {
           </div>
         )}
 
-        {/* Row 1: Yield slider + Underperformers */}
-        <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
-          <div className="lg:col-span-2">
-            <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
-              <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-                <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
-              </section>
-            </HelpTooltip>
-          </div>
-          {!showStockFinder && (
-            <div>
-              <HelpTooltip text="These are the investments that deliver lower returns than a benchmark, market average, or expected performance. Stocks in this category are listed here." side="left">
-                <section id="underperformers-section" className="animate-fade-in scroll-mt-[180px]" style={{ animationDelay: '400ms' }}>
-                  <UnderperformersList
-                    underperformers={underperformers}
-                    selectedStock={selectedUnderperformer}
-                    onSelectStock={handleSelectUnderperformer}
-                    targetYield={targetYield}
-                  />
-                </section>
-              </HelpTooltip>
-            </div>
-          )}
+        {/* Row 1: Income YTD + Yield slider */}
+        <div className="space-y-4">
+          <IncomeYTD
+            stocks={stocks}
+            sharesMap={Object.fromEntries(
+              (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+            )}
+          />
+          <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
+            <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+              <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
+            </section>
+          </HelpTooltip>
         </div>
 
+        {/* Combined Underperformers + Replacements panel (above Income Impact) */}
+        {!showStockFinder && underperformers.length > 0 && (
+          <section id="replacement-suggestions-section" className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
+            <UnderperformersPanel
+              underperformers={underperformers}
+              selectedStock={selectedUnderperformer}
+              onSelectStock={(stock) => setSelectedUnderperformer(stock)}
+              targetYield={targetYield}
+              candidates={replacements}
+              sharesYHeld={
+                selectedUnderperformer
+                  ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                  : 0
+              }
+              portfolioValue={portfolioStats.value}
+              portfolioIncome={portfolioStats.income}
+              onIncomeDeltaChange={(ticker, delta) =>
+                setIncomeDeltaByTicker((prev) =>
+                  prev[ticker] === delta ? prev : { ...prev, [ticker]: delta }
+                )
+              }
+              onAddStock={(stock, shares) => handleAddStock(stock, shares)}
+              onSwap={(candidate, buyShares, removeTicker, sellShares) => {
+                handleAddStock(candidate, buyShares);
+                handleSellShares(removeTicker, sellShares ?? 0);
+              }}
+            />
+          </section>
+        )}
+
+        {/* Income Impact (full width, below combined panel) */}
+        {!showStockFinder && underperformers.length > 0 && (
+          <section className="mt-8 animate-fade-in" style={{ animationDelay: '350ms' }}>
+            <IncomeImpact
+              underperformers={underperformers}
+              sharesMap={Object.fromEntries(
+                (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+              )}
+              marketPool={liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks}
+              portfolioTickers={stocks.map((s) => s.ticker)}
+              targetYield={targetYield}
+              portfolioValue={portfolioStats.value}
+              portfolioIncome={portfolioStats.income}
+            />
+          </section>
+        )}
+
+        {/* "All meeting target" message when there are no underperformers */}
+        {!showStockFinder && stocks.length > 0 && underperformers.length === 0 && (
+          <section className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
+            <UnderperformersList
+              underperformers={underperformers}
+              selectedStock={selectedUnderperformer}
+              onSelectStock={(stock) => setSelectedUnderperformer(stock)}
+              targetYield={targetYield}
+            />
+          </section>
+        )}
+
         {/* Row 2: Portfolio cards + Suggested stocks */}
-        <div className={`grid ${showStockFinder ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8 mt-8`}>
-          <div className="lg:col-span-2">
+        <div className="mt-8">
+          <div>
+
             <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
                 <HelpTooltip text="This is the collection of stocks (investments) represented below." side="bottom">
@@ -422,7 +538,7 @@ const Index = () => {
                   {stockAnalyses.map((analysis, index) => (
                     <div
                       key={analysis.stock.ticker}
-                      className="animate-fade-in"
+                      className="animate-fade-in relative"
                       style={{ animationDelay: `${300 + index * 50}ms` }}
                     >
                       <StockCard
@@ -468,13 +584,40 @@ const Index = () => {
               <ReplacementSuggestions
                 removedStock={selectedUnderperformer}
                 candidates={replacements}
+                sharesYHeld={
+                  selectedUnderperformer
+                    ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                    : 0
+                }
+                targetYield={targetYield}
+                portfolioValue={portfolioStats.value}
+                portfolioIncome={portfolioStats.income}
+                onIncomeDeltaChange={(ticker, delta) =>
+                  setIncomeDeltaByTicker((prev) =>
+                    prev[ticker] === delta ? prev : { ...prev, [ticker]: delta }
+                  )
+                }
                 onAddStock={(stock, shares) => {
                   handleAddStock(stock, shares);
+                  setReplacementDialogOpen(false);
+                }}
+                onSwap={(candidate, buyShares, removeTicker, sellShares) => {
+                  handleAddStock(candidate, buyShares);
+                  handleSellShares(removeTicker, sellShares ?? 0);
                   setReplacementDialogOpen(false);
                 }}
               />
             </DialogContent>
           </Dialog>
+
+          <AddStockModal
+            existingTickers={stocks.map((s) => s.ticker)}
+            onAddStock={handleAddStock}
+            open={addStockOpen}
+            onOpenChange={setAddStockOpen}
+            suggestedStocks={liveMarketStocks}
+            targetYield={targetYield}
+          />
         </div>
       </main>
     </div>

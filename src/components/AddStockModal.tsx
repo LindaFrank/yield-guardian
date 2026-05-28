@@ -88,12 +88,14 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) resetAndClose(); else setOpen(true); }}>
-      <DialogTrigger asChild>
-        <Button variant="secondary" className="gap-2 border-[3px] border-muted-foreground/50">
-          <Search className="w-4 h-4" />
-          Search Stocks Generally
-        </Button>
-      </DialogTrigger>
+      {controlledOpen === undefined && (
+        <DialogTrigger asChild>
+          <Button variant="secondary" className="gap-2 border-[3px] border-muted-foreground/50">
+            <Search className="w-4 h-4" />
+            Search Stocks Generally
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-lg border-[3px] border-muted-foreground/60">
         <DialogHeader>
           <DialogTitle>
@@ -181,9 +183,6 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
 
         {phase === 'shares' && (
           <>
-            <p className="text-sm text-muted-foreground">
-              How many shares of each stock do you own?
-            </p>
 
             <div className="max-h-72 overflow-y-auto space-y-3 mt-2">
               {Array.from(selected.values()).map((result, idx) => {

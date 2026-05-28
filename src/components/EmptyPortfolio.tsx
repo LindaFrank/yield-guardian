@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-import { TrendingUp, DollarSign, Target, ChevronRight, Check, Hash, Loader2 } from 'lucide-react';
+import { TrendingUp, DollarSign, Target, ChevronRight, Check, Hash, Loader2, Search } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -125,10 +125,14 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Button onClick={() => setStep(1)} size="lg" className="gap-2">
               <Target className="w-5 h-5" />
-              Set Yield
+              Desired Dividend Yield
             </Button>
             <Button size="lg" onClick={() => setStep(1)} className="gap-2">
               Find Matching Stocks <ChevronRight className="w-4 h-4" />
+            </Button>
+            <Button size="lg" variant="outline" onClick={onSelectStocks} className="gap-2">
+              <Search className="w-5 h-5" />
+              General Stock Search
             </Button>
             {onAddStock && (
               <ImportStocksModal
@@ -251,6 +255,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             )}
             <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
             <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
+            <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
             {selectedTickers.size > 0 && (
               <Button className="gap-2" onClick={handleProceedToShares}>
                 Enter Shares for {selectedTickers.size} Stock{selectedTickers.size !== 1 ? 's' : ''} <ChevronRight className="w-4 h-4" />

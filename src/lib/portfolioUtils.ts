@@ -46,8 +46,11 @@ export function checkDividendStability(
     const yearPayments = paymentsByYear[year];
     const annualTotal = yearPayments.reduce((sum, p) => sum + p, 0);
 
-    // Require consistent quarterly payments in each completed year
-    if (yearPayments.length < 4) {
+    // Require the issuer actually paid that year (catches suspensions).
+    // We don't enforce exactly 4/year — MLPs, ADRs, and foreign payers often
+    // have 3 or 5 payments land in a calendar year due to timing, and that's
+    // fine as long as the annual total holds up (checked below).
+    if (yearPayments.length < 2) {
       hasDecline = true;
     }
 
@@ -120,8 +123,10 @@ export function suggestReplacements(
   targetMinYield: number,
   existingTickers: string[]
 ): ReplacementCandidate[] {
+  const heldSet = new Set(existingTickers);
   const vettedCandidates = marketData
-    .filter((stock) => !existingTickers.includes(stock.ticker))
+    // Always exclude the underperformer itself — replacing it with itself is a no-op.
+    .filter((stock) => stock.ticker !== removedStock.ticker)
     .map((stock) => {
       const currentYield = calculateDividendYield(stock);
       const stability = checkDividendStability(stock, 2, targetMinYield);
@@ -131,23 +136,33 @@ export function suggestReplacements(
       currentYield >= targetMinYield && stability.status === 'stable'
     )
     .map(({ stock, currentYield }) => {
-      const matchReason = stock.sector === removedStock.sector
-        ? `Same sector (${stock.sector}) — 2+ yrs stable`
-        : 'Vetted: 2+ yrs stable at target yield';
+      const alreadyHeld = heldSet.has(stock.ticker);
+      const matchReason = alreadyHeld
+        ? 'Already in your portfolio — diversification preferred'
+        : stock.sector === removedStock.sector
+          ? `Same sector (${stock.sector}) — 2+ yrs stable`
+          : 'Vetted: 2+ yrs stable at target yield';
       return {
         stock,
         yield: currentYield,
         stabilityScore: 3,
         matchReason,
+        alreadyHeld,
       };
     })
+    // Prefer diversification: new tickers first, then add-more options. Within each
+    // group, order by yield descending so the highest-yield candidate is on top.
     .sort((a, b) => {
-      if (a.stock.sector === removedStock.sector && b.stock.sector !== removedStock.sector) return -1;
-      if (b.stock.sector === removedStock.sector && a.stock.sector !== removedStock.sector) return 1;
+      if (!!a.alreadyHeld !== !!b.alreadyHeld) return a.alreadyHeld ? 1 : -1;
       return b.yield - a.yield;
     });
 
-  return vettedCandidates.slice(0, 5);
+  // Take top 5 fresh picks (diversification preferred), then append all
+  // viable already-held tickers so the user can still choose "add more of
+  // what I own" — e.g. ARCC stays selectable even when 5 fresh picks exist.
+  const fresh = vettedCandidates.filter((c) => !c.alreadyHeld).slice(0, 5);
+  const held = vettedCandidates.filter((c) => c.alreadyHeld);
+  return [...fresh, ...held];
 }
 
 export function formatCurrency(value: number): string {
