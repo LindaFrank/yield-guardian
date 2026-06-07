@@ -32,6 +32,13 @@ serve(async (req) => {
   try {
     const { action, tickers } = await req.json();
 
+    // Lightweight keep-alive ping — no FMP call, no DB call.
+    if (action === 'ping') {
+      return new Response(JSON.stringify({ ok: true, ts: Date.now() }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     if (!tickers || !Array.isArray(tickers) || tickers.length === 0) {
       return new Response(JSON.stringify({ error: 'tickers array required' }), {
         status: 400,
