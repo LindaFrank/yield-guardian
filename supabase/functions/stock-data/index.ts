@@ -43,6 +43,9 @@ serve(async (req) => {
       .map((t: string) => t.toUpperCase().replace(/[^A-Z0-9.-]/g, ''))
       .slice(0, 100);
 
+    // For search, preserve the raw query (so things like "AT&T" still match by name)
+    const rawQuery = typeof tickers[0] === 'string' ? tickers[0].trim() : '';
+
     const sb = getServiceClient();
 
     if (action === 'quote') {
@@ -144,7 +147,7 @@ serve(async (req) => {
     }
 
     if (action === 'search') {
-      const query = cleanTickers[0];
+      const query = rawQuery || cleanTickers[0];
       // Run both a symbol search and a direct quote lookup in parallel
       const [searchRes, quoteRes] = await Promise.all([
         fetch(`${FMP_BASE}/search-symbol?query=${encodeURIComponent(query)}&apikey=${apiKey}`),
