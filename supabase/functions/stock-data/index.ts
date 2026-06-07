@@ -152,11 +152,13 @@ serve(async (req) => {
 
       async function runSearch(q: string) {
         if (!q) return [] as any[];
+        console.log(`[search] querying FMP with q="${q}"`);
         const [searchRes, nameRes, quoteRes] = await Promise.all([
           fetch(`${FMP_BASE}/search-symbol?query=${encodeURIComponent(q)}&apikey=${apiKey}`),
           fetch(`${FMP_BASE}/search-name?query=${encodeURIComponent(q)}&apikey=${apiKey}`),
           fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(q)}&apikey=${apiKey}`),
         ]);
+        console.log(`[search] status sym=${searchRes.status} name=${nameRes.status} quote=${quoteRes.status}`);
         let acc: any[] = [];
         if (searchRes.ok) {
           const d = await searchRes.json();
