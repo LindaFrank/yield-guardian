@@ -147,49 +147,53 @@ serve(async (req) => {
     }
 
     if (action === 'search') {
-      const query = rawQuery || cleanTickers[0];
-      // Run symbol search, name search, and a direct quote lookup in parallel.
-      // Name search lets queries like "AT&T" match company names even when
-      // the symbol search returns nothing.
-      const [searchRes, nameRes, quoteRes] = await Promise.all([
-        fetch(`${FMP_BASE}/search-symbol?query=${encodeURIComponent(query)}&apikey=${apiKey}`),
-        fetch(`${FMP_BASE}/search-name?query=${encodeURIComponent(query)}&apikey=${apiKey}`),
-        fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(query)}&apikey=${apiKey}`),
-      ]);
+      const rawQ = rawQuery || cleanTickers[0] || '';
+      const sanitizedQ = rawQ.replace(/[^A-Za-z0-9.\- ]/g, ' ').replace(/\s+/g, ' ').trim();
 
-      let results: any[] = [];
-      if (searchRes.ok) {
-        const d = await searchRes.json();
-        if (Array.isArray(d)) results = d;
-      }
-
-      if (nameRes.ok) {
-        const d = await nameRes.json();
-        if (Array.isArray(d)) {
-          for (const item of d) {
-            if (item?.symbol && !results.some((r: any) => r.symbol === item.symbol)) {
-              results.push(item);
+      async function runSearch(q: string) {
+        if (!q) return [] as any[];
+        const [searchRes, nameRes, quoteRes] = await Promise.all([
+          fetch(`${FMP_BASE}/search-symbol?query=${encodeURIComponent(q)}&apikey=${apiKey}`),
+          fetch(`${FMP_BASE}/search-name?query=${encodeURIComponent(q)}&apikey=${apiKey}`),
+          fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(q)}&apikey=${apiKey}`),
+        ]);
+        let acc: any[] = [];
+        if (searchRes.ok) {
+          const d = await searchRes.json();
+          if (Array.isArray(d)) acc = d;
+        }
+        if (nameRes.ok) {
+          const d = await nameRes.json();
+          if (Array.isArray(d)) {
+            for (const item of d) {
+              if (item?.symbol && !acc.some((r: any) => r.symbol === item.symbol)) acc.push(item);
             }
           }
         }
+        if (quoteRes.ok) {
+          const qd = await quoteRes.json();
+          const quote = Array.isArray(qd) ? qd[0] : qd;
+          if (quote && quote.symbol) {
+            const idx = acc.findIndex((r: any) => r.symbol === quote.symbol);
+            const entry = {
+              symbol: quote.symbol,
+              name: quote.name,
+              currency: 'USD',
+              stockExchange: quote.exchange,
+              exchange: quote.exchange,
+            };
+            if (idx >= 0) acc.splice(idx, 1);
+            acc.unshift(entry);
+          }
+        }
+        return acc;
       }
 
-      // If the direct quote lookup found an exact match, prepend it
-      if (quoteRes.ok) {
-        const quoteData = await quoteRes.json();
-        const quote = Array.isArray(quoteData) ? quoteData[0] : quoteData;
-        if (quote && quote.symbol) {
-          const idx = results.findIndex((r: any) => r.symbol === quote.symbol);
-          const entry = {
-            symbol: quote.symbol,
-            name: quote.name,
-            currency: 'USD',
-            stockExchange: quote.exchange,
-            exchange: quote.exchange,
-          };
-          if (idx >= 0) results.splice(idx, 1);
-          results.unshift(entry);
-        }
+      let results = await runSearch(rawQ);
+      // Fallback: if the raw query had special chars and produced nothing,
+      // retry with a sanitized version (e.g. "AT&T" -> "AT T").
+      if (results.length === 0 && sanitizedQ && sanitizedQ !== rawQ) {
+        results = await runSearch(sanitizedQ);
       }
 
       return new Response(JSON.stringify(results), {
