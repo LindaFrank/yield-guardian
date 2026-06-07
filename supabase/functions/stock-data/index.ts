@@ -148,35 +148,47 @@ serve(async (req) => {
 
     if (action === 'search') {
       const query = rawQuery || cleanTickers[0];
-      // Run both a symbol search and a direct quote lookup in parallel
-      const [searchRes, quoteRes] = await Promise.all([
+      // Run symbol search, name search, and a direct quote lookup in parallel.
+      // Name search lets queries like "AT&T" match company names even when
+      // the symbol search returns nothing.
+      const [searchRes, nameRes, quoteRes] = await Promise.all([
         fetch(`${FMP_BASE}/search-symbol?query=${encodeURIComponent(query)}&apikey=${apiKey}`),
+        fetch(`${FMP_BASE}/search-name?query=${encodeURIComponent(query)}&apikey=${apiKey}`),
         fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(query)}&apikey=${apiKey}`),
       ]);
 
-      if (!searchRes.ok) {
-        throw new Error(`FMP search API failed [${searchRes.status}]: ${await searchRes.text()}`);
+      let results: any[] = [];
+      if (searchRes.ok) {
+        const d = await searchRes.json();
+        if (Array.isArray(d)) results = d;
       }
-      const searchData = await searchRes.json();
-      const results = Array.isArray(searchData) ? searchData : [];
+
+      if (nameRes.ok) {
+        const d = await nameRes.json();
+        if (Array.isArray(d)) {
+          for (const item of d) {
+            if (item?.symbol && !results.some((r: any) => r.symbol === item.symbol)) {
+              results.push(item);
+            }
+          }
+        }
+      }
 
       // If the direct quote lookup found an exact match, prepend it
       if (quoteRes.ok) {
         const quoteData = await quoteRes.json();
         const quote = Array.isArray(quoteData) ? quoteData[0] : quoteData;
         if (quote && quote.symbol) {
-          const alreadyInResults = results.some(
-            (r: any) => r.symbol === quote.symbol
-          );
-          if (!alreadyInResults) {
-            results.unshift({
-              symbol: quote.symbol,
-              name: quote.name,
-              currency: 'USD',
-              stockExchange: quote.exchange,
-              exchange: quote.exchange,
-            });
-          }
+          const idx = results.findIndex((r: any) => r.symbol === quote.symbol);
+          const entry = {
+            symbol: quote.symbol,
+            name: quote.name,
+            currency: 'USD',
+            stockExchange: quote.exchange,
+            exchange: quote.exchange,
+          };
+          if (idx >= 0) results.splice(idx, 1);
+          results.unshift(entry);
         }
       }
 
