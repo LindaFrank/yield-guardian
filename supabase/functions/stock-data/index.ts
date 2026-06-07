@@ -43,6 +43,9 @@ serve(async (req) => {
       .map((t: string) => t.toUpperCase().replace(/[^A-Z0-9.-]/g, ''))
       .slice(0, 100);
 
+    // For search, preserve the raw query (so things like "AT&T" still match by name)
+    const rawQuery = typeof tickers[0] === 'string' ? tickers[0].trim() : '';
+
     const sb = getServiceClient();
 
     if (action === 'quote') {
