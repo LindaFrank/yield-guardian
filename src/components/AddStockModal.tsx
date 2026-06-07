@@ -131,9 +131,12 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
               )}
 
               {search.length > 0 && !isLoading && filtered.length === 0 && (
-                <p className="text-center text-muted-foreground py-8 text-sm">
-                  No results found
-                </p>
+                <div className="text-center py-8 space-y-2">
+                  <p className="text-muted-foreground text-sm">No results found</p>
+                  <p className="text-muted-foreground/70 text-xs">
+                    Data provider may be temporarily unavailable — please try again later.
+                  </p>
+                </div>
               )}
 
               {filtered.map((result) => {
