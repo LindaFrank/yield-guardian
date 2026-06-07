@@ -147,7 +147,7 @@ serve(async (req) => {
     }
 
     if (action === 'search') {
-      const query = cleanTickers[0];
+      const query = rawQuery || cleanTickers[0];
       // Run both a symbol search and a direct quote lookup in parallel
       const [searchRes, quoteRes] = await Promise.all([
         fetch(`${FMP_BASE}/search-symbol?query=${encodeURIComponent(query)}&apikey=${apiKey}`),
