@@ -148,7 +148,7 @@ serve(async (req) => {
 
     if (action === 'search') {
       const rawQ = rawQuery || cleanTickers[0] || '';
-      const sanitizedQ = rawQ.replace(/[^A-Za-z0-9.\- ]/g, ' ').replace(/\s+/g, ' ').trim();
+      const sanitizedQ = rawQ.replace(/[^A-Za-z0-9.\-]/g, '').trim();
 
       async function runSearch(q: string) {
         if (!q) return [] as any[];
