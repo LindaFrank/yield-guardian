@@ -59,10 +59,18 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
     },
     {
       label: 'Your Portfolio Income Rate',
-      subtitle: avgYield >= targetYield ? 'You are meeting your goal' : 'You are below your goal',
+      subtitle: stocks.length === 0
+        ? 'Add stocks to see your rate'
+        : avgYield >= targetYield
+          ? 'You are meeting your goal'
+          : 'You are below your goal',
       value: formatPercentage(avgYield),
       icon: Target,
-      color: avgYield >= targetYield ? 'text-yield-positive' : 'text-yield-warning',
+      color: stocks.length === 0
+        ? 'text-muted-foreground'
+        : avgYield >= targetYield
+          ? 'text-yield-positive'
+          : 'text-yield-warning',
     },
     {
       label: 'Underperformers',
