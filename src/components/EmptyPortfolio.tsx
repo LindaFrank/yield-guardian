@@ -10,6 +10,7 @@ import { Stock } from '@/types/portfolio';
 import { marketStocks } from '@/data/mockData';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { useStockQuotes } from '@/hooks/useStockData';
+import { checkDividendStability } from '@/lib/portfolioUtils';
 
 interface EmptyPortfolioProps {
   onSelectStocks: () => void;
@@ -51,6 +52,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
     });
     return stocksToUse
       .filter((s) => s.computedYield >= localYield)
+      .filter((s) => checkDividendStability(s, 2, localYield).status === 'stable')
       .sort((a, b) => b.computedYield - a.computedYield);
   }, [localYield, liveStocks]);
 
