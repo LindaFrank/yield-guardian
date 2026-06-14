@@ -224,7 +224,12 @@ const Index = () => {
       .sort((a, b) => b.yield - a.yield);
 
     // In default mode (no underperformer), only show stocks above target yield
-    return scored.filter((c) => c.yield >= targetYield).slice(0, 5);
+    // AND that pass the 2-year stability + actively-paying (<=120 day) check.
+    // This prevents stocks like WBA (suspended dividend) from appearing as
+    // suggestions just because their trailing yield looks high.
+    return scored
+      .filter((c) => c.yield >= targetYield && c.stabilityScore === 3)
+      .slice(0, 5);
   }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks, candidatePool]);
 
   const handleRemoveStock = (ticker: string) => {
