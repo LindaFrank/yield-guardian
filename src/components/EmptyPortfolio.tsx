@@ -52,6 +52,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
     });
     return stocksToUse
       .filter((s) => s.computedYield >= localYield)
+      .filter((s) => checkDividendStability(s, 2, localYield).status === 'stable')
       .sort((a, b) => b.computedYield - a.computedYield);
   }, [localYield, liveStocks]);
 
