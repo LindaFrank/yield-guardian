@@ -54,6 +54,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <AppRoutes />
+          <Footer />
         </TooltipProvider>
       </HelpWizardProvider>
     </AuthProvider>
