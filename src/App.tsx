@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { HelpWizardProvider } from "@/contexts/HelpWizardContext";
 import { useKeepAlive } from "@/hooks/useKeepAlive";
+import { Footer } from "@/components/Footer";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -53,6 +54,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <AppRoutes />
+          <Footer />
         </TooltipProvider>
       </HelpWizardProvider>
     </AuthProvider>
