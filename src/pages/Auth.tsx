@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
 
 const TICKER_DATA = [
   { symbol: 'JNJ', yield: '3.12', up: true },
@@ -28,7 +29,9 @@ export default function Auth() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const { required: inviteRequired } = useInviteCodeRequired();
   const [autoLogging, setAutoLogging] = useState(!!adminKey);
   const [showForm, setShowForm] = useState(false);
   const { toast } = useToast();
@@ -61,6 +64,17 @@ export default function Auth() {
         if (error) toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
       } else if (mode === 'signup') {
         if (password.length < 8) { toast({ title: 'Password too short', description: 'Use at least 8 characters.', variant: 'destructive' }); setLoading(false); return; }
+        if (inviteRequired) {
+          if (!inviteCode.trim()) {
+            toast({ title: 'Invite code required', description: 'Enter the invite code you were sent.', variant: 'destructive' });
+            setLoading(false); return;
+          }
+          const { data: v, error: vErr } = await supabase.functions.invoke('validate-invite-code', { body: { code: inviteCode.trim() } });
+          if (vErr || !v?.valid) {
+            toast({ title: 'Invalid invite code', description: 'That code is not valid, expired, or already used.', variant: 'destructive' });
+            setLoading(false); return;
+          }
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
