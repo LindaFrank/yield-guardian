@@ -5,6 +5,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function randomCode(): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const group = (n: number) => Array.from({ length: n }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
+  return `YG-${group(4)}-${group(4)}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -19,7 +25,6 @@ Deno.serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const admin = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    // Verify caller and admin role
     const { data: userData, error: uErr } = await admin.auth.getUser(token);
     if (uErr || !userData.user) return json({ error: "Not authenticated" }, 401);
     const callerId = userData.user.id;
@@ -92,6 +97,62 @@ Deno.serve(async (req) => {
       } else {
         await admin.from("user_roles").insert({ user_id, role }).select();
       }
+      return json({ success: true });
+    }
+
+    // ----- Invite code management -----
+    if (action === "list_invite_codes") {
+      const { data, error } = await admin
+        .from("beta_invite_codes")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) return json({ error: error.message }, 500);
+      return json({ codes: data ?? [] });
+    }
+
+    if (action === "generate_invite_code") {
+      const { max_uses, expires_at } = body as { max_uses?: number; expires_at?: string | null };
+      let attempt = 0;
+      while (attempt < 5) {
+        const code = randomCode();
+        const { data, error } = await admin
+          .from("beta_invite_codes")
+          .insert({
+            code,
+            max_uses: Math.max(1, Math.min(1000, Number(max_uses) || 1)),
+            expires_at: expires_at ?? null,
+            created_by: callerId,
+          })
+          .select()
+          .maybeSingle();
+        if (!error) return json({ code: data });
+        attempt++;
+      }
+      return json({ error: "Could not generate a unique code" }, 500);
+    }
+
+    if (action === "revoke_invite_code") {
+      const { id } = body as { id?: string };
+      if (!id) return json({ error: "id required" }, 400);
+      const { error } = await admin.from("beta_invite_codes").update({ revoked: true }).eq("id", id);
+      if (error) return json({ error: error.message }, 500);
+      return json({ success: true });
+    }
+
+    if (action === "delete_invite_code") {
+      const { id } = body as { id?: string };
+      if (!id) return json({ error: "id required" }, 400);
+      const { error } = await admin.from("beta_invite_codes").delete().eq("id", id);
+      if (error) return json({ error: error.message }, 500);
+      return json({ success: true });
+    }
+
+    if (action === "set_require_invite_code") {
+      const { value } = body as { value?: boolean };
+      const { error } = await admin
+        .from("app_settings")
+        .upsert({ id: 1, require_invite_code: !!value, updated_at: new Date().toISOString() });
+      if (error) return json({ error: error.message }, 500);
       return json({ success: true });
     }
 
