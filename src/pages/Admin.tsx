@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
 import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck } from 'lucide-react';
 
@@ -12,6 +13,7 @@ type AdminUser = { id: string; email?: string; created_at: string; last_sign_in_
 
 export default function Admin() {
   const { isAdmin, isLoading } = useIsAdmin();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -30,10 +32,13 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    if (!isLoading && !isAdmin) navigate('/', { replace: true });
-    if (isAdmin) load();
+    if (authLoading) return;
+    if (!user) { navigate('/auth', { replace: true }); return; }
+    if (isLoading) return;
+    if (!isAdmin) { navigate('/', { replace: true }); return; }
+    load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin, isLoading]);
+  }, [isAdmin, isLoading, authLoading, user]);
 
   const createUser = async (e: React.FormEvent) => {
     e.preventDefault();
