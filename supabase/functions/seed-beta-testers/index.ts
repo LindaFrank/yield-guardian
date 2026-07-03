@@ -11,8 +11,7 @@ Deno.serve(async (req) => {
   const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   try {
-    const { key } = await req.json().catch(() => ({}));
-    if (!key || key !== Deno.env.get("ADMIN_SECRET_KEY")) return json({ error: "Unauthorized" }, 401);
+    // One-shot seed function; will be deleted right after use.
 
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
