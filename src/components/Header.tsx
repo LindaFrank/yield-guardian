@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { TrendingUp, LogOut, User } from 'lucide-react';
+import { TrendingUp, LogOut, User, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Button } from '@/components/ui/button';
 import { HelpIconToggle } from '@/components/HelpIconToggle';
 import { useQuery } from '@tanstack/react-query';
@@ -19,6 +20,7 @@ import {
 
 export function Header() {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
@@ -69,6 +71,12 @@ export function Header() {
               <HelpIconToggle />
               {user && (
                 <div className="flex items-center gap-3 ml-[100px]">
+                  {isAdmin && (
+                    <Button variant="outline" size="sm" onClick={() => navigate('/admin')} title="Admin console" className="gap-1.5">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span className="hidden sm:inline">Admin</span>
+                    </Button>
+                  )}
                   <button
                     onClick={() => navigate('/profile')}
                     className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors hidden sm:flex"
