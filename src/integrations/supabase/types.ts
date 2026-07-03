@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          id: number
+          require_invite_code: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          require_invite_code?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          require_invite_code?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      beta_invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          max_uses: number
+          revoked: boolean
+          updated_at: string
+          uses: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          revoked?: boolean
+          updated_at?: string
+          uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          revoked?: boolean
+          updated_at?: string
+          uses?: number
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -148,6 +202,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_invite_code: { Args: { _code: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
