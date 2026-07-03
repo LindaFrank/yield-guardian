@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.admin-users]
 verify_jwt = false
+
+[functions.validate-invite-code]
+verify_jwt = false
