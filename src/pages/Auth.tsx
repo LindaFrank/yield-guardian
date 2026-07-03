@@ -225,6 +225,13 @@ export default function Auth() {
                       <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} placeholder={mode === 'signup' ? 'At least 8 characters' : ''} />
                     </div>
                   )}
+                  {mode === 'signup' && inviteRequired && (
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium">Invite code</label>
+                      <Input type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value.toUpperCase())} placeholder="YG-XXXX-XXXX" required autoCapitalize="characters" />
+                      <p className="text-[11px] text-muted-foreground">Enter the invite code you were sent.</p>
+                    </div>
+                  )}
                   <Button type="submit" className="w-full group" disabled={loading}>
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
                       <>{cta}<ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" /></>
