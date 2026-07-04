@@ -148,9 +148,9 @@ export default function Admin() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-6 py-8 max-w-5xl">
-        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
-          <ArrowLeft className="w-4 h-4" /> Back to dashboard
-        </button>
+        <Button variant="outline" onClick={() => navigate('/')} className="mb-4">
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to dashboard
+        </Button>
         <div className="flex items-center gap-2 mb-6">
           <ShieldCheck className="w-6 h-6 text-primary" />
           <h1 className="text-2xl font-semibold">Admin Console</h1>
