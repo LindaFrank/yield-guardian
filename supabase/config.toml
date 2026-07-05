@@ -7,7 +7,10 @@ project_id = "swspkyagdxsambpqiguo"
     verify_jwt = false
   [functions.auth-email-hook]
     verify_jwt = false
-  [functions.process-email-queue]
-    verify_jwt = true
+[functions.process-email-queue]
+verify_jwt = true
+
+[functions.bootstrap-mindi]
+verify_jwt = false
   [functions.validate-invite-code]
     verify_jwt = false
