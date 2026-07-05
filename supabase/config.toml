@@ -1,13 +1,14 @@
 project_id = "swspkyagdxsambpqiguo"
 
-[functions.admin-login]
-verify_jwt = false
-
-[functions.admin-users]
-verify_jwt = false
-
-[functions.validate-invite-code]
-verify_jwt = false
-
+[functions]
+  [functions.admin-login]
+    verify_jwt = false
+  [functions.admin-users]
+    verify_jwt = false
+  [functions.auth-email-hook]
+    verify_jwt = false
 [functions.process-email-queue]
 verify_jwt = true
+
+  [functions.validate-invite-code]
+    verify_jwt = false
