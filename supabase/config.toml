@@ -10,7 +10,5 @@ project_id = "swspkyagdxsambpqiguo"
 [functions.process-email-queue]
 verify_jwt = true
 
-[functions.bootstrap-mindi]
-verify_jwt = false
   [functions.validate-invite-code]
     verify_jwt = false
