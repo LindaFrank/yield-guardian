@@ -106,17 +106,27 @@ export function UnderperformersPanel({
             />
 
             {selectedStock ? (
-              <ReplacementSuggestions
-                removedStock={selectedStock}
-                candidates={candidates}
-                sharesYHeld={sharesYHeld}
-                targetYield={targetYield}
-                portfolioValue={portfolioValue}
-                portfolioIncome={portfolioIncome}
-                onIncomeDeltaChange={onIncomeDeltaChange}
-                onAddStock={onAddStock}
-                onSwap={onSwap}
-              />
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => onSelectStock(null)}
+                  aria-label="Close replacement suggestions"
+                  className="absolute -top-2 -right-2 z-10 w-8 h-8 rounded-md border-[2px] border-muted-foreground/50 bg-secondary/80 backdrop-blur text-muted-foreground hover:text-foreground hover:border-muted-foreground/80 hover:bg-secondary transition-colors flex items-center justify-center shadow-card"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <ReplacementSuggestions
+                  removedStock={selectedStock}
+                  candidates={candidates}
+                  sharesYHeld={sharesYHeld}
+                  targetYield={targetYield}
+                  portfolioValue={portfolioValue}
+                  portfolioIncome={portfolioIncome}
+                  onIncomeDeltaChange={onIncomeDeltaChange}
+                  onAddStock={onAddStock}
+                  onSwap={onSwap}
+                />
+              </div>
             ) : (
               <div className="p-8 rounded-xl border-[4px] border-dashed border-muted-foreground/40 flex flex-col items-center justify-center text-center text-muted-foreground min-h-[200px]">
                 <MousePointerClick className="w-8 h-8 mb-3 opacity-60" />
