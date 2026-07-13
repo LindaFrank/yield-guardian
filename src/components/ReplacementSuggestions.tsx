@@ -146,7 +146,7 @@ export function ReplacementSuggestions({
 
       {removedStock && (
         <>
-          <div className="inline-flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50 w-[33.44rem] max-w-full">
+          <div className="inline-flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50 w-[35.11rem] max-w-full">
             <span className="font-mono text-sm text-muted-foreground">{removedStock.ticker}</span>
             <ArrowRight className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">Showing alternatives</span>
