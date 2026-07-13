@@ -8,7 +8,7 @@ import { TrendingDown, MousePointerClick, AlertTriangle, X } from 'lucide-react'
 interface UnderperformersPanelProps {
   underperformers: StockAnalysis[];
   selectedStock: Stock | null;
-  onSelectStock: (stock: Stock) => void;
+  onSelectStock: (stock: Stock | null) => void;
   targetYield: number;
   candidates: ReplacementCandidate[];
   sharesYHeld: number;
