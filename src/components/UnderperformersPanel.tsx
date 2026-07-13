@@ -111,9 +111,9 @@ export function UnderperformersPanel({
                   type="button"
                   onClick={() => onSelectStock(null)}
                   aria-label="Close replacement suggestions"
-                  className="absolute top-2 right-2 z-10 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  className="absolute top-2 right-2 z-10 w-6 h-6 flex items-center justify-center rounded-md border-[2px] border-muted-foreground/50 bg-secondary/80 backdrop-blur text-muted-foreground hover:text-foreground hover:border-muted-foreground/80 hover:bg-secondary transition-colors"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
                 <ReplacementSuggestions
                   removedStock={selectedStock}
