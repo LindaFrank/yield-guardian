@@ -75,6 +75,8 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
         'active:scale-[0.97]',
         isSelected && 'ring-2 ring-primary border-primary/40',
         isUnderperforming && 'border-yield-negative',
+        isStable === 'warning' && 'border-[hsl(var(--yield-warning)/0.6)] hover:border-[hsl(var(--yield-warning)/0.85)]',
+        isStable === 'unstable' && 'hover:border-[hsl(var(--yield-negative)/0.5)]',
         onSelect && 'cursor-pointer'
       )}
     >
