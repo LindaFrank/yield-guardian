@@ -509,8 +509,16 @@ const Index = () => {
               }
               onAddStock={(stock, shares) => handleAddStock(stock, shares)}
               onSwap={(candidate, buyShares, removeTicker, sellShares) => {
+                const fromStock = stocks.find((s) => s.ticker === removeTicker);
+                const sold = sellShares ?? 0;
+                const incomeDelta = (buyShares * candidate.annualDividend) - (sold * (fromStock?.annualDividend ?? 0));
+                const yieldDelta = (candidate.currentYield ?? 0) - (fromStock?.currentYield ?? 0);
+                if (user) logReplacementEvent({
+                  userId: user.id, fromTicker: removeTicker, toTicker: candidate.ticker,
+                  sharesSold: sold, sharesBought: buyShares, incomeDelta, yieldDelta,
+                });
                 handleAddStock(candidate, buyShares);
-                handleSellShares(removeTicker, sellShares ?? 0);
+                handleSellShares(removeTicker, sold);
               }}
             />
           </section>
