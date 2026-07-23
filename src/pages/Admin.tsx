@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
+import { AdminAnalytics } from '@/components/AdminAnalytics';
 import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck, Ticket, Copy, Ban, Plus } from 'lucide-react';
 
 type AdminUser = { id: string; email?: string; created_at: string; last_sign_in_at: string | null; roles: string[] };
