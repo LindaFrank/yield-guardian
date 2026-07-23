@@ -165,6 +165,23 @@ const Index = () => {
     return { value, income, newIncome, newYield };
   }, [stocks, stocksWithShares, totalIncomeGain]);
 
+  // Daily portfolio snapshot for admin analytics (avg improvement over time)
+  useEffect(() => {
+    if (!user || stocks.length === 0 || portfolioStats.value <= 0) return;
+    if (!markDailySnapshotLogged(user.id)) return;
+    const currentYield = portfolioStats.value > 0 ? (portfolioStats.income / portfolioStats.value) * 100 : 0;
+    logPortfolioSnapshot({
+      userId: user.id,
+      portfolioValue: portfolioStats.value,
+      annualIncome: portfolioStats.income,
+      weightedYield: currentYield,
+      numPositions: stocks.length,
+      numUnderperformers: underperformers.length,
+      reason: 'daily',
+    });
+  }, [user, stocks.length, portfolioStats.value, portfolioStats.income, underperformers.length]);
+
+
   // Build a live market stocks pool for replacement suggestions
   const liveMarketStocks = useMemo(() => {
     if (!liveCandidates || liveCandidates.length === 0) return [];
