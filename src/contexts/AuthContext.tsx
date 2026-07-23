@@ -23,10 +23,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const logged = new Set<string>();
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setSession(session);
         setLoading(false);
+        if (event === 'SIGNED_IN' && session?.user && !logged.has(session.user.id)) {
+          logged.add(session.user.id);
+          supabase.from('login_events').insert({
+            user_id: session.user.id,
+            user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+          }).then(() => {}, () => {});
+        }
       }
     );
 

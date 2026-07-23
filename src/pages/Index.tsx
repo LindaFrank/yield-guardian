@@ -30,6 +30,7 @@ import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
 
 
 const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
@@ -163,6 +164,23 @@ const Index = () => {
     const newYield = value > 0 ? (newIncome / value) * 100 : 0;
     return { value, income, newIncome, newYield };
   }, [stocks, stocksWithShares, totalIncomeGain]);
+
+  // Daily portfolio snapshot for admin analytics (avg improvement over time)
+  useEffect(() => {
+    if (!user || stocks.length === 0 || portfolioStats.value <= 0) return;
+    if (!markDailySnapshotLogged(user.id)) return;
+    const currentYield = portfolioStats.value > 0 ? (portfolioStats.income / portfolioStats.value) * 100 : 0;
+    logPortfolioSnapshot({
+      userId: user.id,
+      portfolioValue: portfolioStats.value,
+      annualIncome: portfolioStats.income,
+      weightedYield: currentYield,
+      numPositions: stocks.length,
+      numUnderperformers: underperformers.length,
+      reason: 'daily',
+    });
+  }, [user, stocks.length, portfolioStats.value, portfolioStats.income, underperformers.length]);
+
 
   // Build a live market stocks pool for replacement suggestions
   const liveMarketStocks = useMemo(() => {
@@ -491,8 +509,16 @@ const Index = () => {
               }
               onAddStock={(stock, shares) => handleAddStock(stock, shares)}
               onSwap={(candidate, buyShares, removeTicker, sellShares) => {
+                const fromStock = stocks.find((s) => s.ticker === removeTicker);
+                const sold = sellShares ?? 0;
+                const incomeDelta = (buyShares * candidate.annualDividend) - (sold * (fromStock?.annualDividend ?? 0));
+                const yieldDelta = (candidate.currentYield ?? 0) - (fromStock?.currentYield ?? 0);
+                if (user) logReplacementEvent({
+                  userId: user.id, fromTicker: removeTicker, toTicker: candidate.ticker,
+                  sharesSold: sold, sharesBought: buyShares, incomeDelta, yieldDelta,
+                });
                 handleAddStock(candidate, buyShares);
-                handleSellShares(removeTicker, sellShares ?? 0);
+                handleSellShares(removeTicker, sold);
               }}
             />
           </section>
@@ -607,8 +633,16 @@ const Index = () => {
                   setReplacementDialogOpen(false);
                 }}
                 onSwap={(candidate, buyShares, removeTicker, sellShares) => {
+                  const fromStock = stocks.find((s) => s.ticker === removeTicker);
+                  const sold = sellShares ?? 0;
+                  const incomeDelta = (buyShares * candidate.annualDividend) - (sold * (fromStock?.annualDividend ?? 0));
+                  const yieldDelta = (candidate.currentYield ?? 0) - (fromStock?.currentYield ?? 0);
+                  if (user) logReplacementEvent({
+                    userId: user.id, fromTicker: removeTicker, toTicker: candidate.ticker,
+                    sharesSold: sold, sharesBought: buyShares, incomeDelta, yieldDelta,
+                  });
                   handleAddStock(candidate, buyShares);
-                  handleSellShares(removeTicker, sellShares ?? 0);
+                  handleSellShares(removeTicker, sold);
                   setReplacementDialogOpen(false);
                 }}
               />

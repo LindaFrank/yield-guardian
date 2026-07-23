@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
+import { AdminAnalytics } from '@/components/AdminAnalytics';
 import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck, Ticket, Copy, Ban, Plus } from 'lucide-react';
 
 type AdminUser = { id: string; email?: string; created_at: string; last_sign_in_at: string | null; roles: string[] };
@@ -155,6 +156,8 @@ export default function Admin() {
           <ShieldCheck className="w-6 h-6 text-primary" />
           <h1 className="text-2xl font-semibold">Admin Console</h1>
         </div>
+        <AdminAnalytics />
+
 
         {/* Beta gate toggle */}
         <section className="gradient-card border border-border/50 rounded-xl p-6 mb-8">

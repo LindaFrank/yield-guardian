@@ -179,6 +179,63 @@ export type Database = {
         }
         Relationships: []
       }
+      login_events: {
+        Row: {
+          id: string
+          occurred_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          occurred_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          occurred_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      portfolio_snapshots: {
+        Row: {
+          annual_income: number | null
+          id: string
+          num_positions: number | null
+          num_underperformers: number | null
+          portfolio_value: number | null
+          reason: string | null
+          taken_at: string
+          user_id: string
+          weighted_yield: number | null
+        }
+        Insert: {
+          annual_income?: number | null
+          id?: string
+          num_positions?: number | null
+          num_underperformers?: number | null
+          portfolio_value?: number | null
+          reason?: string | null
+          taken_at?: string
+          user_id: string
+          weighted_yield?: number | null
+        }
+        Update: {
+          annual_income?: number | null
+          id?: string
+          num_positions?: number | null
+          num_underperformers?: number | null
+          portfolio_value?: number | null
+          reason?: string | null
+          taken_at?: string
+          user_id?: string
+          weighted_yield?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
@@ -212,6 +269,45 @@ export type Database = {
           target_yield?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      replacement_events: {
+        Row: {
+          from_ticker: string
+          id: string
+          income_delta: number | null
+          mode: string | null
+          occurred_at: string
+          shares_bought: number | null
+          shares_sold: number | null
+          to_ticker: string
+          user_id: string
+          yield_delta: number | null
+        }
+        Insert: {
+          from_ticker: string
+          id?: string
+          income_delta?: number | null
+          mode?: string | null
+          occurred_at?: string
+          shares_bought?: number | null
+          shares_sold?: number | null
+          to_ticker: string
+          user_id: string
+          yield_delta?: number | null
+        }
+        Update: {
+          from_ticker?: string
+          id?: string
+          income_delta?: number | null
+          mode?: string | null
+          occurred_at?: string
+          shares_bought?: number | null
+          shares_sold?: number | null
+          to_ticker?: string
+          user_id?: string
+          yield_delta?: number | null
         }
         Relationships: []
       }
@@ -287,6 +383,7 @@ export type Database = {
           id: string
           purchase_price: number | null
           shares_owned: number | null
+          source: string | null
           ticker: string
           user_id: string
         }
@@ -295,6 +392,7 @@ export type Database = {
           id?: string
           purchase_price?: number | null
           shares_owned?: number | null
+          source?: string | null
           ticker: string
           user_id: string
         }
@@ -303,6 +401,7 @@ export type Database = {
           id?: string
           purchase_price?: number | null
           shares_owned?: number | null
+          source?: string | null
           ticker?: string
           user_id?: string
         }
@@ -323,6 +422,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_admin_metrics: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
