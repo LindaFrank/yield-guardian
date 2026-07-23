@@ -156,6 +156,8 @@ export default function Admin() {
           <ShieldCheck className="w-6 h-6 text-primary" />
           <h1 className="text-2xl font-semibold">Admin Console</h1>
         </div>
+        <AdminAnalytics />
+
 
         {/* Beta gate toggle */}
         <section className="gradient-card border border-border/50 rounded-xl p-6 mb-8">
