@@ -41,21 +41,12 @@ Deno.serve(async (req) => {
     }
 
     if (!foundUser) {
-      const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-      });
-      if (createError) {
-        return new Response(JSON.stringify({ error: createError.message }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      return new Response(JSON.stringify({ success: true, created: true, user_id: created.user?.id }), {
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
 
     // Update password
