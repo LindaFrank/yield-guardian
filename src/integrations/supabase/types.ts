@@ -423,6 +423,7 @@ export type Database = {
         Returns: number
       }
       get_admin_metrics: { Args: never; Returns: Json }
+      get_require_invite_code: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
