@@ -8,7 +8,7 @@ export const GUIDED_EXPERIENCES = [
   {
     id: 'income-lift',
     icon: TrendingUp,
-    title: 'See the Income Lift',
+    title: 'Meet Susan and see what Yield Guardian can show her about her portfolio',
     blurb: 'Walk a sample portfolio from a 2.8% yield to 4.9% and see the dollar difference.',
   },
   {
