@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
+import { GuidedExperiencesMenu } from '@/components/GuidedExperiencesMenu';
+
 
 const TICKER_DATA = [
   { symbol: 'JNJ', yield: '3.12', up: true },
