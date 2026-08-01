@@ -183,6 +183,20 @@ export default function Auth() {
 
         <AnimatePresence>
           {showForm && (
+            <motion.div
+              className="w-full max-w-sm mb-4 flex justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.5 }}
+            >
+              <GuidedExperiencesMenu />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+
+          {showForm && (
             <motion.div className="w-full max-w-sm" initial={{ opacity: 0, y: 30, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', stiffness: 250, damping: 25 }}>
               <div className="relative gradient-card rounded-xl border border-border/50 shadow-elevated backdrop-blur-sm p-6">
                 <h2 className="text-lg font-semibold mb-4 text-center">{title}</h2>
