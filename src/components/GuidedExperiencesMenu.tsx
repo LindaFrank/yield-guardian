@@ -8,7 +8,7 @@ export const GUIDED_EXPERIENCES = [
   {
     id: 'income-lift',
     icon: TrendingUp,
-    title: 'See the Income Lift',
+    title: 'Meet Susan and see what Yield Guardian can show her about her portfolio',
     blurb: 'Walk a sample portfolio from a 2.8% yield to 4.9% and see the dollar difference.',
   },
   {
@@ -70,9 +70,9 @@ export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) =>
                   }
                   className="w-full text-left p-3 rounded-lg gradient-card border-2 border-border/60 hover:border-primary/60 transition-colors"
                 >
-                  <span className="flex items-center gap-2 text-sm font-medium">
-                    <Icon className="w-4 h-4 text-primary" />
-                    {title}
+                  <span className="flex items-start gap-2 text-sm font-medium">
+                    <Icon className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="leading-snug">{title}</span>
                   </span>
                   <span className="block text-[11px] text-muted-foreground mt-1 leading-snug">{blurb}</span>
                 </motion.button>
