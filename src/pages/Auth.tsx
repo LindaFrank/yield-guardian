@@ -257,18 +257,7 @@ export default function Auth() {
           )}
         </AnimatePresence>
 
-        <AnimatePresence>
-          {showForm && (
-            <motion.div
-              className="w-full max-w-sm mt-4 flex justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25, duration: 0.5 }}
-            >
-              <GuidedExperiencesMenu />
-            </motion.div>
-          )}
-        </AnimatePresence>
+
 
       </div>
     </div>
