@@ -14,10 +14,10 @@ export const GUIDED_EXPERIENCES = [
     loomId: '',
   },
   {
-    id: 'find-laggards',
-    icon: ShieldAlert,
-    title: 'Find the Laggards',
-    blurb: 'Spot which holdings are dragging income down and why they are flagged.',
+    id: 'first-portfolio',
+    icon: Rocket,
+    title: 'Meet Michael and see how he can set up his first stocks and his portfolio',
+    blurb: 'Start from zero — add tickers and shares, and watch a portfolio come together.',
     loomId: '',
   },
   {
