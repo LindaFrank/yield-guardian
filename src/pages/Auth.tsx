@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
-import { TrendingUp, ArrowRight, Loader2, BarChart3, Shield, Zap, Mail, Apple } from 'lucide-react';
+import { TrendingUp, ArrowRight, Loader2, BarChart3, Shield, Zap, Mail, Apple, LogIn, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
