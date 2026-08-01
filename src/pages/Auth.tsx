@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
+import { GuidedExperiencesMenu } from '@/components/GuidedExperiencesMenu';
+
 
 const TICKER_DATA = [
   { symbol: 'JNJ', yield: '3.12', up: true },
@@ -254,6 +256,20 @@ export default function Auth() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <AnimatePresence>
+          {showForm && (
+            <motion.div
+              className="w-full max-w-sm mt-4 flex justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25, duration: 0.5 }}
+            >
+              <GuidedExperiencesMenu />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </div>
     </div>
   );
