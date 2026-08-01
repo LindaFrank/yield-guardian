@@ -36,6 +36,7 @@ export default function Auth() {
   const { required: inviteRequired } = useInviteCodeRequired();
   const [autoLogging, setAutoLogging] = useState(!!adminKey);
   const [showForm, setShowForm] = useState(false);
+  const [signInOpen, setSignInOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
