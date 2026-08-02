@@ -90,23 +90,21 @@ export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) =>
       </AnimatePresence>
 
       <Dialog open={!!active} onOpenChange={(o) => !o && setActive(null)}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-base leading-snug pr-6">{active?.title}</DialogTitle>
+        <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
+          <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0">
+            <DialogTitle className="text-sm leading-snug pr-8 text-left">{active?.title}</DialogTitle>
           </DialogHeader>
           {active?.loomId ? (
-            <div className="relative w-full rounded-lg overflow-hidden border-2 border-border/60" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                title={active.title}
-                src={`https://www.loom.com/embed/${active.loomId}?hideEmbedTopBar=true`}
-                allowFullScreen
-                className="absolute inset-0 w-full h-full"
-                allow="fullscreen; picture-in-picture"
-              />
-            </div>
+            <iframe
+              title={active.title}
+              src={`https://www.loom.com/embed/${active.loomId}?hideEmbedTopBar=true&hide_owner=true&hide_share=true&hide_title=true&autoplay=1`}
+              allowFullScreen
+              className="flex-1 w-full bg-black"
+              allow="fullscreen; autoplay; picture-in-picture"
+            />
           ) : (
-            <div className="w-full aspect-video rounded-lg border-2 border-dashed border-border/60 flex flex-col items-center justify-center gap-2 text-center px-6">
-              <Video className="w-8 h-8 text-primary" />
+            <div className="flex-1 w-full flex flex-col items-center justify-center gap-2 text-center px-6">
+              <Video className="w-10 h-10 text-primary" />
               <p className="text-sm font-medium">Video coming soon</p>
               <p className="text-xs text-muted-foreground max-w-sm">
                 Record this walkthrough in Loom, then drop the video ID into this experience to play it right here.
@@ -115,6 +113,7 @@ export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) =>
           )}
         </DialogContent>
       </Dialog>
+
     </div>
   );
 });
