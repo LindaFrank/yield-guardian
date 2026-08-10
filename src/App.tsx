@@ -14,7 +14,9 @@ import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
+import Unsubscribe from "./pages/Unsubscribe";
 import NotFound from "./pages/NotFound";
+
 
 const queryClient = new QueryClient();
 

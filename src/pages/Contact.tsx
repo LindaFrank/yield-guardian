@@ -46,11 +46,15 @@ export default function Contact() {
     }
 
     setSending(true);
-    const { error } = await supabase.from('contact_messages').insert({
-      name: trimmedName,
-      email: trimmedEmail,
-      message: trimmedMessage,
-    });
+    const { data: inserted, error } = await supabase
+      .from('contact_messages')
+      .insert({
+        name: trimmedName,
+        email: trimmedEmail,
+        message: trimmedMessage,
+      })
+      .select('id')
+      .maybeSingle();
     setSending(false);
 
     if (error) {
@@ -58,7 +62,18 @@ export default function Contact() {
       return;
     }
 
+    // Fire-and-forget confirmation email to the sender
+    supabase.functions.invoke('send-transactional-email', {
+      body: {
+        templateName: 'contact-confirmation',
+        recipientEmail: trimmedEmail,
+        idempotencyKey: `contact-confirm-${inserted?.id ?? trimmedEmail}`,
+        templateData: { name: trimmedName, message: trimmedMessage },
+      },
+    }).catch(() => {});
+
     toast({ title: 'Message sent!', description: 'Thanks for reaching out. We\'ll get back to you soon.' });
+
     setName('');
     setEmail('');
     setMessage('');
