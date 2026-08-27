@@ -27,35 +27,53 @@ import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
-import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares } from '@/hooks/usePortfolio';
+import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
 
 
-const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
 const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
 
 const Index = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
   const addTicker = useAddTicker();
   const removeTicker = useRemoveTicker();
   const updateShares = useUpdateShares();
   const { data: stocksWithShares } = useUserStocksWithShares();
 
-  // Use saved tickers if logged in and loaded, otherwise defaults
+  // Guest mode: no account — portfolio lives in local state for this session only
+  const isGuest = !user;
+  const [guestTickers, setGuestTickers] = useState<string[]>([]);
+  const [guestShares, setGuestShares] = useState<Record<string, number | null>>({});
+
+  const setGuestShareValue = useCallback((ticker: string, shares: number | null) => {
+    setGuestShares((prev) => ({ ...prev, [ticker]: shares }));
+  }, []);
+
+  // Use saved tickers if logged in and loaded, otherwise the guest session list
   const tickers = useMemo(() => {
-    if (!user) return DEFAULT_TICKERS;
+    if (isGuest) return guestTickers;
     if (tickersLoading) return [];
     return savedTickers && savedTickers.length > 0 ? savedTickers : [];
-  }, [user, tickersLoading, savedTickers]);
+  }, [isGuest, guestTickers, tickersLoading, savedTickers]);
+
+  const sharesList = useMemo<UserStockEntry[]>(() => {
+    if (isGuest) {
+      return guestTickers.map((ticker) => ({ ticker, shares_owned: guestShares[ticker] ?? null }));
+    }
+    return stocksWithShares ?? [];
+  }, [isGuest, guestTickers, guestShares, stocksWithShares]);
 
   // Candidate tickers = market stocks NOT already in the portfolio
   const candidateTickers = useMemo(
     () => ALL_MARKET_TICKERS.filter((t) => !tickers.includes(t)),
     [tickers]
   );
+
 
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
@@ -69,7 +87,8 @@ const Index = () => {
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
-  const wizardDone = wizardDismissed || (!tickersLoading && tickers.length > 0);
+  const portfolioLoading = isGuest ? false : tickersLoading;
+  const wizardDone = wizardDismissed || (!portfolioLoading && tickers.length > 0);
   const showStockFinder = !wizardDone || showFindStocksFlow;
   const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
@@ -151,7 +170,7 @@ const Index = () => {
   // Current portfolio dividend income & projected new yield after applying gains
   const portfolioStats = useMemo(() => {
     const sharesMap = Object.fromEntries(
-      (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+      sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
     );
     let value = 0;
     let income = 0;
@@ -258,18 +277,26 @@ const Index = () => {
     // Any previously-previewed income deltas referenced the prior portfolio
     // composition; invalidate them so "New portfolio yield" stays accurate.
     setIncomeDeltaByTicker({});
-    if (user) {
-      removeTicker.mutate(ticker);
+    if (isGuest) {
+      setGuestTickers((prev) => prev.filter((t) => t !== ticker));
+      setGuestShares((prev) => {
+        const next = { ...prev };
+        delete next[ticker];
+        return next;
+      });
+      return;
     }
+    removeTicker.mutate(ticker);
   };
 
   const handleSellShares = (ticker: string, sellShares: number) => {
-    const currentShares = stocksWithShares?.find((s) => s.ticker === ticker)?.shares_owned ?? 0;
+    const currentShares = sharesList.find((s) => s.ticker === ticker)?.shares_owned ?? 0;
     const remainingShares = Math.max(0, currentShares - Math.floor(sellShares));
 
     setIncomeDeltaByTicker({});
     if (remainingShares > 0) {
-      if (user) updateShares.mutate({ ticker, shares: remainingShares });
+      if (isGuest) setGuestShareValue(ticker, remainingShares);
+      else updateShares.mutate({ ticker, shares: remainingShares });
       return;
     }
 
@@ -282,7 +309,10 @@ const Index = () => {
       // Invalidate stale projected gains — they were computed against the
       // previous portfolio value/income.
       setIncomeDeltaByTicker({});
-      if (user) {
+      if (isGuest) {
+        setGuestTickers((prev) => (prev.includes(stock.ticker) ? prev : [...prev, stock.ticker]));
+        if (shares !== undefined) setGuestShareValue(stock.ticker, shares);
+      } else {
         addTicker.mutate({ ticker: stock.ticker, shares });
       }
     }
@@ -299,24 +329,42 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       
       <Header />
+
+      {isGuest && (
+        <div className="border-b-2 border-primary/30 bg-primary/5">
+          <div className="container mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              <span className="font-semibold text-foreground">Guest analysis</span> — analyze any portfolio without an account. Nothing is saved when you leave.
+            </p>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
+                Sign in
+              </Button>
+              <Button size="sm" className="shadow-glow" onClick={() => navigate('/auth')}>
+                Save my portfolio
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}
         <HelpTooltip text="This is used to display instructions or messages." side="bottom">
           <div className="mb-4">
-            {(isLoading || tickersLoading) && (
+            {(isLoading || portfolioLoading) && (
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
                 Fetching live market data…
               </div>
             )}
-            {!isLoading && !tickersLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
+            {!isLoading && !portfolioLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
                 Live data · Refreshes every 5 min
               </div>
             )}
-            {!isLoading && !tickersLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
+            {!isLoading && !portfolioLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
                 Waiting for live feed…
@@ -354,7 +402,7 @@ const Index = () => {
           <PortfolioStats
             stocks={stocks}
             sharesMap={Object.fromEntries(
-              (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+              sharesList.map(s => [s.ticker, s.shares_owned])
             )}
             targetYield={targetYield}
             underperformerCount={underperformers.length}
@@ -400,12 +448,11 @@ const Index = () => {
                 </Button>
                 <ImportStocksModal
                   existingTickers={stocks.map((s) => s.ticker)}
-                  existingShares={stocksWithShares?.map(s => ({ ticker: s.ticker, shares: s.shares_owned })) ?? []}
+                  existingShares={sharesList.map(s => ({ ticker: s.ticker, shares: s.shares_owned }))}
                   onAddStock={handleAddStock}
                   onUpdateShares={(ticker, shares) => {
-                    if (user) {
-                      updateShares.mutate({ ticker, shares });
-                    }
+                    if (isGuest) setGuestShareValue(ticker, shares);
+                    else updateShares.mutate({ ticker, shares });
                   }}
                 />
                 <Button
@@ -448,7 +495,7 @@ const Index = () => {
                           await generatePortfolioReport({
                             stocks,
                             sharesMap: Object.fromEntries(
-                              (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                              sharesList.map(s => [s.ticker, s.shares_owned])
                             ),
                             targetYield,
                             underperformers,
@@ -476,7 +523,7 @@ const Index = () => {
           <IncomeYTD
             stocks={stocks}
             sharesMap={Object.fromEntries(
-              (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+              sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
             )}
           />
           <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
@@ -497,7 +544,7 @@ const Index = () => {
               candidates={replacements}
               sharesYHeld={
                 selectedUnderperformer
-                  ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                  ? sharesList.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
                   : 0
               }
               portfolioValue={portfolioStats.value}
@@ -530,7 +577,7 @@ const Index = () => {
             <IncomeImpact
               underperformers={underperformers}
               sharesMap={Object.fromEntries(
-                (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+                sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
               )}
               marketPool={liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks}
               portfolioTickers={stocks.map((s) => s.ticker)}
@@ -574,11 +621,14 @@ const Index = () => {
                     >
                       <StockCard
                         analysis={analysis}
-                        sharesOwned={stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
+                        sharesOwned={sharesList.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
                         onRemove={handleRemoveStock}
                         onSelect={analysis.isUnderperforming ? handleSelectUnderperformer : undefined}
                         onUpdateShares={(ticker, shares) => {
-                          if (user) {
+                          if (isGuest) {
+                            setGuestShareValue(ticker, shares);
+                            toast({ title: 'Shares updated', description: `${ticker} set to ${shares ?? 0} shares.` });
+                          } else {
                             updateShares.mutate(
                               { ticker, shares },
                               {
@@ -617,7 +667,7 @@ const Index = () => {
                 candidates={replacements}
                 sharesYHeld={
                   selectedUnderperformer
-                    ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                    ? sharesList.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
                     : 0
                 }
                 targetYield={targetYield}
