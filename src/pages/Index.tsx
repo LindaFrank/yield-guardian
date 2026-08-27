@@ -44,18 +44,35 @@ const Index = () => {
   const updateShares = useUpdateShares();
   const { data: stocksWithShares } = useUserStocksWithShares();
 
-  // Use saved tickers if logged in and loaded, otherwise defaults
+  // Guest mode: no account — portfolio lives in local state for this session only
+  const isGuest = !user;
+  const [guestTickers, setGuestTickers] = useState<string[]>([]);
+  const [guestShares, setGuestShares] = useState<Record<string, number | null>>({});
+
+  const setGuestShareValue = useCallback((ticker: string, shares: number | null) => {
+    setGuestShares((prev) => ({ ...prev, [ticker]: shares }));
+  }, []);
+
+  // Use saved tickers if logged in and loaded, otherwise the guest session list
   const tickers = useMemo(() => {
-    if (!user) return DEFAULT_TICKERS;
+    if (isGuest) return guestTickers;
     if (tickersLoading) return [];
     return savedTickers && savedTickers.length > 0 ? savedTickers : [];
-  }, [user, tickersLoading, savedTickers]);
+  }, [isGuest, guestTickers, tickersLoading, savedTickers]);
+
+  const sharesList = useMemo<UserStockEntry[]>(() => {
+    if (isGuest) {
+      return guestTickers.map((ticker) => ({ ticker, shares_owned: guestShares[ticker] ?? null }));
+    }
+    return stocksWithShares ?? [];
+  }, [isGuest, guestTickers, guestShares, stocksWithShares]);
 
   // Candidate tickers = market stocks NOT already in the portfolio
   const candidateTickers = useMemo(
     () => ALL_MARKET_TICKERS.filter((t) => !tickers.includes(t)),
     [tickers]
   );
+
 
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
