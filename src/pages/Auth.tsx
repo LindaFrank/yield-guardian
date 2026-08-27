@@ -185,15 +185,27 @@ export default function Auth() {
         <AnimatePresence>
           {showForm && (
             <motion.div
-              className="w-full max-w-sm mb-4 flex justify-center"
+              className="w-full max-w-sm mb-4 flex flex-col items-center gap-3"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.5 }}
             >
+              <Button
+                type="button"
+                className="w-full justify-between border-2 border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow"
+                onClick={() => navigate('/try')}
+              >
+                <span className="flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4" />
+                  Analyze a portfolio — no account needed
+                </span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
               <GuidedExperiencesMenu />
             </motion.div>
           )}
         </AnimatePresence>
+
 
         <AnimatePresence>
 
