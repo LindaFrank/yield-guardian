@@ -241,7 +241,41 @@ function parseLine(line: string, source: ParseSource): ParsedRow | undefined {
   };
 }
 
+/**
+ * Handles labeled/pipe-delimited exports such as:
+ *   AAPL | Apple | SHARES: 60 | PRICE: $309.90 | VALUE: $18,594.00
+ * These often wrap across lines, so we scan the whole document.
+ */
+const LABELED_ROW_RE =
+  /\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\s*\|[^|]*\|\s*(?:SHARES|SHS|QTY|QUANTITY|UNITS)\s*[:=]?\s*([\d,]+(?:\.\d+)?)/gi;
+
+function parseLabeledRows(text: string): ParsedRow[] {
+  const rows: ParsedRow[] = [];
+  const normalized = text.replace(/\r?\n/g, ' ');
+  LABELED_ROW_RE.lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = LABELED_ROW_RE.exec(normalized)) !== null) {
+    const ticker = normalizeTickerToken(match[1]);
+    if (!ticker || NOISE_WORDS.has(ticker) || BLOCKED_TICKER_WORDS.has(ticker)) continue;
+    if (!KNOWN_TICKERS.has(ticker) && !/^[A-Z]{1,5}(?:\.[A-Z]{1,2})?$/.test(ticker)) continue;
+
+    const shares = parseNumber(match[2]);
+    rows.push({
+      ticker,
+      shares: shares !== undefined && shares > 0 ? shares : undefined,
+      raw: match[0].replace(/\s+/g, ' ').trim(),
+    });
+  }
+
+  return rows;
+}
+
 export function parseTextLines(text: string, options: ParseTextOptions = {}): ParsedRow[] {
+  const labeled = parseLabeledRows(text);
+  if (labeled.length) return labeled;
+
+
   const rows: ParsedRow[] = [];
   const source = options.source ?? 'text';
   const lines = text.split(/\r?\n/);
