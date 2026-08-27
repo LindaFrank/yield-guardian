@@ -48,7 +48,7 @@ export const SamplePortfolioViewer = forwardRef<HTMLDivElement>((_props, ref) =>
         onClick={() => setOpen(true)}
       >
         <FileText className="w-3.5 h-3.5 text-primary" />
-        View the sample portfolio file
+        View Susan's sample portfolio file
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -56,7 +56,7 @@ export const SamplePortfolioViewer = forwardRef<HTMLDivElement>((_props, ref) =>
           <DialogHeader className="px-5 py-3 border-b border-border/60">
             <DialogTitle className="flex items-center gap-2 text-base">
               <Eye className="w-4 h-4 text-primary" />
-              Sample Portfolio — 24 Stocks
+              Susan's Sample Portfolio — 24 Stocks
             </DialogTitle>
             <DialogDescription className="text-xs flex items-center gap-1.5">
               <Lock className="w-3 h-3" />
