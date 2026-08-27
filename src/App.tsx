@@ -41,7 +41,9 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/try" element={<Index />} />
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
