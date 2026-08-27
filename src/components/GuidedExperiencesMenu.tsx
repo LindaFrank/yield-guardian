@@ -65,24 +65,25 @@ export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) =>
               {GUIDED_EXPERIENCES.map((exp, i) => {
                 const Icon = exp.icon;
                 return (
-                  <motion.button
-                    key={exp.id}
-                    type="button"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 * i }}
-                    onClick={() => setActive(exp)}
-                    className="w-full text-left p-3 rounded-lg gradient-card border-2 border-border/60 hover:border-primary/60 transition-colors"
-                  >
-                    <span className="flex items-start gap-2 text-sm font-medium">
-                      <Icon className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                      <span className="leading-snug">{exp.title}</span>
-                    </span>
-                    <span className="block text-[11px] text-muted-foreground mt-1 leading-snug">{exp.blurb}</span>
-                  </motion.button>
+                  <div key={exp.id} className="space-y-2">
+                    <motion.button
+                      type="button"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.05 * i }}
+                      onClick={() => setActive(exp)}
+                      className="w-full text-left p-3 rounded-lg gradient-card border-2 border-border/60 hover:border-primary/60 transition-colors"
+                    >
+                      <span className="flex items-start gap-2 text-sm font-medium">
+                        <Icon className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        <span className="leading-snug">{exp.title}</span>
+                      </span>
+                      <span className="block text-[11px] text-muted-foreground mt-1 leading-snug">{exp.blurb}</span>
+                    </motion.button>
+                    {exp.id === 'income-lift' && <SamplePortfolioViewer />}
+                  </div>
                 );
               })}
-              <SamplePortfolioViewer />
               <p className="text-[10px] text-muted-foreground text-center pt-1">
                 Short guided videos — no sign-in required.
               </p>
