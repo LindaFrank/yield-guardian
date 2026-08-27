@@ -81,6 +81,7 @@ export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) =>
                   </motion.button>
                 );
               })}
+              <SamplePortfolioViewer />
               <p className="text-[10px] text-muted-foreground text-center pt-1">
                 Short guided videos — no sign-in required.
               </p>
