@@ -29,6 +29,7 @@ import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
 
@@ -37,6 +38,7 @@ const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
 
 const Index = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
   const addTicker = useAddTicker();
   const removeTicker = useRemoveTicker();
@@ -85,7 +87,8 @@ const Index = () => {
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
-  const wizardDone = wizardDismissed || (!tickersLoading && tickers.length > 0);
+  const portfolioLoading = isGuest ? false : tickersLoading;
+  const wizardDone = wizardDismissed || (!portfolioLoading && tickers.length > 0);
   const showStockFinder = !wizardDone || showFindStocksFlow;
   const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
@@ -326,24 +329,42 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       
       <Header />
+
+      {isGuest && (
+        <div className="border-b-2 border-primary/30 bg-primary/5">
+          <div className="container mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              <span className="font-semibold text-foreground">Guest analysis</span> — analyze any portfolio without an account. Nothing is saved when you leave.
+            </p>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
+                Sign in
+              </Button>
+              <Button size="sm" className="shadow-glow" onClick={() => navigate('/auth')}>
+                Save my portfolio
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}
         <HelpTooltip text="This is used to display instructions or messages." side="bottom">
           <div className="mb-4">
-            {(isLoading || tickersLoading) && (
+            {(isLoading || portfolioLoading) && (
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
                 Fetching live market data…
               </div>
             )}
-            {!isLoading && !tickersLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
+            {!isLoading && !portfolioLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
                 Live data · Refreshes every 5 min
               </div>
             )}
-            {!isLoading && !tickersLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
+            {!isLoading && !portfolioLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
                 Waiting for live feed…
