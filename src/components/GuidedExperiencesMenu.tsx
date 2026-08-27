@@ -9,7 +9,7 @@ export const GUIDED_EXPERIENCES = [
     id: 'income-lift',
     icon: TrendingUp,
     title: 'Meet Susan and see what Yield Guardian can show her about her portfolio',
-    blurb: 'Walk a sample portfolio from a 2.8% yield to 4.9% and see the dollar difference.',
+    blurb: 'Import her portfolio and see information about performance.',
     // Paste the Loom video ID here (the part after /share/ in the Loom URL)
     loomId: '',
   },
