@@ -151,7 +151,7 @@ const Index = () => {
   // Current portfolio dividend income & projected new yield after applying gains
   const portfolioStats = useMemo(() => {
     const sharesMap = Object.fromEntries(
-      (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+      sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
     );
     let value = 0;
     let income = 0;
@@ -264,7 +264,7 @@ const Index = () => {
   };
 
   const handleSellShares = (ticker: string, sellShares: number) => {
-    const currentShares = stocksWithShares?.find((s) => s.ticker === ticker)?.shares_owned ?? 0;
+    const currentShares = sharesList.find((s) => s.ticker === ticker)?.shares_owned ?? 0;
     const remainingShares = Math.max(0, currentShares - Math.floor(sellShares));
 
     setIncomeDeltaByTicker({});
@@ -354,7 +354,7 @@ const Index = () => {
           <PortfolioStats
             stocks={stocks}
             sharesMap={Object.fromEntries(
-              (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+              sharesList.map(s => [s.ticker, s.shares_owned])
             )}
             targetYield={targetYield}
             underperformerCount={underperformers.length}
@@ -400,7 +400,7 @@ const Index = () => {
                 </Button>
                 <ImportStocksModal
                   existingTickers={stocks.map((s) => s.ticker)}
-                  existingShares={stocksWithShares?.map(s => ({ ticker: s.ticker, shares: s.shares_owned })) ?? []}
+                  existingShares={sharesList.map(s => ({ ticker: s.ticker, shares: s.shares_owned }))}
                   onAddStock={handleAddStock}
                   onUpdateShares={(ticker, shares) => {
                     if (user) {
@@ -448,7 +448,7 @@ const Index = () => {
                           await generatePortfolioReport({
                             stocks,
                             sharesMap: Object.fromEntries(
-                              (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+                              sharesList.map(s => [s.ticker, s.shares_owned])
                             ),
                             targetYield,
                             underperformers,
@@ -476,7 +476,7 @@ const Index = () => {
           <IncomeYTD
             stocks={stocks}
             sharesMap={Object.fromEntries(
-              (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+              sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
             )}
           />
           <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
@@ -497,7 +497,7 @@ const Index = () => {
               candidates={replacements}
               sharesYHeld={
                 selectedUnderperformer
-                  ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                  ? sharesList.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
                   : 0
               }
               portfolioValue={portfolioStats.value}
@@ -530,7 +530,7 @@ const Index = () => {
             <IncomeImpact
               underperformers={underperformers}
               sharesMap={Object.fromEntries(
-                (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+                sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
               )}
               marketPool={liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks}
               portfolioTickers={stocks.map((s) => s.ticker)}
@@ -574,7 +574,7 @@ const Index = () => {
                     >
                       <StockCard
                         analysis={analysis}
-                        sharesOwned={stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
+                        sharesOwned={sharesList.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
                         onRemove={handleRemoveStock}
                         onSelect={analysis.isUnderperforming ? handleSelectUnderperformer : undefined}
                         onUpdateShares={(ticker, shares) => {
@@ -617,7 +617,7 @@ const Index = () => {
                 candidates={replacements}
                 sharesYHeld={
                   selectedUnderperformer
-                    ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                    ? sharesList.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
                     : 0
                 }
                 targetYield={targetYield}
