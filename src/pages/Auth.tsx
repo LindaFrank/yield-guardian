@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 import { TrendingUp, ArrowRight, Loader2, BarChart3, Shield, Zap, Mail, Apple, LogIn, ChevronDown } from 'lucide-react';
@@ -26,6 +26,7 @@ type Mode = 'signin' | 'signup' | 'forgot';
 
 export default function Auth() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const adminKey = searchParams.get('key');
   const [mode, setMode] = useState<Mode>('signin');
   const [name, setName] = useState('');
