@@ -27,13 +27,12 @@ import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { useStockQuotes } from '@/hooks/useStockData';
-import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares } from '@/hooks/usePortfolio';
+import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
 
 
-const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
 const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
 
 const Index = () => {
@@ -275,9 +274,16 @@ const Index = () => {
     // Any previously-previewed income deltas referenced the prior portfolio
     // composition; invalidate them so "New portfolio yield" stays accurate.
     setIncomeDeltaByTicker({});
-    if (user) {
-      removeTicker.mutate(ticker);
+    if (isGuest) {
+      setGuestTickers((prev) => prev.filter((t) => t !== ticker));
+      setGuestShares((prev) => {
+        const next = { ...prev };
+        delete next[ticker];
+        return next;
+      });
+      return;
     }
+    removeTicker.mutate(ticker);
   };
 
   const handleSellShares = (ticker: string, sellShares: number) => {
@@ -286,7 +292,8 @@ const Index = () => {
 
     setIncomeDeltaByTicker({});
     if (remainingShares > 0) {
-      if (user) updateShares.mutate({ ticker, shares: remainingShares });
+      if (isGuest) setGuestShareValue(ticker, remainingShares);
+      else updateShares.mutate({ ticker, shares: remainingShares });
       return;
     }
 
@@ -299,7 +306,10 @@ const Index = () => {
       // Invalidate stale projected gains — they were computed against the
       // previous portfolio value/income.
       setIncomeDeltaByTicker({});
-      if (user) {
+      if (isGuest) {
+        setGuestTickers((prev) => (prev.includes(stock.ticker) ? prev : [...prev, stock.ticker]));
+        if (shares !== undefined) setGuestShareValue(stock.ticker, shares);
+      } else {
         addTicker.mutate({ ticker: stock.ticker, shares });
       }
     }
@@ -420,9 +430,8 @@ const Index = () => {
                   existingShares={sharesList.map(s => ({ ticker: s.ticker, shares: s.shares_owned }))}
                   onAddStock={handleAddStock}
                   onUpdateShares={(ticker, shares) => {
-                    if (user) {
-                      updateShares.mutate({ ticker, shares });
-                    }
+                    if (isGuest) setGuestShareValue(ticker, shares);
+                    else updateShares.mutate({ ticker, shares });
                   }}
                 />
                 <Button
@@ -595,7 +604,10 @@ const Index = () => {
                         onRemove={handleRemoveStock}
                         onSelect={analysis.isUnderperforming ? handleSelectUnderperformer : undefined}
                         onUpdateShares={(ticker, shares) => {
-                          if (user) {
+                          if (isGuest) {
+                            setGuestShareValue(ticker, shares);
+                            toast({ title: 'Shares updated', description: `${ticker} set to ${shares ?? 0} shares.` });
+                          } else {
                             updateShares.mutate(
                               { ticker, shares },
                               {
