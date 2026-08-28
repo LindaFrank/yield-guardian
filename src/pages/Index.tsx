@@ -327,16 +327,10 @@ const Index = () => {
     setReplacementDialogOpen(true);
   };
 
-  useEffect(() => {
-    return () => {
-      if (reportUrl) URL.revokeObjectURL(reportUrl);
-    };
-  }, [reportUrl]);
-
   const handleGenerateReport = async () => {
     setReportGenerating(true);
     try {
-      const blob = await generatePortfolioReport({
+      const pdfDataUrl = await generatePortfolioReport({
         stocks,
         sharesMap: Object.fromEntries(
           sharesList.map((s) => [s.ticker, s.shares_owned])
@@ -346,13 +340,42 @@ const Index = () => {
         getReplacements: (stock) =>
           suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map((s) => s.ticker)),
       });
-      setReportUrl(URL.createObjectURL(blob));
+      setReportUrl(pdfDataUrl);
     } catch (err) {
       console.error('Report generation failed:', err);
       toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
     } finally {
       setReportGenerating(false);
     }
+  };
+
+  const handleDownloadReport = () => {
+    if (!reportUrl) return;
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = reportUrl;
+    downloadLink.download = `yield-guardian-portfolio-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+  };
+
+  const handleOpenReport = () => {
+    if (!reportUrl) return;
+
+    const reportWindow = window.open('', '_blank');
+    if (!reportWindow) {
+      toast({
+        title: 'Allow pop-ups to open the report',
+        description: 'You can still use Download PDF to save it directly.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    reportWindow.document.open();
+    reportWindow.document.write(`<!doctype html><html><head><title>Yield Guardian Portfolio Report</title><style>html,body,iframe{width:100%;height:100%;margin:0;border:0}body{overflow:hidden}</style></head><body><iframe title="Portfolio report" src="${reportUrl}"></iframe></body></html>`);
+    reportWindow.document.close();
   };
 
   return (
@@ -722,17 +745,13 @@ const Index = () => {
               {reportUrl && (
                 <>
                   <div className="flex flex-wrap gap-2">
-                    <Button asChild>
-                      <a href={reportUrl} download="portfolio-report.pdf">
-                        <FileDown className="w-4 h-4" />
-                        Download PDF
-                      </a>
+                    <Button onClick={handleDownloadReport}>
+                      <FileDown className="w-4 h-4" />
+                      Download PDF
                     </Button>
-                    <Button variant="outline" asChild>
-                      <a href={reportUrl} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4" />
-                        Open PDF
-                      </a>
+                    <Button variant="outline" onClick={handleOpenReport}>
+                      <ExternalLink className="w-4 h-4" />
+                      Open PDF
                     </Button>
                   </div>
                   <iframe
