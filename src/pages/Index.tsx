@@ -364,23 +364,6 @@ const Index = () => {
     window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
   };
 
-  const handleSaveReport = async () => {
-    if (!reportBytes) return;
-    const filename = `yield-guardian-portfolio-report-${new Date().toISOString().slice(0, 10)}.pdf`;
-    const file = new File([reportBytes.slice()], filename, { type: 'application/pdf' });
-
-    if (navigator.share && navigator.canShare?.({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: 'Yield Guardian Portfolio Report' });
-        return;
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-      }
-    }
-
-    handleDownloadReport();
-  };
-
   return (
     <div className="min-h-screen bg-background">
       
@@ -749,11 +732,11 @@ const Index = () => {
               {reportBytes && (
                 <>
                   <div className="flex flex-wrap gap-2">
-                    <Button onClick={() => void handleSaveReport()}>
+                    <Button onClick={handleDownloadReport}>
                       <FileDown className="w-4 h-4" />
-                      Save PDF
+                      Download PDF
                     </Button>
-                    <p className="self-center text-xs text-muted-foreground">On Safari, choose “Save to Files” in the share sheet.</p>
+                    <p className="self-center text-xs text-muted-foreground">The report will be saved to your Downloads folder.</p>
                   </div>
                   <PdfReportPreview bytes={reportBytes} />
                 </>
