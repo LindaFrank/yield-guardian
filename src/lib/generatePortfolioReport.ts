@@ -9,7 +9,7 @@ interface ReportData {
   getReplacements: (stock: Stock) => ReplacementCandidate[];
 }
 
-export async function generatePortfolioReport(data: ReportData): Promise<void> {
+export async function generatePortfolioReport(data: ReportData): Promise<Blob> {
   const { jsPDF } = await import('jspdf');
   const { default: autoTable } = await import('jspdf-autotable');
 
@@ -194,20 +194,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
     doc.text('Dividend Tracker — Portfolio Report', 14, doc.internal.pageSize.getHeight() - 8);
   }
 
-  // Download via an anchor, and additionally try opening a new tab (previews
-  // sometimes block downloads). Never navigate the current window/top frame.
-  const blob = doc.output('blob');
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'portfolio-report.pdf';
-  link.rel = 'noopener';
-  link.target = '_blank';
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  // Return the finished document so the UI can display it first. A subsequent
+  // real click on Download/Open works reliably in Safari and embedded previews.
+  return doc.output('blob');
 }

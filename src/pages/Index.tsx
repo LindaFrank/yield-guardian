@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft, Search } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft, Search, ExternalLink, Loader2 } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -82,6 +82,8 @@ const Index = () => {
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
   const [actionBarExpanded, setActionBarExpanded] = useState(false);
+  const [reportGenerating, setReportGenerating] = useState(false);
+  const [reportUrl, setReportUrl] = useState<string | null>(null);
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
@@ -325,6 +327,34 @@ const Index = () => {
     setReplacementDialogOpen(true);
   };
 
+  useEffect(() => {
+    return () => {
+      if (reportUrl) URL.revokeObjectURL(reportUrl);
+    };
+  }, [reportUrl]);
+
+  const handleGenerateReport = async () => {
+    setReportGenerating(true);
+    try {
+      const blob = await generatePortfolioReport({
+        stocks,
+        sharesMap: Object.fromEntries(
+          sharesList.map((s) => [s.ticker, s.shares_owned])
+        ),
+        targetYield,
+        underperformers,
+        getReplacements: (stock) =>
+          suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map((s) => s.ticker)),
+      });
+      setReportUrl(URL.createObjectURL(blob));
+    } catch (err) {
+      console.error('Report generation failed:', err);
+      toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
+    } finally {
+      setReportGenerating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       
@@ -490,26 +520,11 @@ const Index = () => {
                     <Button
                       variant="outline"
                       className="gap-1.5 border-[3px] border-muted-foreground/50"
-                      onClick={async () => {
-                        try {
-                          await generatePortfolioReport({
-                            stocks,
-                            sharesMap: Object.fromEntries(
-                              sharesList.map(s => [s.ticker, s.shares_owned])
-                            ),
-                            targetYield,
-                            underperformers,
-                            getReplacements: (stock) =>
-                              suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
-                          });
-                        } catch (err) {
-                          console.error('Report generation failed:', err);
-                          toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
-                        }
-                      }}
+                      onClick={handleGenerateReport}
+                      disabled={reportGenerating}
                     >
-                      <FileDown className="w-3.5 h-3.5" />
-                      Report
+                      {reportGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
+                      {reportGenerating ? 'Creating Report…' : 'Report'}
                     </Button>
                   </>
                 )}
@@ -696,6 +711,37 @@ const Index = () => {
                   setReplacementDialogOpen(false);
                 }}
               />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={Boolean(reportUrl)} onOpenChange={(open) => !open && setReportUrl(null)}>
+            <DialogContent className="max-w-5xl h-[88vh] flex flex-col overflow-hidden">
+              <DialogHeader>
+                <DialogTitle>Portfolio Report</DialogTitle>
+              </DialogHeader>
+              {reportUrl && (
+                <>
+                  <div className="flex flex-wrap gap-2">
+                    <Button asChild>
+                      <a href={reportUrl} download="portfolio-report.pdf">
+                        <FileDown className="w-4 h-4" />
+                        Download PDF
+                      </a>
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <a href={reportUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4" />
+                        Open PDF
+                      </a>
+                    </Button>
+                  </div>
+                  <iframe
+                    src={reportUrl}
+                    title="Portfolio report preview"
+                    className="min-h-0 flex-1 w-full rounded border-2 border-border bg-muted"
+                  />
+                </>
+              )}
             </DialogContent>
           </Dialog>
 
