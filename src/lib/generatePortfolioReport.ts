@@ -194,34 +194,20 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
     doc.text('Dividend Tracker — Portfolio Report', 14, doc.internal.pageSize.getHeight() - 8);
   }
 
-  // Preview/iframe environments often block automatic downloads, so try a
-  // download link first and fall back to opening the PDF in a new tab.
+  // Download via an anchor, and additionally try opening a new tab (previews
+  // sometimes block downloads). Never navigate the current window/top frame.
   const blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
 
-  try {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'portfolio-report.pdf';
-    link.rel = 'noopener';
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  } catch {
-    // ignore, fallback below
-  }
-
-  // Always offer a viewable window as a fallback (sandboxed iframes ignore downloads).
-  const opened = window.open(url, '_blank');
-  if (!opened) {
-    // Last resort: navigate the top window to the PDF.
-    try {
-      (window.top ?? window).location.href = url;
-    } catch {
-      window.location.href = url;
-    }
-  }
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'portfolio-report.pdf';
+  link.rel = 'noopener';
+  link.target = '_blank';
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
