@@ -9,7 +9,7 @@ interface ReportData {
   getReplacements: (stock: Stock) => ReplacementCandidate[];
 }
 
-export async function generatePortfolioReport(data: ReportData): Promise<Blob> {
+export async function generatePortfolioReport(data: ReportData): Promise<string> {
   const { jsPDF } = await import('jspdf');
   const { default: autoTable } = await import('jspdf-autotable');
 
@@ -194,7 +194,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<Blob> {
     doc.text('Dividend Tracker — Portfolio Report', 14, doc.internal.pageSize.getHeight() - 8);
   }
 
-  // Return the finished document so the UI can display it first. A subsequent
-  // real click on Download/Open works reliably in Safari and embedded previews.
-  return doc.output('blob');
+  // A self-contained data URL avoids Safari's blank `blob:` tabs when the app
+  // is running inside an embedded preview.
+  return doc.output('datauristring');
 }
