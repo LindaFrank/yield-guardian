@@ -74,11 +74,11 @@ export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) =>
                       onClick={() => setActive(exp)}
                       className="w-full text-left p-3 rounded-lg gradient-card border-2 border-border/60 hover:border-primary/60 transition-colors"
                     >
-                      <span className="flex items-start gap-2 text-sm font-medium">
+                      <span className="flex items-start gap-2 text-base font-medium">
                         <Icon className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                         <span className="leading-snug">{exp.title}</span>
                       </span>
-                      <span className="block text-[11px] text-muted-foreground mt-1 leading-snug">{exp.blurb}</span>
+                      <span className="block text-[13px] text-muted-foreground mt-1 leading-snug">{exp.blurb}</span>
                     </motion.button>
                     {exp.id === 'income-lift' && <SamplePortfolioViewer />}
                   </div>
