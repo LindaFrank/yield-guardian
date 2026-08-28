@@ -12,7 +12,7 @@ export const GUIDED_EXPERIENCES = [
     title: 'Meet Susan and see what Yield Guardian can show her about her portfolio',
     blurb: 'Import her portfolio and see information about performance.',
     // Paste the Loom video ID here (the part after /share/ in the Loom URL)
-    loomId: '',
+    loomId: '2494ecce7e354cc4b1e77a62fdbaae37',
   },
   {
     id: 'first-portfolio',
