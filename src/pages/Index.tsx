@@ -352,16 +352,17 @@ const Index = () => {
 
   const handleDownloadReport = () => {
     if (!reportBytes) return;
-
-    const reportBlob = new Blob([reportBytes.slice()], { type: 'application/pdf' });
-    const downloadLink = document.createElement('a');
-    const objectUrl = URL.createObjectURL(reportBlob);
-    downloadLink.href = objectUrl;
-    downloadLink.download = `yield-guardian-portfolio-report-${new Date().toISOString().slice(0, 10)}.pdf`;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    downloadLink.remove();
-    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
+    const filename = `yield-guardian-portfolio-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let offset = 0; offset < reportBytes.length; offset += chunkSize) {
+      binary += String.fromCharCode(...reportBytes.subarray(offset, offset + chunkSize));
+    }
+    window.localStorage.setItem(
+      'yield-guardian-report-download',
+      JSON.stringify({ filename, base64: window.btoa(binary) }),
+    );
+    window.open(`${window.location.origin}/download-report`, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -736,7 +737,7 @@ const Index = () => {
                       <FileDown className="w-4 h-4" />
                       Download PDF
                     </Button>
-                    <p className="self-center text-xs text-muted-foreground">The report will be saved to your Downloads folder.</p>
+                    <p className="self-center text-xs text-muted-foreground">Opens a download page outside the embedded preview.</p>
                   </div>
                   <PdfReportPreview bytes={reportBytes} />
                 </>
