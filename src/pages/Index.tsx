@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft, Search, ExternalLink, Loader2 } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
@@ -26,6 +26,7 @@ import { AddStockModal } from '@/components/AddStockModal';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
+import { PdfReportPreview } from '@/components/PdfReportPreview';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
@@ -83,7 +84,7 @@ const Index = () => {
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
   const [actionBarExpanded, setActionBarExpanded] = useState(false);
   const [reportGenerating, setReportGenerating] = useState(false);
-  const [reportUrl, setReportUrl] = useState<string | null>(null);
+  const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
@@ -330,7 +331,7 @@ const Index = () => {
   const handleGenerateReport = async () => {
     setReportGenerating(true);
     try {
-      const pdfDataUrl = await generatePortfolioReport({
+      const pdfBytes = await generatePortfolioReport({
         stocks,
         sharesMap: Object.fromEntries(
           sharesList.map((s) => [s.ticker, s.shares_owned])
@@ -340,7 +341,7 @@ const Index = () => {
         getReplacements: (stock) =>
           suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map((s) => s.ticker)),
       });
-      setReportUrl(pdfDataUrl);
+      setReportBytes(pdfBytes);
     } catch (err) {
       console.error('Report generation failed:', err);
       toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
@@ -350,32 +351,34 @@ const Index = () => {
   };
 
   const handleDownloadReport = () => {
-    if (!reportUrl) return;
+    if (!reportBytes) return;
 
+    const reportBlob = new Blob([reportBytes.slice()], { type: 'application/pdf' });
     const downloadLink = document.createElement('a');
-    downloadLink.href = reportUrl;
+    const objectUrl = URL.createObjectURL(reportBlob);
+    downloadLink.href = objectUrl;
     downloadLink.download = `yield-guardian-portfolio-report-${new Date().toISOString().slice(0, 10)}.pdf`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     downloadLink.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
   };
 
-  const handleOpenReport = () => {
-    if (!reportUrl) return;
+  const handleSaveReport = async () => {
+    if (!reportBytes) return;
+    const filename = `yield-guardian-portfolio-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+    const file = new File([reportBytes.slice()], filename, { type: 'application/pdf' });
 
-    const reportWindow = window.open('', '_blank');
-    if (!reportWindow) {
-      toast({
-        title: 'Allow pop-ups to open the report',
-        description: 'You can still use Download PDF to save it directly.',
-        variant: 'destructive',
-      });
-      return;
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'Yield Guardian Portfolio Report' });
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+      }
     }
 
-    reportWindow.document.open();
-    reportWindow.document.write(`<!doctype html><html><head><title>Yield Guardian Portfolio Report</title><style>html,body,iframe{width:100%;height:100%;margin:0;border:0}body{overflow:hidden}</style></head><body><iframe title="Portfolio report" src="${reportUrl}"></iframe></body></html>`);
-    reportWindow.document.close();
+    handleDownloadReport();
   };
 
   return (
@@ -737,28 +740,22 @@ const Index = () => {
             </DialogContent>
           </Dialog>
 
-          <Dialog open={Boolean(reportUrl)} onOpenChange={(open) => !open && setReportUrl(null)}>
+          <Dialog open={Boolean(reportBytes)} onOpenChange={(open) => !open && setReportBytes(null)}>
             <DialogContent className="max-w-5xl h-[88vh] flex flex-col overflow-hidden">
               <DialogHeader>
                 <DialogTitle>Portfolio Report</DialogTitle>
+                <DialogDescription>Review the report below, then save the PDF to your device.</DialogDescription>
               </DialogHeader>
-              {reportUrl && (
+              {reportBytes && (
                 <>
                   <div className="flex flex-wrap gap-2">
-                    <Button onClick={handleDownloadReport}>
+                    <Button onClick={() => void handleSaveReport()}>
                       <FileDown className="w-4 h-4" />
-                      Download PDF
+                      Save PDF
                     </Button>
-                    <Button variant="outline" onClick={handleOpenReport}>
-                      <ExternalLink className="w-4 h-4" />
-                      Open PDF
-                    </Button>
+                    <p className="self-center text-xs text-muted-foreground">On Safari, choose “Save to Files” in the share sheet.</p>
                   </div>
-                  <iframe
-                    src={reportUrl}
-                    title="Portfolio report preview"
-                    className="min-h-0 flex-1 w-full rounded border-2 border-border bg-muted"
-                  />
+                  <PdfReportPreview bytes={reportBytes} />
                 </>
               )}
             </DialogContent>

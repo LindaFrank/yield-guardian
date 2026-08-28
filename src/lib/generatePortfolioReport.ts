@@ -9,7 +9,7 @@ interface ReportData {
   getReplacements: (stock: Stock) => ReplacementCandidate[];
 }
 
-export async function generatePortfolioReport(data: ReportData): Promise<string> {
+export async function generatePortfolioReport(data: ReportData): Promise<Uint8Array> {
   const { jsPDF } = await import('jspdf');
   const { default: autoTable } = await import('jspdf-autotable');
 
@@ -194,7 +194,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<string>
     doc.text('Dividend Tracker — Portfolio Report', 14, doc.internal.pageSize.getHeight() - 8);
   }
 
-  // A self-contained data URL avoids Safari's blank `blob:` tabs when the app
-  // is running inside an embedded preview.
-  return doc.output('datauristring');
+  // Return the bytes rather than a data/blob URL. Embedded Safari previews
+  // commonly block those URLs before the PDF viewer can read them.
+  return new Uint8Array(doc.output('arraybuffer'));
 }
