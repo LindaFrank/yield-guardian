@@ -30,9 +30,11 @@ import { PdfReportPreview } from '@/components/PdfReportPreview';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
+import { SubscriptionModal, loadPendingGuestPortfolio, clearPendingGuestPortfolio } from '@/components/SubscriptionModal';
+import { supabase } from '@/integrations/supabase/client';
 
 
 const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
@@ -86,6 +88,8 @@ const Index = () => {
   const [reportGenerating, setReportGenerating] = useState(false);
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
   const [quickStartOpen, setQuickStartOpen] = useState(false);
+  const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
@@ -151,6 +155,42 @@ const Index = () => {
       });
     }
   }, [error]);
+
+  // After a successful checkout from the guest "Save my portfolio" flow,
+  // persist the guest portfolio to the newly-subscribed user's account.
+  useEffect(() => {
+    const checkoutSuccess = searchParams.get('checkout') === 'success';
+    if (!checkoutSuccess || !user) return;
+
+    const pending = loadPendingGuestPortfolio();
+    if (!pending || pending.tickers.length === 0) {
+      clearPendingGuestPortfolio();
+      searchParams.delete('checkout');
+      searchParams.delete('session_id');
+      setSearchParams(searchParams, { replace: true });
+      return;
+    }
+
+    let saved = 0;
+    const save = async () => {
+      for (const ticker of pending.tickers) {
+        const shares = pending.shares[ticker] ?? null;
+        const { error } = await supabase
+          .from('user_stocks')
+          .insert({ user_id: user.id, ticker, shares_owned: shares });
+        if (!error) saved++;
+      }
+      clearPendingGuestPortfolio();
+      searchParams.delete('checkout');
+      searchParams.delete('session_id');
+      setSearchParams(searchParams, { replace: true });
+      toast({
+        title: 'Portfolio saved',
+        description: `${saved} of ${pending.tickers.length} holdings saved to your account. Welcome to Yield Guardian!`,
+      });
+    };
+    save();
+  }, [searchParams, setSearchParams, user, toast]);
 
   const stockAnalyses = useMemo(
     () => stocks.map((stock) => analyzeStock(stock, targetYield)),
@@ -384,7 +424,7 @@ const Index = () => {
               <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
                 Quick Start Guide
               </Button>
-              <Button size="sm" className="shadow-glow" onClick={() => navigate('/auth')}>
+              <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
                 Save my portfolio
               </Button>
             </div>
@@ -771,6 +811,13 @@ const Index = () => {
             onOpenChange={setAddStockOpen}
             suggestedStocks={liveMarketStocks}
             targetYield={targetYield}
+          />
+
+          <SubscriptionModal
+            open={subscriptionOpen}
+            onOpenChange={setSubscriptionOpen}
+            guestTickers={tickers}
+            guestShares={guestShares}
           />
         </div>
       </main>

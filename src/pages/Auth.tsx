@@ -156,7 +156,7 @@ export default function Auth() {
           <AnimatePresence>
             {!showForm && (
               <motion.div className="flex flex-wrap justify-center gap-3 mt-6" exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={{ duration: 0.4 }}>
-                {[{ icon: BarChart3, label: 'Live Yield Analysis' }, { icon: Shield, label: 'Underperformer Detection' }, { icon: Zap, label: 'Smart Replacements' }].map(({ icon: Icon, label }, i) => (
+                {[{ icon: BarChart3, label: 'Live Yield Analysis' }, { icon: Shield, label: 'Underperformer Detection' }, { icon: Zap, label: 'Smart replacement alternatives' }].map(({ icon: Icon, label }, i) => (
                   <motion.div key={label} className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border/50 text-sm text-muted-foreground backdrop-blur-sm"
                     initial={{ opacity: 0, y: 15, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ delay: 0.7 + i * 0.15, type: 'spring', stiffness: 300, damping: 25 }}>
