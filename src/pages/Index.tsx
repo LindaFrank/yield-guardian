@@ -30,9 +30,10 @@ import { PdfReportPreview } from '@/components/PdfReportPreview';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
+import { SubscriptionModal, loadPendingGuestPortfolio, clearPendingGuestPortfolio } from '@/components/SubscriptionModal';
 
 
 const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
