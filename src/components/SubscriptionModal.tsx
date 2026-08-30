@@ -219,6 +219,12 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                 <Label htmlFor="sub-password">Password</Label>
                 <Input id="sub-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} placeholder="At least 8 characters" />
               </div>
+              {authMode === 'signup' && inviteRequired && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="sub-invite">Invite code</Label>
+                  <Input id="sub-invite" type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} required={authMode === 'signup'} maxLength={100} placeholder="Enter your invite code" />
+                </div>
+              )}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (authMode === 'signup' ? 'Create account & continue' : 'Sign in & continue')}
               </Button>
