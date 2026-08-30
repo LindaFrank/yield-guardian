@@ -34,6 +34,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
 import { SubscriptionModal, loadPendingGuestPortfolio, clearPendingGuestPortfolio } from '@/components/SubscriptionModal';
+import { supabase } from '@/integrations/supabase/client';
 
 
 const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
