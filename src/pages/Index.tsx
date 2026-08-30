@@ -85,6 +85,7 @@ const Index = () => {
   const [actionBarExpanded, setActionBarExpanded] = useState(false);
   const [reportGenerating, setReportGenerating] = useState(false);
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
+  const [quickStartOpen, setQuickStartOpen] = useState(false);
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
