@@ -85,6 +85,7 @@ const Index = () => {
   const [actionBarExpanded, setActionBarExpanded] = useState(false);
   const [reportGenerating, setReportGenerating] = useState(false);
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
+  const [quickStartOpen, setQuickStartOpen] = useState(false);
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
@@ -380,6 +381,9 @@ const Index = () => {
               <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
                 Sign in
               </Button>
+              <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
+                Quick Start Guide
+              </Button>
               <Button size="sm" className="shadow-glow" onClick={() => navigate('/auth')}>
                 Save my portfolio
               </Button>
@@ -387,6 +391,21 @@ const Index = () => {
           </div>
         </div>
       )}
+
+      <Dialog open={quickStartOpen} onOpenChange={(o) => setQuickStartOpen(o)}>
+        <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
+          <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0">
+            <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start Guide</DialogTitle>
+          </DialogHeader>
+          <iframe
+            title="Quick Start Guide"
+            src="https://www.loom.com/embed/1264e9fbaf324ff5af3379af17396e63?hideEmbedTopBar=true&hide_owner=true&hide_share=true&hide_title=true&autoplay=1"
+            allowFullScreen
+            className="flex-1 w-full bg-black"
+            allow="fullscreen; autoplay; picture-in-picture"
+          />
+        </DialogContent>
+      </Dialog>
       
       <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}
