@@ -380,6 +380,9 @@ const Index = () => {
               <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
                 Sign in
               </Button>
+              <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
+                Quick Start Guide
+              </Button>
               <Button size="sm" className="shadow-glow" onClick={() => navigate('/auth')}>
                 Save my portfolio
               </Button>
