@@ -811,6 +811,13 @@ const Index = () => {
             suggestedStocks={liveMarketStocks}
             targetYield={targetYield}
           />
+
+          <SubscriptionModal
+            open={subscriptionOpen}
+            onOpenChange={setSubscriptionOpen}
+            guestTickers={tickers}
+            guestShares={shares}
+          />
         </div>
       </main>
     </div>
