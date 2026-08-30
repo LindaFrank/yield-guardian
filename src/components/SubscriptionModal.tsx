@@ -95,6 +95,19 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
           setLoading(false);
           return;
         }
+        if (inviteRequired) {
+          if (!inviteCode.trim()) {
+            toast({ title: 'Invite code required', description: 'Enter the invite code you were sent.', variant: 'destructive' });
+            setLoading(false);
+            return;
+          }
+          const { data: v, error: vErr } = await supabase.functions.invoke('validate-invite-code', { body: { code: inviteCode.trim() } });
+          if (vErr || !v?.valid) {
+            toast({ title: 'Invalid invite code', description: 'That code is not valid, expired, or already used.', variant: 'destructive' });
+            setLoading(false);
+            return;
+          }
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
