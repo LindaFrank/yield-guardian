@@ -155,6 +155,42 @@ const Index = () => {
     }
   }, [error]);
 
+  // After a successful checkout from the guest "Save my portfolio" flow,
+  // persist the guest portfolio to the newly-subscribed user's account.
+  useEffect(() => {
+    const checkoutSuccess = searchParams.get('checkout') === 'success';
+    if (!checkoutSuccess || !user) return;
+
+    const pending = loadPendingGuestPortfolio();
+    if (!pending || pending.tickers.length === 0) {
+      clearPendingGuestPortfolio();
+      searchParams.delete('checkout');
+      searchParams.delete('session_id');
+      setSearchParams(searchParams, { replace: true });
+      return;
+    }
+
+    let saved = 0;
+    const save = async () => {
+      for (const ticker of pending.tickers) {
+        const shares = pending.shares[ticker] ?? null;
+        const { error } = await supabase
+          .from('user_stocks')
+          .insert({ user_id: user.id, ticker, shares_owned: shares });
+        if (!error) saved++;
+      }
+      clearPendingGuestPortfolio();
+      searchParams.delete('checkout');
+      searchParams.delete('session_id');
+      setSearchParams(searchParams, { replace: true });
+      toast({
+        title: 'Portfolio saved',
+        description: `${saved} of ${pending.tickers.length} holdings saved to your account. Welcome to Yield Guardian!`,
+      });
+    };
+    save();
+  }, [searchParams, setSearchParams, user, toast]);
+
   const stockAnalyses = useMemo(
     () => stocks.map((stock) => analyzeStock(stock, targetYield)),
     [stocks, targetYield]
