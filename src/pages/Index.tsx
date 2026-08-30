@@ -817,7 +817,7 @@ const Index = () => {
             open={subscriptionOpen}
             onOpenChange={setSubscriptionOpen}
             guestTickers={tickers}
-            guestShares={shares}
+            guestShares={guestShares}
           />
         </div>
       </main>
