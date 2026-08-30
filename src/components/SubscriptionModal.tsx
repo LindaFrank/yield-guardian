@@ -60,9 +60,11 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
   const { toast } = useToast();
+  const { required: inviteRequired } = useInviteCodeRequired();
 
   const reset = () => {
     setStep('pricing');
@@ -70,6 +72,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
     setName('');
     setEmail('');
     setPassword('');
+    setInviteCode('');
     setLoading(false);
     setUserId(undefined);
   };
