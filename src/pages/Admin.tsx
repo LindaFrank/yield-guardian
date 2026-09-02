@@ -158,6 +158,9 @@ export default function Admin() {
         </div>
         <AdminAnalytics />
 
+        <DemoFeedbackList />
+
+
 
         {/* Beta gate toggle */}
         <section className="gradient-card border border-border/50 rounded-xl p-6 mb-8">
