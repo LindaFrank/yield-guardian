@@ -435,9 +435,17 @@ const Index = () => {
               <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
                 Quick Start Guide
               </Button>
+              <Button
+                size="sm"
+                className="bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback"
+                onClick={() => setFeedbackOpen(true)}
+              >
+                Feedback
+              </Button>
               <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
                 Save my portfolio
               </Button>
+
             </div>
           </div>
         </div>
