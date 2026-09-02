@@ -63,7 +63,7 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
       console.error('Parse error:', err);
       const reason = err instanceof Error && err.message
         ? err.message
-        : 'Failed to read this file. Please try a CSV, TXT, or text-based PDF.';
+        : 'Failed to read this file. Please try a CSV, TXT, PDF, or a clear photo/scan of your statement.';
       setValidation({ newStocks: [], duplicates: [], errors: [{ raw: file.name, reason }] });
       setDuplicatesWithComparison([]);
       setActiveTab('errors');
@@ -160,16 +160,18 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
             {isLoading ? (
               <>
                 <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                <p className="text-sm text-muted-foreground">Parsing file…</p>
+                <p className="text-sm text-muted-foreground">Reading file…</p>
+                <p className="text-xs text-muted-foreground/60">Scans and photos can take up to a minute</p>
               </>
             ) : (
               <>
                 <FileUp className="w-10 h-10 text-muted-foreground/50" />
                 <p className="text-sm text-muted-foreground text-center">
-                  Drop a CSV, TXT, or PDF file here<br />
+                  Drop a CSV, TXT, PDF, or photo/scan (JPEG, PNG) here<br />
                   <span className="text-xs">or click to browse</span>
                 </p>
-                <p className="text-xs text-muted-foreground/60">
+                <p className="text-xs text-muted-foreground/60 text-center">
+                  Scanned statements and photos are read automatically<br />
                   PII (names, SSNs, etc.) is automatically filtered out
                 </p>
               </>
@@ -177,13 +179,14 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
             <input
               ref={fileInputRef}
               type="file"
-              accept=".csv,.txt,.pdf"
+              accept=".csv,.txt,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,image/*"
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFile(file);
               }}
             />
+
           </div>
         )}
 

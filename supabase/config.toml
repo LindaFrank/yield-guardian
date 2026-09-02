@@ -25,3 +25,6 @@ verify_jwt = true
     verify_jwt = false
   [functions.payments-webhook]
     verify_jwt = false
+  [functions.parse-statement-ocr]
+    verify_jwt = false
+

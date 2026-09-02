@@ -7,6 +7,7 @@
 import * as pdfjsLib from 'pdfjs-dist';
 // Bundle the worker locally — CDN workers can be blocked by CSP in the preview/live app.
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { supabase } from '@/integrations/supabase/client';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
@@ -348,9 +349,93 @@ export class ScannedPdfError extends Error {
   }
 }
 
+const MAX_OCR_PAGES = 6;
+const OCR_MAX_DIMENSION = 1700;
+
+function canvasToDataUrl(canvas: HTMLCanvasElement): string {
+  return canvas.toDataURL('image/jpeg', 0.85);
+}
+
+async function imageFileToDataUrl(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, OCR_MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Could not read this image.');
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close?.();
+  return canvasToDataUrl(canvas);
+}
+
+async function pdfToImageDataUrls(buffer: ArrayBuffer): Promise<string[]> {
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  const pages: string[] = [];
+  const pageCount = Math.min(pdf.numPages, MAX_OCR_PAGES);
+
+  for (let i = 1; i <= pageCount; i++) {
+    const page = await pdf.getPage(i);
+    const baseViewport = page.getViewport({ scale: 1 });
+    const scale = Math.min(2, OCR_MAX_DIMENSION / Math.max(baseViewport.width, baseViewport.height));
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(viewport.width);
+    canvas.height = Math.round(viewport.height);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) continue;
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    pages.push(canvasToDataUrl(canvas));
+  }
+
+  return pages;
+}
+
+/**
+ * Reads scanned statements (photos, screenshots, image-only PDFs) with AI vision OCR.
+ */
+async function ocrImages(images: string[]): Promise<ParsedRow[]> {
+  if (!images.length) throw new ScannedPdfError();
+
+  const { data, error } = await supabase.functions.invoke('parse-statement-ocr', {
+    body: { images },
+  });
+
+  if (error) {
+    throw new Error(
+      'We could not read this scanned statement. Please try a clearer scan, or a CSV/TXT/text-based PDF.'
+    );
+  }
+  if (data?.error) throw new Error(data.error);
+
+  const holdings: { ticker: string; shares?: number }[] = data?.holdings ?? [];
+  const rows: ParsedRow[] = [];
+  for (const holding of holdings) {
+    const ticker = normalizeTickerToken(holding.ticker ?? '');
+    if (!ticker || NOISE_WORDS.has(ticker) || BLOCKED_TICKER_WORDS.has(ticker)) continue;
+    rows.push({
+      ticker,
+      shares: holding.shares,
+      raw: `${ticker}${holding.shares != null ? ` — ${holding.shares} shares` : ''} (scanned)`,
+    });
+  }
+
+  if (!rows.length) {
+    throw new Error(
+      'We read this scan but could not find any stock holdings. Please try a clearer scan of the holdings pages.'
+    );
+  }
+
+  return rows;
+}
+
+export async function parseImage(file: File): Promise<ParsedRow[]> {
+  return ocrImages([await imageFileToDataUrl(file)]);
+}
+
 export async function parsePDF(file: File): Promise<ParsedRow[]> {
   const buffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: buffer.slice(0) }).promise;
   let fullText = '';
 
   for (let i = 1; i <= pdf.numPages; i++) {
@@ -358,17 +443,28 @@ export async function parsePDF(file: File): Promise<ParsedRow[]> {
     fullText += `${await extractPageTextWithStructure(page)}\n`;
   }
 
-  if (fullText.replace(/\s/g, '').length < 40) {
-    throw new ScannedPdfError();
+  if (fullText.replace(/\s/g, '').length >= 40) {
+    const rows = parseTextLines(fullText, { source: 'pdf' });
+    if (rows.length) return rows;
   }
 
-  return parseTextLines(fullText, { source: 'pdf' });
+  // Scanned / image-only PDF (or text we couldn't interpret) — fall back to AI vision OCR.
+  return ocrImages(await pdfToImageDataUrls(buffer.slice(0)));
 }
 
+const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|heic|heif|gif|bmp|tiff?)$/i;
+
+export function isImageFile(file: File): boolean {
+  return file.type.startsWith('image/') || IMAGE_EXTENSIONS.test(file.name);
+}
 
 export function parseFile(file: File): Promise<ParsedRow[]> {
   if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
     return parsePDF(file);
+  }
+
+  if (isImageFile(file)) {
+    return parseImage(file);
   }
 
   return new Promise((resolve, reject) => {
@@ -381,6 +477,7 @@ export function parseFile(file: File): Promise<ParsedRow[]> {
     reader.readAsText(file);
   });
 }
+
 
 export function validateImport(
   parsed: ParsedRow[],
