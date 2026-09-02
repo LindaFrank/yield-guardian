@@ -57,9 +57,13 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
       setPhase('preview');
     } catch (err) {
       console.error('Parse error:', err);
-      setValidation({ newStocks: [], duplicates: [], errors: [{ raw: file.name, reason: 'Failed to parse file' }] });
+      const reason = err instanceof Error && err.message
+        ? err.message
+        : 'Failed to read this file. Please try a CSV, TXT, or text-based PDF.';
+      setValidation({ newStocks: [], duplicates: [], errors: [{ raw: file.name, reason }] });
       setDuplicatesWithComparison([]);
       setPhase('preview');
+
     } finally {
       setIsLoading(false);
     }
