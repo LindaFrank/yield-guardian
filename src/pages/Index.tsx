@@ -456,7 +456,7 @@ const Index = () => {
               Download PDF
             </a>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto bg-muted/20 px-4 py-4">
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain bg-muted/20 px-4 py-4" style={{ WebkitOverflowScrolling: 'touch' }}>
             <div className="mx-auto max-w-[900px] space-y-4">
               {quickStartPages.map((page, i) => (
                 <img
@@ -464,7 +464,9 @@ const Index = () => {
                   src={page.url}
                   alt={`Yield Guardian Quick Start Guide, page ${i + 1}`}
                   loading={i === 0 ? 'eager' : 'lazy'}
-                  className="w-full rounded-md border border-border/60 shadow-sm bg-white"
+                  width={850}
+                  height={1100}
+                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-white object-contain"
                 />
               ))}
             </div>
