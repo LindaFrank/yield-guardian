@@ -27,6 +27,7 @@ import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
+import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide.pdf.asset.json';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
@@ -439,10 +440,8 @@ const Index = () => {
           </DialogHeader>
           <iframe
             title="Quick Start Guide"
-            src="https://www.loom.com/embed/1264e9fbaf324ff5af3379af17396e63?hideEmbedTopBar=true&hide_owner=true&hide_share=true&hide_title=true&autoplay=1"
-            allowFullScreen
-            className="flex-1 w-full bg-black"
-            allow="fullscreen; autoplay; picture-in-picture"
+            src={quickStartPdf.url}
+            className="flex-1 w-full bg-background"
           />
         </DialogContent>
       </Dialog>
