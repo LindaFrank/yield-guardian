@@ -45,6 +45,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
 import { SubscriptionModal, loadPendingGuestPortfolio, clearPendingGuestPortfolio } from '@/components/SubscriptionModal';
+import { DemoFeedbackModal } from '@/components/DemoFeedbackModal';
+
 import { supabase } from '@/integrations/supabase/client';
 
 
@@ -100,6 +102,8 @@ const Index = () => {
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
   const [quickStartOpen, setQuickStartOpen] = useState(false);
   const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+
   const [searchParams, setSearchParams] = useSearchParams();
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
@@ -435,9 +439,17 @@ const Index = () => {
               <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
                 Quick Start Guide
               </Button>
+              <Button
+                size="sm"
+                className="bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback"
+                onClick={() => setFeedbackOpen(true)}
+              >
+                Feedback
+              </Button>
               <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
                 Save my portfolio
               </Button>
+
             </div>
           </div>
         </div>
@@ -473,6 +485,10 @@ const Index = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DemoFeedbackModal open={feedbackOpen} onOpenChange={setFeedbackOpen} />
+
+
       
       <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}

@@ -35,6 +35,11 @@ export default {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        feedback: {
+          DEFAULT: "hsl(var(--feedback))",
+          foreground: "hsl(var(--feedback-foreground))",
+        },
+
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
