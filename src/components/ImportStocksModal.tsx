@@ -183,7 +183,8 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
 
         {phase === 'preview' && validation && (
           <>
-            <Tabs defaultValue="new" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+
               <TabsList className="w-full">
                 <TabsTrigger value="new" className="flex-1 gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5" />
