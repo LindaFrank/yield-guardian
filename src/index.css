@@ -43,6 +43,9 @@
     --yield-warning: 38 92% 50%;
     --yield-negative: 0 80% 45%;
     --yield-neutral: 215 20% 55%;
+    --feedback: 214 90% 54%;
+    --feedback-foreground: 0 0% 100%;
+
 
     /* Approach accents */
     --approach-aggressive: 270 75% 65%;
