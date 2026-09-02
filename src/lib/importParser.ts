@@ -5,9 +5,11 @@
  */
 
 import * as pdfjsLib from 'pdfjs-dist';
+// Bundle the worker locally — CDN workers can be blocked by CSP in the preview/live app.
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
-// Use the bundled worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+
 
 export interface ParsedRow {
   ticker: string;
