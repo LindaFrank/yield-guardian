@@ -437,7 +437,7 @@ const Index = () => {
                 Sign in
               </Button>
               <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
-                Quick Start Guide
+                Quick Start_Create Portfolio
               </Button>
               <Button
                 size="sm"
