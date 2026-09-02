@@ -188,3 +188,25 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground));
 }
+
+.red-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.red-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+.red-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--yield-negative));
+  border-radius: 5px;
+}
+
+.red-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--yield-negative) / 0.8);
+}
+
+.red-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--yield-negative)) hsl(var(--background));
+}
