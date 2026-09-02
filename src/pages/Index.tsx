@@ -100,6 +100,8 @@ const Index = () => {
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
   const [quickStartOpen, setQuickStartOpen] = useState(false);
   const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+
   const [searchParams, setSearchParams] = useSearchParams();
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
