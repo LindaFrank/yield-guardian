@@ -485,6 +485,10 @@ const Index = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DemoFeedbackModal open={feedbackOpen} onOpenChange={setFeedbackOpen} />
+
+
       
       <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}
