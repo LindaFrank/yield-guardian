@@ -45,6 +45,8 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
       const parsed = await parseFile(file);
       const result = validateImport(parsed, existingTickers);
       setValidation(result);
+      setActiveTab(result.newStocks.length > 0 ? 'new' : result.duplicates.length > 0 ? 'duplicates' : 'new');
+
 
       // Build duplicate comparison data
       const dupsWithComparison = result.duplicates.map((row): DuplicateWithComparison => {
