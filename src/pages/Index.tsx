@@ -45,6 +45,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
 import { SubscriptionModal, loadPendingGuestPortfolio, clearPendingGuestPortfolio } from '@/components/SubscriptionModal';
+import { DemoFeedbackModal } from '@/components/DemoFeedbackModal';
+
 import { supabase } from '@/integrations/supabase/client';
 
 
