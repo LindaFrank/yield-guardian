@@ -34,7 +34,9 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [fileName, setFileName] = useState('');
+  const [activeTab, setActiveTab] = useState('new');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const handleFile = useCallback(async (file: File) => {
     setIsLoading(true);
