@@ -27,6 +27,7 @@ import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
+import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide.pdf.asset.json';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
