@@ -28,6 +28,16 @@ import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
 import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide.pdf.asset.json';
+import qsg1 from '@/assets/quick-start-1.jpg.asset.json';
+import qsg2 from '@/assets/quick-start-2.jpg.asset.json';
+import qsg3 from '@/assets/quick-start-3.jpg.asset.json';
+import qsg4 from '@/assets/quick-start-4.jpg.asset.json';
+import qsg5 from '@/assets/quick-start-5.jpg.asset.json';
+import qsg6 from '@/assets/quick-start-6.jpg.asset.json';
+import qsg7 from '@/assets/quick-start-7.jpg.asset.json';
+import qsg8 from '@/assets/quick-start-8.jpg.asset.json';
+
+const quickStartPages = [qsg1, qsg2, qsg3, qsg4, qsg5, qsg6, qsg7, qsg8];
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
