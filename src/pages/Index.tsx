@@ -28,6 +28,16 @@ import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
 import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide.pdf.asset.json';
+import qsg1 from '@/assets/quick-start-1.jpg.asset.json';
+import qsg2 from '@/assets/quick-start-2.jpg.asset.json';
+import qsg3 from '@/assets/quick-start-3.jpg.asset.json';
+import qsg4 from '@/assets/quick-start-4.jpg.asset.json';
+import qsg5 from '@/assets/quick-start-5.jpg.asset.json';
+import qsg6 from '@/assets/quick-start-6.jpg.asset.json';
+import qsg7 from '@/assets/quick-start-7.jpg.asset.json';
+import qsg8 from '@/assets/quick-start-8.jpg.asset.json';
+
+const quickStartPages = [qsg1, qsg2, qsg3, qsg4, qsg5, qsg6, qsg7, qsg8];
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
@@ -435,14 +445,30 @@ const Index = () => {
 
       <Dialog open={quickStartOpen} onOpenChange={(o) => setQuickStartOpen(o)}>
         <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
-          <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0">
+          <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0 flex-row items-center justify-between gap-3">
             <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start Guide</DialogTitle>
+            <a
+              href={quickStartPdf.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0 mr-8"
+            >
+              Download PDF
+            </a>
           </DialogHeader>
-          <iframe
-            title="Quick Start Guide"
-            src={quickStartPdf.url}
-            className="flex-1 w-full bg-background"
-          />
+          <div className="flex-1 overflow-y-auto bg-muted/20 px-4 py-4">
+            <div className="mx-auto max-w-[900px] space-y-4">
+              {quickStartPages.map((page, i) => (
+                <img
+                  key={page.url}
+                  src={page.url}
+                  alt={`Yield Guardian Quick Start Guide, page ${i + 1}`}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  className="w-full rounded-md border border-border/60 shadow-sm bg-white"
+                />
+              ))}
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
       
