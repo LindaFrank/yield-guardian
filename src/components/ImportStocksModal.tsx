@@ -66,7 +66,9 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
         : 'Failed to read this file. Please try a CSV, TXT, or text-based PDF.';
       setValidation({ newStocks: [], duplicates: [], errors: [{ raw: file.name, reason }] });
       setDuplicatesWithComparison([]);
+      setActiveTab('errors');
       setPhase('preview');
+
 
     } finally {
       setIsLoading(false);
