@@ -339,6 +339,15 @@ async function extractPageTextWithStructure(page: any): Promise<string> {
     .join('\n');
 }
 
+export class ScannedPdfError extends Error {
+  constructor() {
+    super(
+      'This PDF has no readable text — it looks like a scan or screenshot. Please export your statement as a text-based PDF, CSV, or TXT file.'
+    );
+    this.name = 'ScannedPdfError';
+  }
+}
+
 export async function parsePDF(file: File): Promise<ParsedRow[]> {
   const buffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
@@ -349,8 +358,13 @@ export async function parsePDF(file: File): Promise<ParsedRow[]> {
     fullText += `${await extractPageTextWithStructure(page)}\n`;
   }
 
+  if (fullText.replace(/\s/g, '').length < 40) {
+    throw new ScannedPdfError();
+  }
+
   return parseTextLines(fullText, { source: 'pdf' });
 }
+
 
 export function parseFile(file: File): Promise<ParsedRow[]> {
   if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
