@@ -212,8 +212,17 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
               <TabsContent value="new">
                 <div className="border-[4px] border-yield-positive/40 rounded-lg p-3 max-h-60 overflow-y-auto">
                   {totalNew === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">No new stocks found</p>
+                    <div className="py-4 space-y-1.5 text-center">
+                      <p className="text-sm text-muted-foreground">No new stocks found</p>
+                      {totalDupes === 0 && totalErrors === 0 && (
+                        <p className="text-xs text-muted-foreground/70">
+                          We couldn't recognize any ticker symbols in this file. Make sure it's a text-based
+                          statement (CSV, TXT, or a PDF you can select text in) that lists ticker symbols and share counts.
+                        </p>
+                      )}
+                    </div>
                   ) : (
+
                     <div className="space-y-2">
                       {validation.newStocks.map((row, i) => (
                         <StockRow key={`${row.ticker}-${i}`} row={row} variant="new" />
