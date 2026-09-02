@@ -92,6 +92,36 @@ export type Database = {
         }
         Relationships: []
       }
+      demo_feedback: {
+        Row: {
+          comment: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
