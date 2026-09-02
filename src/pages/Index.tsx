@@ -440,10 +440,8 @@ const Index = () => {
           </DialogHeader>
           <iframe
             title="Quick Start Guide"
-            src="https://www.loom.com/embed/1264e9fbaf324ff5af3379af17396e63?hideEmbedTopBar=true&hide_owner=true&hide_share=true&hide_title=true&autoplay=1"
-            allowFullScreen
-            className="flex-1 w-full bg-black"
-            allow="fullscreen; autoplay; picture-in-picture"
+            src={quickStartPdf.url}
+            className="flex-1 w-full bg-background"
           />
         </DialogContent>
       </Dialog>
