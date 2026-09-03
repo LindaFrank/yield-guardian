@@ -101,6 +101,7 @@ const Index = () => {
   const [reportGenerating, setReportGenerating] = useState(false);
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
   const [quickStartOpen, setQuickStartOpen] = useState(false);
+  const [quickStartImportOpen, setQuickStartImportOpen] = useState(false);
   const [subscriptionOpen, setSubscriptionOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
@@ -439,6 +440,9 @@ const Index = () => {
               <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
                 Quick Start_Create Portfolio
               </Button>
+              <Button size="sm" className="shadow-glow" onClick={() => setQuickStartImportOpen(true)}>
+                Quick Start_Import your own portfolio
+              </Button>
               <Button
                 size="sm"
                 className="bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback"
@@ -482,6 +486,17 @@ const Index = () => {
                 />
               ))}
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={quickStartImportOpen} onOpenChange={(o) => setQuickStartImportOpen(o)}>
+        <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
+          <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0 flex-row items-center justify-between gap-3">
+            <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start — Import Your Own Portfolio</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain bg-muted/20 px-4 py-4 red-scrollbar flex items-center justify-center" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <p className="text-sm text-muted-foreground text-center">Guide coming soon.</p>
           </div>
         </DialogContent>
       </Dialog>
