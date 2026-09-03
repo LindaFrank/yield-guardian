@@ -437,6 +437,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ui_events: {
+        Row: {
+          category: string | null
+          event: string
+          id: string
+          is_guest: boolean
+          label: string | null
+          occurred_at: string
+          path: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          event: string
+          id?: string
+          is_guest?: boolean
+          label?: string | null
+          occurred_at?: string
+          path?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          event?: string
+          id?: string
+          is_guest?: boolean
+          label?: string | null
+          occurred_at?: string
+          path?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -506,6 +539,7 @@ export type Database = {
       get_admin_metrics: { Args: never; Returns: Json }
       get_payments_enabled: { Args: never; Returns: boolean }
       get_require_invite_code: { Args: never; Returns: boolean }
+      get_ui_event_metrics: { Args: { _days?: number }; Returns: Json }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean

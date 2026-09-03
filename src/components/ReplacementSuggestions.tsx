@@ -16,6 +16,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -162,7 +163,7 @@ export function ReplacementSuggestions({
             {/* Mode toggle */}
             <div className="flex gap-1 p-1 rounded-md bg-secondary/40">
               <button
-                onClick={() => setMode('aggressive')}
+                onClick={() => { trackEvent('strategy_mode_select', { category: 'strategy', label: 'aggressive' }); setMode('aggressive'); }}
                 className={cn(
                   'flex-1 text-xs font-medium py-1.5 px-2 rounded transition-colors border-4 border-muted-foreground/60',
                   mode === 'aggressive' ? 'bg-primary text-primary-foreground' : 'text-white hover:text-foreground',
@@ -171,7 +172,7 @@ export function ReplacementSuggestions({
                 Aggressive
               </button>
               <button
-                onClick={() => setMode('conservative')}
+                onClick={() => { trackEvent('strategy_mode_select', { category: 'strategy', label: 'conservative' }); setMode('conservative'); }}
                 className={cn(
                   'flex-1 text-xs font-medium py-1.5 px-2 rounded transition-colors border-4 border-muted-foreground/60',
                   mode === 'conservative' ? 'bg-primary text-primary-foreground' : 'text-white hover:text-foreground',

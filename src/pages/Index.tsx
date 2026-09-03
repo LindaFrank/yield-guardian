@@ -59,7 +59,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
+import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged, trackEvent } from '@/lib/analytics';
 import { SubscriptionModal, loadPendingGuestPortfolio, clearPendingGuestPortfolio } from '@/components/SubscriptionModal';
 import { DemoFeedbackModal } from '@/components/DemoFeedbackModal';
 
@@ -398,6 +398,7 @@ const Index = () => {
   const [replacementDialogOpen, setReplacementDialogOpen] = useState(false);
 
   const handleSelectUnderperformer = (stock: Stock) => {
+    trackEvent('alternatives_reviewed', { category: 'replacement', label: stock.ticker, userId: user?.id ?? null });
     setSelectedUnderperformer(stock);
     setReplacementDialogOpen(true);
   };
@@ -416,6 +417,7 @@ const Index = () => {
           suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map((s) => s.ticker)),
       });
       setReportBytes(pdfBytes);
+      trackEvent('report_generated', { category: 'report', label: `${underperformers.length} underperformers`, userId: user?.id ?? null });
     } catch (err) {
       console.error('Report generation failed:', err);
       toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
@@ -426,6 +428,7 @@ const Index = () => {
 
   const handleDownloadReport = () => {
     if (!reportBytes) return;
+    trackEvent('report_printed', { category: 'report', userId: user?.id ?? null });
     const filename = `yield-guardian-portfolio-report-${new Date().toISOString().slice(0, 10)}.pdf`;
     let binary = '';
     const chunkSize = 0x8000;
@@ -451,16 +454,16 @@ const Index = () => {
               <span className="font-semibold text-foreground">Guest analysis</span> — analyze any portfolio without an account. Nothing is saved when you leave.
             </p>
             <div className="flex items-center gap-2">
-              <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
+              <Button size="sm" className="shadow-glow" onClick={() => { trackEvent('quick_start_create_open', { category: 'guide', label: 'Quick Start_Create Portfolio', userId: user?.id ?? null }); setQuickStartOpen(true); }}>
                 Quick Start_Create Portfolio
               </Button>
-              <Button size="sm" className="shadow-glow" onClick={() => setQuickStartImportOpen(true)}>
+              <Button size="sm" className="shadow-glow" onClick={() => { trackEvent('quick_start_import_open', { category: 'guide', label: 'Quick Start_Import your own portfolio', userId: user?.id ?? null }); setQuickStartImportOpen(true); }}>
                 Quick Start_Import your own portfolio
               </Button>
               <Button
                 size="sm"
                 className="bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback"
-                onClick={() => setFeedbackOpen(true)}
+                onClick={() => { trackEvent('feedback_open', { category: 'feedback', userId: user?.id ?? null }); setFeedbackOpen(true); }}
               >
                 Feedback
               </Button>
