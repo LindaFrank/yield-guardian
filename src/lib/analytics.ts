@@ -60,3 +60,25 @@ export function markDailySnapshotLogged(userId: string) {
   dailyLogged.add(key);
   return true;
 }
+
+/**
+ * Fire-and-forget UI interaction tracking. Works for guests and signed-in users.
+ * Aggregated for admins via the get_ui_event_metrics report.
+ */
+export function trackEvent(
+  event: string,
+  opts?: { category?: string; label?: string; userId?: string | null },
+) {
+  try {
+    void supabase.from('ui_events').insert({
+      event,
+      category: opts?.category ?? null,
+      label: opts?.label ?? null,
+      path: typeof window !== 'undefined' ? window.location.pathname : null,
+      is_guest: !opts?.userId,
+      user_id: opts?.userId ?? null,
+    }).then(() => {}, () => {});
+  } catch {
+    // never let analytics break the UI
+  }
+}
