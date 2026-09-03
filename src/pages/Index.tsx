@@ -37,7 +37,22 @@ import qsg6 from '@/assets/quick-start-6.jpg.asset.json';
 import qsg7 from '@/assets/quick-start-7.jpg.asset.json';
 import qsg8 from '@/assets/quick-start-8.jpg.asset.json';
 
+import quickStartImportPdf from '@/assets/YG_Quick_Start_Existing_Portfolio.pdf.asset.json';
+import qsi1 from '@/assets/quick-start-import-1.jpg.asset.json';
+import qsi2 from '@/assets/quick-start-import-2.jpg.asset.json';
+import qsi3 from '@/assets/quick-start-import-3.jpg.asset.json';
+import qsi4 from '@/assets/quick-start-import-4.jpg.asset.json';
+import qsi5 from '@/assets/quick-start-import-5.jpg.asset.json';
+import qsi6 from '@/assets/quick-start-import-6.jpg.asset.json';
+import qsi7 from '@/assets/quick-start-import-7.jpg.asset.json';
+import qsi8 from '@/assets/quick-start-import-8.jpg.asset.json';
+import qsi9 from '@/assets/quick-start-import-9.jpg.asset.json';
+import qsi10 from '@/assets/quick-start-import-10.jpg.asset.json';
+import qsi11 from '@/assets/quick-start-import-11.jpg.asset.json';
+import qsi12 from '@/assets/quick-start-import-12.jpg.asset.json';
+
 const quickStartPages = [qsg1, qsg2, qsg3, qsg4, qsg5, qsg6, qsg7, qsg8];
+const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, qsi9, qsi10, qsi11, qsi12];
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
