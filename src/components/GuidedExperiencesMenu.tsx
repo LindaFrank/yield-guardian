@@ -4,6 +4,7 @@ import { Compass, ChevronDown, TrendingUp, Rocket, Repeat, Video } from 'lucide-
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { SamplePortfolioViewer } from '@/components/SamplePortfolioViewer';
+import { trackEvent } from '@/lib/analytics';
 
 export const GUIDED_EXPERIENCES = [
   {
@@ -71,7 +72,10 @@ export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) =>
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.05 * i }}
-                      onClick={() => setActive(exp)}
+                      onClick={() => {
+                        trackEvent('guided_experience_open', { category: 'entry', label: exp.title });
+                        setActive(exp);
+                      }}
                       className="w-full text-left p-3 rounded-lg gradient-card border-2 border-border/60 hover:border-primary/60 transition-colors"
                     >
                       <span className="flex items-start gap-2 text-base font-medium">

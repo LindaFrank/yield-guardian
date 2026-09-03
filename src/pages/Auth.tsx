@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
 import { GuidedExperiencesMenu } from '@/components/GuidedExperiencesMenu';
+import { trackEvent } from '@/lib/analytics';
 
 
 const TICKER_DATA = [
@@ -194,7 +195,10 @@ export default function Auth() {
               <Button
                 type="button"
                 className="w-full justify-between border-2 border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow"
-                onClick={() => navigate('/try')}
+                onClick={() => {
+                  trackEvent('analyze_portfolio_click', { category: 'entry', label: 'Analyze a portfolio — no account needed' });
+                  navigate('/try');
+                }}
               >
                 <span className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4" />
