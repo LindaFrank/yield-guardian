@@ -56,6 +56,7 @@ const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, q
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
