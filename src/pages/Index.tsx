@@ -56,6 +56,7 @@ const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, q
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged } from '@/lib/analytics';
@@ -75,6 +76,7 @@ const Index = () => {
   const removeTicker = useRemoveTicker();
   const updateShares = useUpdateShares();
   const { data: stocksWithShares } = useUserStocksWithShares();
+  const { enabled: paymentsEnabled } = usePaymentsEnabled();
 
   // Guest mode: no account — portfolio lives in local state for this session only
   const isGuest = !user;
@@ -462,9 +464,11 @@ const Index = () => {
               >
                 Feedback
               </Button>
-              <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
-                Save my portfolio
-              </Button>
+              {paymentsEnabled && (
+                <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
+                  Save my portfolio
+                </Button>
+              )}
               <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
                 Sign in
               </Button>

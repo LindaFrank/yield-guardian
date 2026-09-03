@@ -156,6 +156,15 @@ Deno.serve(async (req) => {
       return json({ success: true });
     }
 
+    if (action === "set_payments_enabled") {
+      const { value } = body as { value?: boolean };
+      const { error } = await admin
+        .from("app_settings")
+        .upsert({ id: 1, payments_enabled: !!value, updated_at: new Date().toISOString() });
+      if (error) return json({ error: error.message }, 500);
+      return json({ success: true });
+    }
+
     return json({ error: "Unknown action" }, 400);
   } catch (e) {
     return json({ error: (e as Error).message }, 500);

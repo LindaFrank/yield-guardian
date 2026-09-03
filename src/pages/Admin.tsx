@@ -11,7 +11,7 @@ import { Header } from '@/components/Header';
 import { AdminAnalytics } from '@/components/AdminAnalytics';
 import { DemoFeedbackList } from '@/components/DemoFeedbackList';
 
-import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck, Ticket, Copy, Ban, Plus } from 'lucide-react';
+import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck, Ticket, Copy, Ban, Plus, CreditCard } from 'lucide-react';
 
 type AdminUser = { id: string; email?: string; created_at: string; last_sign_in_at: string | null; roles: string[] };
 type InviteCode = { id: string; code: string; max_uses: number; uses: number; expires_at: string | null; revoked: boolean; created_at: string };
@@ -36,6 +36,10 @@ export default function Admin() {
   const [generating, setGenerating] = useState(false);
   const [newMaxUses, setNewMaxUses] = useState(1);
 
+  // Payments state
+  const [paymentsEnabled, setPaymentsEnabled] = useState(false);
+  const [togglingPayments, setTogglingPayments] = useState(false);
+
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase.functions.invoke('admin-users', { body: { action: 'list_users' } });
@@ -57,6 +61,11 @@ export default function Admin() {
     setInviteRequired(!!data?.require_invite_code);
   };
 
+  const loadPayments = async () => {
+    const { data } = await supabase.rpc('get_payments_enabled');
+    setPaymentsEnabled(!!data);
+  };
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) { navigate('/auth', { replace: true }); return; }
@@ -65,6 +74,7 @@ export default function Admin() {
     load();
     loadCodes();
     loadSetting();
+    loadPayments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, isLoading, authLoading, user]);
 
@@ -109,6 +119,17 @@ export default function Admin() {
     if (error) { toast({ title: 'Update failed', description: error.message, variant: 'destructive' }); return; }
     setInviteRequired(value);
     toast({ title: value ? 'Invite codes required' : 'Sign-up is now open', description: value ? 'New users must provide a valid code.' : 'Anyone with the URL can sign up.' });
+  };
+
+  const togglePayments = async (value: boolean) => {
+    setTogglingPayments(true);
+    const { error } = await supabase.functions.invoke('admin-users', {
+      body: { action: 'set_payments_enabled', value },
+    });
+    setTogglingPayments(false);
+    if (error) { toast({ title: 'Update failed', description: error.message, variant: 'destructive' }); return; }
+    setPaymentsEnabled(value);
+    toast({ title: value ? 'Payments enabled' : 'Payments hidden', description: value ? 'The subscription button is now visible to guests.' : 'The subscription button is hidden during beta.' });
   };
 
   const generateCode = async () => {
@@ -175,6 +196,20 @@ export default function Admin() {
               </p>
             </div>
             <Switch checked={inviteRequired} disabled={togglingSetting} onCheckedChange={toggleRequireInvite} />
+          </div>
+        </section>
+
+        {/* Payments toggle */}
+        <section className="gradient-card border border-border/50 rounded-xl p-6 mb-8">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold flex items-center gap-2"><CreditCard className="w-5 h-5 text-primary" /> Show payment/subscription button</h2>
+              <p className="text-sm text-muted-foreground mt-1 max-w-xl">
+                When OFF, the "Save my portfolio" subscription button is hidden from the free demo flow.
+                Turn this ON when you're ready to start charging.
+              </p>
+            </div>
+            <Switch checked={paymentsEnabled} disabled={togglingPayments} onCheckedChange={togglePayments} />
           </div>
         </section>
 
