@@ -76,6 +76,7 @@ const Index = () => {
   const removeTicker = useRemoveTicker();
   const updateShares = useUpdateShares();
   const { data: stocksWithShares } = useUserStocksWithShares();
+  const { enabled: paymentsEnabled } = usePaymentsEnabled();
 
   // Guest mode: no account — portfolio lives in local state for this session only
   const isGuest = !user;
