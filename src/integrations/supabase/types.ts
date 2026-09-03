@@ -17,16 +17,19 @@ export type Database = {
       app_settings: {
         Row: {
           id: number
+          payments_enabled: boolean
           require_invite_code: boolean
           updated_at: string
         }
         Insert: {
           id?: number
+          payments_enabled?: boolean
           require_invite_code?: boolean
           updated_at?: string
         }
         Update: {
           id?: number
+          payments_enabled?: boolean
           require_invite_code?: boolean
           updated_at?: string
         }
@@ -501,6 +504,7 @@ export type Database = {
         Returns: number
       }
       get_admin_metrics: { Args: never; Returns: Json }
+      get_payments_enabled: { Args: never; Returns: boolean }
       get_require_invite_code: { Args: never; Returns: boolean }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
