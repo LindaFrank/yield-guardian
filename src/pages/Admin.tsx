@@ -61,6 +61,11 @@ export default function Admin() {
     setInviteRequired(!!data?.require_invite_code);
   };
 
+  const loadPayments = async () => {
+    const { data } = await supabase.rpc('get_payments_enabled');
+    setPaymentsEnabled(!!data);
+  };
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) { navigate('/auth', { replace: true }); return; }
@@ -69,6 +74,7 @@ export default function Admin() {
     load();
     loadCodes();
     loadSetting();
+    loadPayments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, isLoading, authLoading, user]);
 
