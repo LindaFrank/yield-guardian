@@ -121,6 +121,17 @@ export default function Admin() {
     toast({ title: value ? 'Invite codes required' : 'Sign-up is now open', description: value ? 'New users must provide a valid code.' : 'Anyone with the URL can sign up.' });
   };
 
+  const togglePayments = async (value: boolean) => {
+    setTogglingPayments(true);
+    const { error } = await supabase.functions.invoke('admin-users', {
+      body: { action: 'set_payments_enabled', value },
+    });
+    setTogglingPayments(false);
+    if (error) { toast({ title: 'Update failed', description: error.message, variant: 'destructive' }); return; }
+    setPaymentsEnabled(value);
+    toast({ title: value ? 'Payments enabled' : 'Payments hidden', description: value ? 'The subscription button is now visible to guests.' : 'The subscription button is hidden during beta.' });
+  };
+
   const generateCode = async () => {
     setGenerating(true);
     const { error } = await supabase.functions.invoke('admin-users', {
