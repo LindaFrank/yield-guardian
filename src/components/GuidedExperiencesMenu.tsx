@@ -42,13 +42,16 @@ export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) =>
       <Button
         type="button"
         variant="outline"
-        className="w-full justify-between border-2 border-primary/40 bg-primary/5 hover:bg-primary/10"
+        className="w-full justify-between border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 h-auto py-2.5"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
-        <span className="flex items-center gap-2">
-          <Compass className="w-4 h-4 text-primary" />
-          Guided Experiences
+        <span className="flex flex-col items-start gap-0.5">
+          <span className="flex items-center gap-2 text-base font-medium">
+            <Compass className="w-4 h-4 text-primary" />
+            Guided Experiences
+          </span>
+          <span className="text-[11px] text-muted-foreground font-normal">Short guided videos — no sign-in required.</span>
         </span>
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
       </Button>
