@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
 import { AdminAnalytics } from '@/components/AdminAnalytics';
 import { DemoFeedbackList } from '@/components/DemoFeedbackList';
+import { ClickAnalytics } from '@/components/ClickAnalytics';
 
 import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck, Ticket, Copy, Ban, Plus, CreditCard } from 'lucide-react';
 
@@ -180,6 +181,8 @@ export default function Admin() {
           <h1 className="text-2xl font-semibold">Admin Console</h1>
         </div>
         <AdminAnalytics />
+
+        <ClickAnalytics />
 
         <DemoFeedbackList />
 
