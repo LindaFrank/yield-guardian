@@ -101,6 +101,7 @@ const Index = () => {
   const [reportGenerating, setReportGenerating] = useState(false);
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
   const [quickStartOpen, setQuickStartOpen] = useState(false);
+  const [quickStartImportOpen, setQuickStartImportOpen] = useState(false);
   const [subscriptionOpen, setSubscriptionOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
@@ -438,6 +439,9 @@ const Index = () => {
               </Button>
               <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
                 Quick Start_Create Portfolio
+              </Button>
+              <Button size="sm" className="shadow-glow" onClick={() => setQuickStartImportOpen(true)}>
+                Quick Start_Import your own portfolio
               </Button>
               <Button
                 size="sm"
