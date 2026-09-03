@@ -508,9 +508,29 @@ const Index = () => {
         <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
           <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0 flex-row items-center justify-between gap-3">
             <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start — Import Your Own Portfolio</DialogTitle>
+            <a
+              href={quickStartImportPdf.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0 mr-8"
+            >
+              Download PDF
+            </a>
           </DialogHeader>
-          <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain bg-muted/20 px-4 py-4 red-scrollbar flex items-center justify-center" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <p className="text-sm text-muted-foreground text-center">Guide coming soon.</p>
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain bg-muted/20 px-4 py-4 red-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="mx-auto max-w-[900px] space-y-4">
+              {quickStartImportPages.map((page, i) => (
+                <img
+                  key={page.url}
+                  src={page.url}
+                  alt={`Yield Guardian import your own portfolio guide, page ${i + 1}`}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  width={850}
+                  height={1100}
+                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-white object-contain"
+                />
+              ))}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
