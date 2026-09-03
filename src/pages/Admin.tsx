@@ -36,6 +36,10 @@ export default function Admin() {
   const [generating, setGenerating] = useState(false);
   const [newMaxUses, setNewMaxUses] = useState(1);
 
+  // Payments state
+  const [paymentsEnabled, setPaymentsEnabled] = useState(false);
+  const [togglingPayments, setTogglingPayments] = useState(false);
+
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase.functions.invoke('admin-users', { body: { action: 'list_users' } });
