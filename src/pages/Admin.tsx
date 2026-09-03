@@ -199,6 +199,20 @@ export default function Admin() {
           </div>
         </section>
 
+        {/* Payments toggle */}
+        <section className="gradient-card border border-border/50 rounded-xl p-6 mb-8">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold flex items-center gap-2"><CreditCard className="w-5 h-5 text-primary" /> Show payment/subscription button</h2>
+              <p className="text-sm text-muted-foreground mt-1 max-w-xl">
+                When OFF, the "Save my portfolio" subscription button is hidden from the free demo flow.
+                Turn this ON when you're ready to start charging.
+              </p>
+            </div>
+            <Switch checked={paymentsEnabled} disabled={togglingPayments} onCheckedChange={togglePayments} />
+          </div>
+        </section>
+
         {/* Invite codes */}
         <section className="gradient-card border border-border/50 rounded-xl p-6 mb-8">
           <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
