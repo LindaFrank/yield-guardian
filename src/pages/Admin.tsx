@@ -11,7 +11,7 @@ import { Header } from '@/components/Header';
 import { AdminAnalytics } from '@/components/AdminAnalytics';
 import { DemoFeedbackList } from '@/components/DemoFeedbackList';
 
-import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck, Ticket, Copy, Ban, Plus } from 'lucide-react';
+import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck, Ticket, Copy, Ban, Plus, CreditCard } from 'lucide-react';
 
 type AdminUser = { id: string; email?: string; created_at: string; last_sign_in_at: string | null; roles: string[] };
 type InviteCode = { id: string; code: string; max_uses: number; uses: number; expires_at: string | null; revoked: boolean; created_at: string };
