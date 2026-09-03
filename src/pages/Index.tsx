@@ -434,9 +434,6 @@ const Index = () => {
               <span className="font-semibold text-foreground">Guest analysis</span> — analyze any portfolio without an account. Nothing is saved when you leave.
             </p>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
-                Sign in
-              </Button>
               <Button size="sm" className="shadow-glow" onClick={() => setQuickStartOpen(true)}>
                 Quick Start_Create Portfolio
               </Button>
@@ -453,7 +450,9 @@ const Index = () => {
               <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
                 Save my portfolio
               </Button>
-
+              <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
+                Sign in
+              </Button>
             </div>
           </div>
         </div>
