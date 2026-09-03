@@ -464,9 +464,11 @@ const Index = () => {
               >
                 Feedback
               </Button>
-              <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
-                Save my portfolio
-              </Button>
+              {paymentsEnabled && (
+                <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
+                  Save my portfolio
+                </Button>
+              )}
               <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
                 Sign in
               </Button>
