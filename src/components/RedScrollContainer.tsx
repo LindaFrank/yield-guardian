@@ -5,9 +5,10 @@ interface RedScrollContainerProps {
   children: ReactNode;
   className?: string;
   innerClassName?: string;
+  tabIndex?: number;
 }
 
-export function RedScrollContainer({ children, className, innerClassName }: RedScrollContainerProps) {
+export function RedScrollContainer({ children, className, innerClassName, tabIndex }: RedScrollContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
