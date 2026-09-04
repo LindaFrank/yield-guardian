@@ -195,32 +195,3 @@
   background: hsl(var(--muted-foreground));
 }
 
-.red-scrollbar {
-  /* Always reserve and show the scrollbar (macOS/iOS hide overlay bars by default) */
-  overflow-y: scroll !important;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--yield-negative)) hsl(var(--background));
-}
-
-.red-scrollbar::-webkit-scrollbar {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-}
-
-.red-scrollbar::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-}
-
-.red-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--yield-negative));
-  border: 2px solid hsl(var(--background));
-  border-radius: 6px;
-  min-height: 40px;
-}
-
-.red-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--yield-negative) / 0.8);
-}

@@ -27,6 +27,7 @@ import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
+import { RedScrollContainer } from '@/components/RedScrollContainer';
 import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide.pdf.asset.json';
 import qsg1 from '@/assets/quick-start-1.jpg.asset.json';
 import qsg2 from '@/assets/quick-start-2.jpg.asset.json';
@@ -493,10 +494,10 @@ const Index = () => {
               Download PDF
             </a>
           </DialogHeader>
-          <div
+          <RedScrollContainer
             tabIndex={0}
-            className="flex-1 min-h-0 bg-muted/20 px-4 py-4 red-scrollbar focus:outline-none"
-            style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', overflowY: 'scroll' }}
+            className="flex-1 min-h-0 bg-muted/20"
+            innerClassName="px-4 py-4"
           >
             <div className="mx-auto max-w-[900px] space-y-4">
               {quickStartPages.map((page, i) => (
@@ -511,7 +512,7 @@ const Index = () => {
                 />
               ))}
             </div>
-          </div>
+          </RedScrollContainer>
         </DialogContent>
       </Dialog>
 
@@ -528,10 +529,10 @@ const Index = () => {
               Download PDF
             </a>
           </DialogHeader>
-          <div
+          <RedScrollContainer
             tabIndex={0}
-            className="flex-1 min-h-0 bg-muted/20 px-4 py-4 red-scrollbar focus:outline-none"
-            style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', overflowY: 'scroll' }}
+            className="flex-1 min-h-0 bg-muted/20"
+            innerClassName="px-4 py-4"
           >
             <div className="mx-auto max-w-[900px] space-y-4">
               {quickStartImportPages.map((page, i) => (
@@ -546,7 +547,7 @@ const Index = () => {
                 />
               ))}
             </div>
-          </div>
+          </RedScrollContainer>
         </DialogContent>
       </Dialog>
 
