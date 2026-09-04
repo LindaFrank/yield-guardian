@@ -196,31 +196,34 @@
 }
 
 .red-scrollbar {
-  /* Always reserve and show the scrollbar (macOS/iOS hide overlay bars by default) */
   overflow-y: scroll !important;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--yield-negative)) hsl(var(--background));
+  scrollbar-width: thin !important;
+  scrollbar-color: hsl(var(--yield-negative)) hsl(var(--background)) !important;
 }
 
 .red-scrollbar::-webkit-scrollbar {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
+  width: 12px !important;
+  height: 12px !important;
 }
 
 .red-scrollbar::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+  background: hsl(var(--background)) !important;
+  border-radius: 6px !important;
 }
 
 .red-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--yield-negative));
-  border: 2px solid hsl(var(--background));
-  border-radius: 6px;
-  min-height: 40px;
+  background: hsl(var(--yield-negative)) !important;
+  border: 2px solid hsl(var(--background)) !important;
+  border-radius: 6px !important;
+  min-height: 40px !important;
 }
 
 .red-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--yield-negative) / 0.8);
+  background: hsl(var(--yield-negative) / 0.8) !important;
+}
+
+.red-scrollbar::-webkit-scrollbar-corner {
+  background: hsl(var(--background)) !important;
 }
