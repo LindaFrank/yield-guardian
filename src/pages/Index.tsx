@@ -529,10 +529,10 @@ const Index = () => {
               Download PDF
             </a>
           </DialogHeader>
-          <div
+          <RedScrollContainer
             tabIndex={0}
-            className="flex-1 min-h-0 bg-muted/20 px-4 py-4 red-scrollbar focus:outline-none"
-            style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', overflowY: 'scroll' }}
+            className="flex-1 min-h-0 bg-muted/20"
+            innerClassName="px-4 py-4"
           >
             <div className="mx-auto max-w-[900px] space-y-4">
               {quickStartImportPages.map((page, i) => (
@@ -547,7 +547,7 @@ const Index = () => {
                 />
               ))}
             </div>
-          </div>
+          </RedScrollContainer>
         </DialogContent>
       </Dialog>
 
