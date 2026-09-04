@@ -130,8 +130,9 @@ export function RedScrollContainer({ children, className, innerClassName, tabInd
     <div ref={containerRef} className={cn('relative overflow-hidden', className)}>
       <div
         ref={contentRef}
+        tabIndex={tabIndex}
         className={cn(
-          'h-full w-full overflow-y-scroll overflow-x-hidden pr-0',
+          'h-full w-full overflow-y-scroll overflow-x-hidden pr-0 focus:outline-none',
           // Hide native scrollbar across browsers while keeping scroll functionality
           '[scrollbar-width:none]',
           '[&::-webkit-scrollbar]:hidden',
