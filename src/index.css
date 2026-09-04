@@ -195,35 +195,3 @@
   background: hsl(var(--muted-foreground));
 }
 
-.red-scrollbar {
-  overflow-y: scroll !important;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  scrollbar-width: thin !important;
-  scrollbar-color: hsl(var(--yield-negative)) hsl(var(--background)) !important;
-}
-
-.red-scrollbar::-webkit-scrollbar {
-  width: 12px !important;
-  height: 12px !important;
-}
-
-.red-scrollbar::-webkit-scrollbar-track {
-  background: hsl(var(--background)) !important;
-  border-radius: 6px !important;
-}
-
-.red-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--yield-negative)) !important;
-  border: 2px solid hsl(var(--background)) !important;
-  border-radius: 6px !important;
-  min-height: 40px !important;
-}
-
-.red-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--yield-negative) / 0.8) !important;
-}
-
-.red-scrollbar::-webkit-scrollbar-corner {
-  background: hsl(var(--background)) !important;
-}
