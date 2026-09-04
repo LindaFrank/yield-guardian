@@ -27,6 +27,7 @@ import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
+import { RedScrollContainer } from '@/components/RedScrollContainer';
 import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide.pdf.asset.json';
 import qsg1 from '@/assets/quick-start-1.jpg.asset.json';
 import qsg2 from '@/assets/quick-start-2.jpg.asset.json';
