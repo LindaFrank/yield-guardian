@@ -51,7 +51,7 @@ export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) =>
             <Compass className="w-4 h-4 text-primary" />
             Guided Experiences
           </span>
-          <span className="text-[13px] text-muted-foreground font-normal">Short guided videos — no sign-in required.</span>
+          <span className="text-[13px] text-primary/90 font-normal">Short guided videos — no sign-in required.</span>
         </span>
         <span className="p-2 -m-2 pointer-events-none">
           <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
