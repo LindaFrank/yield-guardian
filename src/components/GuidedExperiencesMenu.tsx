@@ -34,7 +34,7 @@ export const GUIDED_EXPERIENCES = [
 type Experience = (typeof GUIDED_EXPERIENCES)[number];
 
 export const GuidedExperiencesMenu = forwardRef<HTMLDivElement>((_props, ref) => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [active, setActive] = useState<Experience | null>(null);
 
   return (
