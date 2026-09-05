@@ -212,101 +212,78 @@ export default function Auth() {
 
 
         <AnimatePresence>
-
           {showForm && (
             <motion.div className="w-full max-w-sm" initial={{ opacity: 0, y: 30, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', stiffness: 250, damping: 25 }}>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full justify-between border-2 border-border/60 bg-card/60 hover:bg-card"
-                onClick={() => setSignInOpen((v) => !v)}
-                aria-expanded={signInOpen}
-              >
-                <span className="flex items-center gap-2">
-                  <LogIn className="w-4 h-4 text-primary" />
-                  {title}
-                </span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${signInOpen ? 'rotate-180' : ''}`} />
-              </Button>
-
-              <AnimatePresence initial={false}>
-                {signInOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                    className="overflow-hidden"
-                  >
-                    <div className="relative gradient-card rounded-xl border border-border/50 shadow-elevated backdrop-blur-sm p-6 mt-2">
-                      {mode !== 'forgot' && (
-                        <div className="space-y-2 mb-4">
-                          <Button type="button" variant="outline" className="w-full" onClick={() => oauth('google')}>
-                            <Mail className="w-4 h-4 mr-2" /> Continue with Google
-                          </Button>
-                          <Button type="button" variant="outline" className="w-full" onClick={() => oauth('apple')}>
-                            <Apple className="w-4 h-4 mr-2" /> Continue with Apple
-                          </Button>
-                          <div className="flex items-center gap-2 my-3">
-                            <div className="h-px flex-1 bg-border/50" />
-                            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">or</span>
-                            <div className="h-px flex-1 bg-border/50" />
-                          </div>
-                        </div>
-                      )}
-
-                      <form onSubmit={handleSubmit} className="space-y-3">
-                        {mode === 'signup' && (
-                          <div className="space-y-1.5">
-                            <label className="text-sm font-medium">Your name</label>
-                            <Input type="text" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} placeholder="Jane Doe" />
-                          </div>
-                        )}
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium">Email</label>
-                          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required maxLength={255} placeholder="you@example.com" />
-                        </div>
-                        {mode !== 'forgot' && (
-                          <div className="space-y-1.5">
-                            <div className="flex items-center justify-between">
-                              <label className="text-sm font-medium">Password</label>
-                              {mode === 'signin' && (
-                                <button type="button" className="text-xs text-primary hover:underline" onClick={() => setMode('forgot')}>
-                                  Forgot?
-                                </button>
-                              )}
-                            </div>
-                            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} placeholder={mode === 'signup' ? 'At least 8 characters' : ''} />
-                          </div>
-                        )}
-                        {mode === 'signup' && inviteRequired && (
-                          <div className="space-y-1.5">
-                            <label className="text-sm font-medium">Invite code</label>
-                            <Input type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value.toUpperCase())} placeholder="YG-XXXX-XXXX" required autoCapitalize="characters" />
-                            <p className="text-[11px] text-muted-foreground">Enter the invite code you were sent.</p>
-                          </div>
-                        )}
-                        <Button type="submit" className="w-full group" disabled={loading}>
-                          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                            <>{cta}<ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" /></>
-                          )}
-                        </Button>
-                      </form>
-
-                      {mode !== 'signin' && (
-                        <div className="text-center text-xs text-muted-foreground mt-4">
-                          {mode === 'signup' && (
-                            <>Already have an account?{' '}<button className="text-primary hover:underline" onClick={() => setMode('signin')}>Sign in</button></>
-                          )}
-                          {mode === 'forgot' && (
-                            <button className="text-primary hover:underline" onClick={() => setMode('signin')}>Back to sign in</button>
-                          )}
-                        </div>
-                      )}
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-2 px-1">
+                <LogIn className="w-4 h-4 text-primary" />
+                {title}
+              </div>
+              <div className="relative gradient-card rounded-xl border border-border/50 shadow-elevated backdrop-blur-sm p-6">
+                {mode !== 'forgot' && (
+                  <div className="space-y-2 mb-4">
+                    <Button type="button" variant="outline" className="w-full" onClick={() => oauth('google')}>
+                      <Mail className="w-4 h-4 mr-2" /> Continue with Google
+                    </Button>
+                    <Button type="button" variant="outline" className="w-full" onClick={() => oauth('apple')}>
+                      <Apple className="w-4 h-4 mr-2" /> Continue with Apple
+                    </Button>
+                    <div className="flex items-center gap-2 my-3">
+                      <div className="h-px flex-1 bg-border/50" />
+                      <span className="text-[10px] uppercase tracking-widest text-muted-foreground">or</span>
+                      <div className="h-px flex-1 bg-border/50" />
                     </div>
-                  </motion.div>
+                  </div>
                 )}
-              </AnimatePresence>
+
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  {mode === 'signup' && (
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium">Your name</label>
+                      <Input type="text" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} placeholder="Jane Doe" />
+                    </div>
+                  )}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium">Email</label>
+                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required maxLength={255} placeholder="you@example.com" />
+                  </div>
+                  {mode !== 'forgot' && (
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">Password</label>
+                        {mode === 'signin' && (
+                          <button type="button" className="text-xs text-primary hover:underline" onClick={() => setMode('forgot')}>
+                            Forgot?
+                          </button>
+                        )}
+                      </div>
+                      <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} placeholder={mode === 'signup' ? 'At least 8 characters' : ''} />
+                    </div>
+                  )}
+                  {mode === 'signup' && inviteRequired && (
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium">Invite code</label>
+                      <Input type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value.toUpperCase())} placeholder="YG-XXXX-XXXX" required autoCapitalize="characters" />
+                      <p className="text-[11px] text-muted-foreground">Enter the invite code you were sent.</p>
+                    </div>
+                  )}
+                  <Button type="submit" className="w-full group" disabled={loading}>
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                      <>{cta}<ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" /></>
+                    )}
+                  </Button>
+                </form>
+
+                {mode !== 'signin' && (
+                  <div className="text-center text-xs text-muted-foreground mt-4">
+                    {mode === 'signup' && (
+                      <>Already have an account?{' '}<button className="text-primary hover:underline" onClick={() => setMode('signin')}>Sign in</button></>
+                    )}
+                    {mode === 'forgot' && (
+                      <button className="text-primary hover:underline" onClick={() => setMode('signin')}>Back to sign in</button>
+                    )}
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
