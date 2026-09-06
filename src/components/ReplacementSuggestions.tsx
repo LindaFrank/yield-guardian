@@ -17,8 +17,22 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { trackEvent } from '@/lib/analytics';
+import { usePaidFeatures } from '@/hooks/usePaidFeatures';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+
+/** Blurs children when the visitor isn't a paid subscriber or admin. */
+function Teaser({ isPaid, children }: { isPaid: boolean; children: React.ReactNode }) {
+  if (isPaid) return <>{children}</>;
+  return (
+    <span
+      className="inline-block blur-[4px] select-none opacity-70"
+      title="Subscribe to reveal names and share counts"
+    >
+      {children}
+    </span>
+  );
+}
 
 interface ReplacementSuggestionsProps {
   removedStock: Stock | null;
@@ -49,6 +63,7 @@ export function ReplacementSuggestions({
   portfolioIncome,
   onIncomeDeltaChange,
 }: ReplacementSuggestionsProps) {
+  const { isPaid } = usePaidFeatures();
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
   const [sharesInput, setSharesInput] = useState('');
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
@@ -273,11 +288,16 @@ export function ReplacementSuggestions({
                   const keepIncome = result.sharesYSold * removedStock.annualDividend * fracRemaining;
                   const switchIncome = effectiveNewIncome * fracRemaining;
 
-                  const switchLabel = isOverride
-                    ? `${overrideShares} ${compareStock!.ticker}`
-                    : optimizerPicks.length === 1
-                      ? `${optimizerPicks[0].shares} ${optimizerPicks[0].stock.ticker}`
-                      : optimizerPicks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+                          const switchLabel = isOverride
+                            ? `${overrideShares} ${compareStock!.ticker}`
+                            : optimizerPicks.length === 1
+                              ? `${optimizerPicks[0].shares} ${optimizerPicks[0].stock.ticker}`
+                              : optimizerPicks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+                          const switchLabelNode = isPaid ? (
+                            <>{switchLabel}</>
+                          ) : (
+                            <Teaser isPaid={false}>{switchLabel}</Teaser>
+                          );
 
                   const delta = switchIncome - keepIncome;
                   const allTickers = result.rows.map((r) => r.stock.ticker);
@@ -288,7 +308,7 @@ export function ReplacementSuggestions({
                       <div className="text-[11px] uppercase tracking-wide text-muted-foreground text-center">
                         Rest-of-year dividend comparison
                       </div>
-                      {allTickers.length > 1 && (
+                      {isPaid && allTickers.length > 1 && (
                         <div className="flex items-center gap-2">
                           <label className="text-[11px] uppercase tracking-wide text-muted-foreground">
                             Compare against
@@ -331,7 +351,7 @@ export function ReplacementSuggestions({
                             'text-[13px] uppercase tracking-wide font-bold leading-tight',
                             delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
                           )}>
-                            IF YOU SWITCH TO<br/>{switchLabel}
+                            IF YOU SWITCH TO<br/>{switchLabelNode}
                           </div>
                           <div className={cn(
                             'font-mono font-bold text-lg mt-1',
@@ -356,7 +376,7 @@ export function ReplacementSuggestions({
                 {allocationPicks.length > 0 && (
                   <div className="flex justify-between gap-3">
                     <span className="text-muted-foreground shrink-0">Allocation breakdown</span>
-                    <span className="font-mono text-right">
+                    <span className={cn('font-mono text-right', !isPaid && 'blur-[4px] select-none opacity-70')}>
                       {allocationPicks.map((r) => `Buy ${r.shares} ${r.stock.ticker}`).join(' + ')}
                     </span>
                   </div>
@@ -460,7 +480,9 @@ export function ReplacementSuggestions({
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono font-medium">{row.stock.ticker}</span>
+                  <Teaser isPaid={isPaid}>
+                    <span className="font-mono font-medium">{row.stock.ticker}</span>
+                  </Teaser>
                   <span className={cn(
                     'font-mono text-sm',
                     yieldVal >= 5 ? 'text-yield-positive' : yieldVal >= 3.5 ? 'text-yield-warning' : 'text-yield-negative'
@@ -550,6 +572,7 @@ export function ReplacementSuggestions({
                             w.focus();
                             setTimeout(() => w.print(), 250);
                           };
+                          if (!isPaid) return null;
                           return (
                             <Popover>
                               <PopoverTrigger asChild>
@@ -643,7 +666,7 @@ export function ReplacementSuggestions({
                             </Popover>
                           );
                         })()}
-                        {removedStock && onSwap && (
+                        {isPaid && removedStock && onSwap && (
                           <Button
                             size="sm"
                             onClick={() => {
@@ -660,7 +683,7 @@ export function ReplacementSuggestions({
                   })()}
                 </div>
                 <p className="text-[15px] text-muted-foreground truncate mt-0.5">
-                  {row.stock.name}
+                  <Teaser isPaid={isPaid}>{row.stock.name}</Teaser>
                 </p>
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
                 {displayRows && (() => {
@@ -706,7 +729,11 @@ export function ReplacementSuggestions({
 
                   return (
                     <div className="text-[15px] text-muted-foreground mt-1 space-y-0.5">
-                      <p>Buying {projShares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
+                      <p>
+                        Buying{' '}
+                        <Teaser isPaid={isPaid}>{projShares.toLocaleString()}</Teaser>{' '}
+                        shares at {formatCurrency(row.stock.currentPrice)} each
+                      </p>
                       <p>Total invested: <span className="font-mono">{formatCurrency(projCost)}</span></p>
                       <div className="pt-1 mt-1 border-t border-border/40 space-y-0.5">
                         <p className="flex justify-between gap-3">
@@ -720,7 +747,13 @@ export function ReplacementSuggestions({
                           </p>
                         )}
                         <p className="flex justify-between gap-3">
-                          <span>New {projShares.toLocaleString()} {row.stock.ticker} (rest of year)</span>
+                          <span>
+                            New{' '}
+                            <Teaser isPaid={isPaid}>
+                              {projShares.toLocaleString()} {row.stock.ticker}
+                            </Teaser>{' '}
+                            (rest of year)
+                          </span>
                           <span className="font-mono">{formatCurrency(newRest)}</span>
                         </p>
                         <p className="flex justify-between gap-3 font-medium text-foreground">
@@ -740,7 +773,7 @@ export function ReplacementSuggestions({
                 })()}
               </div>
 
-              {editingTicker === row.stock.ticker ? (
+              {isPaid && editingTicker === row.stock.ticker ? (
                 <div className="flex items-center gap-1.5 ml-2">
                   <Input
                     type="number"
@@ -772,7 +805,7 @@ export function ReplacementSuggestions({
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
-              ) : (
+              ) : isPaid ? (
                 <Button
                   size="sm"
                   variant="ghost"
@@ -781,7 +814,7 @@ export function ReplacementSuggestions({
                 >
                   <Plus className="w-4 h-4" />
                 </Button>
-              )}
+              ) : null}
             </div>
           );
         })}

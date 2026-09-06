@@ -3,6 +3,7 @@ import { Stock, StockAnalysis } from '@/types/portfolio';
 import { suggestReplacements, formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
 import { optimizeReplacement, toOptimizerCandidates, OptimizerMode, OptimizerResult } from '@/lib/optimizer';
 import { Sparkles, ShieldCheck, Rocket, Database, FileText, PieChart, DollarSign, Info } from 'lucide-react';
+import { usePaidFeatures } from '@/hooks/usePaidFeatures';
 import { cn } from '@/lib/utils';
 
 interface IncomeImpactProps {
@@ -212,6 +213,7 @@ function ApproachHeader({
 
 function ModeCard({ summary, accent, portfolioValue, portfolioIncome }: { summary: ModeSummary; accent: Accent; portfolioValue: number; portfolioIncome: number }) {
   const s = ACCENT_STYLES[accent];
+  const { isPaid } = usePaidFeatures();
 
   if (summary.status !== 'ok' || !summary.topTicker) {
     return (
@@ -222,13 +224,14 @@ function ModeCard({ summary, accent, portfolioValue, portfolioIncome }: { summar
   }
 
   const rows = [
-    { icon: Database, label: 'Replacement Stock', value: summary.topTicker },
-    { icon: FileText, label: 'Shares to be purchased', value: summary.totalShares.toLocaleString() },
-    { icon: PieChart, label: 'New Portfolio Yield', value: `${summary.newPortfolioYield.toFixed(2)}%` },
+    { icon: Database, label: 'Replacement Stock', value: summary.topTicker, paidOnly: true },
+    { icon: FileText, label: 'Shares to be purchased', value: summary.totalShares.toLocaleString(), paidOnly: true },
+    { icon: PieChart, label: 'New Portfolio Yield', value: `${summary.newPortfolioYield.toFixed(2)}%`, paidOnly: false },
     {
       icon: DollarSign,
       label: 'Estimated Income Increase',
       value: `${summary.incomeIncrease >= 0 ? '+' : ''}${formatCurrency(summary.incomeIncrease)}/yr`,
+      paidOnly: false,
     },
   ];
 
@@ -240,13 +243,22 @@ function ModeCard({ summary, accent, portfolioValue, portfolioIncome }: { summar
 
   return (
     <div className={cn('p-4 rounded-lg border-[3px] divide-y divide-border/40', s.border)}>
-      {rows.map(({ icon: Icon, label, value }) => (
+      {rows.map(({ icon: Icon, label, value, paidOnly }) => (
         <div key={label} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0 gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <Icon className={cn('w-4 h-4 shrink-0', s.text)} />
             <span className="text-[14px] text-muted-foreground truncate">{label}</span>
           </div>
-          <span className={cn('font-mono font-bold text-sm whitespace-nowrap', s.text)}>{value}</span>
+          <span
+            className={cn(
+              'font-mono font-bold text-sm whitespace-nowrap',
+              s.text,
+              paidOnly && !isPaid && 'blur-[5px] select-none opacity-70',
+            )}
+            title={paidOnly && !isPaid ? 'Subscribe to reveal names and share counts' : undefined}
+          >
+            {value}
+          </span>
         </div>
       ))}
       {yieldUpIncomeDown && (
