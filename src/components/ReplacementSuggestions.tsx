@@ -746,7 +746,13 @@ export function ReplacementSuggestions({
                           </p>
                         )}
                         <p className="flex justify-between gap-3">
-                          <span>New {projShares.toLocaleString()} {row.stock.ticker} (rest of year)</span>
+                          <span>
+                            New{' '}
+                            <Teaser isPaid={isPaid}>
+                              {projShares.toLocaleString()} {row.stock.ticker}
+                            </Teaser>{' '}
+                            (rest of year)
+                          </span>
                           <span className="font-mono">{formatCurrency(newRest)}</span>
                         </p>
                         <p className="flex justify-between gap-3 font-medium text-foreground">
