@@ -376,7 +376,7 @@ export function ReplacementSuggestions({
                 {allocationPicks.length > 0 && (
                   <div className="flex justify-between gap-3">
                     <span className="text-muted-foreground shrink-0">Allocation breakdown</span>
-                    <span className="font-mono text-right">
+                    <span className={cn('font-mono text-right', !isPaid && 'blur-[4px] select-none opacity-70')}>
                       {allocationPicks.map((r) => `Buy ${r.shares} ${r.stock.ticker}`).join(' + ')}
                     </span>
                   </div>
