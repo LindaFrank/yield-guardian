@@ -308,7 +308,7 @@ export function ReplacementSuggestions({
                       <div className="text-[11px] uppercase tracking-wide text-muted-foreground text-center">
                         Rest-of-year dividend comparison
                       </div>
-                      {allTickers.length > 1 && (
+                      {isPaid && allTickers.length > 1 && (
                         <div className="flex items-center gap-2">
                           <label className="text-[11px] uppercase tracking-wide text-muted-foreground">
                             Compare against
