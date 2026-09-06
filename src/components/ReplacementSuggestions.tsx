@@ -475,7 +475,9 @@ export function ReplacementSuggestions({
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono font-medium">{row.stock.ticker}</span>
+                  <Teaser isPaid={isPaid}>
+                    <span className="font-mono font-medium">{row.stock.ticker}</span>
+                  </Teaser>
                   <span className={cn(
                     'font-mono text-sm',
                     yieldVal >= 5 ? 'text-yield-positive' : yieldVal >= 3.5 ? 'text-yield-warning' : 'text-yield-negative'
