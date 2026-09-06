@@ -572,6 +572,7 @@ export function ReplacementSuggestions({
                             w.focus();
                             setTimeout(() => w.print(), 250);
                           };
+                          if (!isPaid) return null;
                           return (
                             <Popover>
                               <PopoverTrigger asChild>
