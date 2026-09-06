@@ -666,7 +666,7 @@ export function ReplacementSuggestions({
                             </Popover>
                           );
                         })()}
-                        {removedStock && onSwap && (
+                        {isPaid && removedStock && onSwap && (
                           <Button
                             size="sm"
                             onClick={() => {
