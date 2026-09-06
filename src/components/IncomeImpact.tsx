@@ -213,6 +213,7 @@ function ApproachHeader({
 
 function ModeCard({ summary, accent, portfolioValue, portfolioIncome }: { summary: ModeSummary; accent: Accent; portfolioValue: number; portfolioIncome: number }) {
   const s = ACCENT_STYLES[accent];
+  const { isPaid } = usePaidFeatures();
 
   if (summary.status !== 'ok' || !summary.topTicker) {
     return (
@@ -223,13 +224,14 @@ function ModeCard({ summary, accent, portfolioValue, portfolioIncome }: { summar
   }
 
   const rows = [
-    { icon: Database, label: 'Replacement Stock', value: summary.topTicker },
-    { icon: FileText, label: 'Shares to be purchased', value: summary.totalShares.toLocaleString() },
-    { icon: PieChart, label: 'New Portfolio Yield', value: `${summary.newPortfolioYield.toFixed(2)}%` },
+    { icon: Database, label: 'Replacement Stock', value: summary.topTicker, paidOnly: true },
+    { icon: FileText, label: 'Shares to be purchased', value: summary.totalShares.toLocaleString(), paidOnly: true },
+    { icon: PieChart, label: 'New Portfolio Yield', value: `${summary.newPortfolioYield.toFixed(2)}%`, paidOnly: false },
     {
       icon: DollarSign,
       label: 'Estimated Income Increase',
       value: `${summary.incomeIncrease >= 0 ? '+' : ''}${formatCurrency(summary.incomeIncrease)}/yr`,
+      paidOnly: false,
     },
   ];
 
