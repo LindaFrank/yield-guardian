@@ -288,11 +288,16 @@ export function ReplacementSuggestions({
                   const keepIncome = result.sharesYSold * removedStock.annualDividend * fracRemaining;
                   const switchIncome = effectiveNewIncome * fracRemaining;
 
-                  const switchLabel = isOverride
-                    ? `${overrideShares} ${compareStock!.ticker}`
-                    : optimizerPicks.length === 1
-                      ? `${optimizerPicks[0].shares} ${optimizerPicks[0].stock.ticker}`
-                      : optimizerPicks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+                          const switchLabel = isOverride
+                            ? `${overrideShares} ${compareStock!.ticker}`
+                            : optimizerPicks.length === 1
+                              ? `${optimizerPicks[0].shares} ${optimizerPicks[0].stock.ticker}`
+                              : optimizerPicks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+                          const switchLabelNode = isPaid ? (
+                            <>{switchLabel}</>
+                          ) : (
+                            <Teaser isPaid={false}>{switchLabel}</Teaser>
+                          );
 
                   const delta = switchIncome - keepIncome;
                   const allTickers = result.rows.map((r) => r.stock.ticker);
