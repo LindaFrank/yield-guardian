@@ -772,7 +772,7 @@ export function ReplacementSuggestions({
                 })()}
               </div>
 
-              {editingTicker === row.stock.ticker ? (
+              {isPaid && editingTicker === row.stock.ticker ? (
                 <div className="flex items-center gap-1.5 ml-2">
                   <Input
                     type="number"
@@ -804,7 +804,7 @@ export function ReplacementSuggestions({
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
-              ) : (
+              ) : isPaid ? (
                 <Button
                   size="sm"
                   variant="ghost"
@@ -813,7 +813,7 @@ export function ReplacementSuggestions({
                 >
                   <Plus className="w-4 h-4" />
                 </Button>
-              )}
+              ) : null}
             </div>
           );
         })}
