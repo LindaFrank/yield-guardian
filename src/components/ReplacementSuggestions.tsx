@@ -63,6 +63,7 @@ export function ReplacementSuggestions({
   portfolioIncome,
   onIncomeDeltaChange,
 }: ReplacementSuggestionsProps) {
+  const { isPaid } = usePaidFeatures();
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
   const [sharesInput, setSharesInput] = useState('');
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
