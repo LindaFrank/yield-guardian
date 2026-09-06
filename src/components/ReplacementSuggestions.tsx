@@ -17,8 +17,22 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { trackEvent } from '@/lib/analytics';
+import { usePaidFeatures } from '@/hooks/usePaidFeatures';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+
+/** Blurs children when the visitor isn't a paid subscriber or admin. */
+function Teaser({ isPaid, children }: { isPaid: boolean; children: React.ReactNode }) {
+  if (isPaid) return <>{children}</>;
+  return (
+    <span
+      className="inline-block blur-[4px] select-none opacity-70"
+      title="Subscribe to reveal names and share counts"
+    >
+      {children}
+    </span>
+  );
+}
 
 interface ReplacementSuggestionsProps {
   removedStock: Stock | null;
