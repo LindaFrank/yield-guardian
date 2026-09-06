@@ -677,7 +677,7 @@ export function ReplacementSuggestions({
                   })()}
                 </div>
                 <p className="text-[15px] text-muted-foreground truncate mt-0.5">
-                  {row.stock.name}
+                  <Teaser isPaid={isPaid}>{row.stock.name}</Teaser>
                 </p>
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
                 {displayRows && (() => {
