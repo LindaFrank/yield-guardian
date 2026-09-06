@@ -3,6 +3,7 @@ import { Stock, StockAnalysis } from '@/types/portfolio';
 import { suggestReplacements, formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
 import { optimizeReplacement, toOptimizerCandidates, OptimizerMode, OptimizerResult } from '@/lib/optimizer';
 import { Sparkles, ShieldCheck, Rocket, Database, FileText, PieChart, DollarSign, Info } from 'lucide-react';
+import { usePaidFeatures } from '@/hooks/usePaidFeatures';
 import { cn } from '@/lib/utils';
 
 interface IncomeImpactProps {
