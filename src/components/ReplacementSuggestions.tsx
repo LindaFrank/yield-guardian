@@ -351,7 +351,7 @@ export function ReplacementSuggestions({
                             'text-[13px] uppercase tracking-wide font-bold leading-tight',
                             delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
                           )}>
-                            IF YOU SWITCH TO<br/>{switchLabel}
+                            IF YOU SWITCH TO<br/>{switchLabelNode}
                           </div>
                           <div className={cn(
                             'font-mono font-bold text-lg mt-1',
