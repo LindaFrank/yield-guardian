@@ -106,7 +106,7 @@ export function Header() {
               )}
             </div>
           </div>
-          <div className="flex items-center justify-center gap-1 mt-3">
+          <div className="flex items-center justify-center gap-1 mt-6">
             <span className="text-muted-foreground/80 text-[10px] leading-none">◂</span>
             <div className="h-[4px] w-[44%] bg-muted-foreground" />
             <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
