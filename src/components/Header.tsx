@@ -113,7 +113,7 @@ export function Header() {
             <div className="flex justify-center mt-4">
               <Button
                 size="default"
-                className="gap-2 bg-[#147D72] hover:bg-[#1A9486] text-white border-2 border-[#6EE7C2] shadow-glow px-6 py-3 text-sm font-semibold"
+                className="gap-2 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-2 border-[#6EE7C2] shadow-glow px-6 py-3 text-sm font-semibold"
                 onClick={() => {
                   trackEvent('save_portfolio_header_click', { category: 'conversion', userId: null });
                   window.dispatchEvent(new CustomEvent('yg:open-subscription'));
