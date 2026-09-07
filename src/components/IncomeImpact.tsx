@@ -218,13 +218,13 @@ function ModeCard({ summary, accent, portfolioValue, portfolioIncome }: { summar
   if (summary.status !== 'ok' || !summary.topTicker) {
     return (
       <div className={cn('p-4 rounded-lg border-[3px] text-center text-sm text-muted-foreground', s.border)}>
-        {summary.emptyMessage ?? 'No replacement available.'}
+        {summary.emptyMessage ?? 'No alternative available.'}
       </div>
     );
   }
 
   const rows = [
-    { icon: Database, label: 'Replacement Stock', value: summary.topTicker, paidOnly: true },
+    { icon: Database, label: 'Alternative Stock', value: summary.topTicker, paidOnly: true },
     { icon: FileText, label: 'Shares to be purchased', value: summary.totalShares.toLocaleString(), paidOnly: true },
     { icon: PieChart, label: 'New Portfolio Yield', value: `${summary.newPortfolioYield.toFixed(2)}%`, paidOnly: false },
     {
@@ -267,7 +267,7 @@ function ModeCard({ summary, accent, portfolioValue, portfolioIncome }: { summar
           <span>
             Heads up: this swap raises your <span className="font-semibold">yield %</span> toward
             your target, but lowers your <span className="font-semibold">total annual dividend dollars</span>.
-            The replacement is a cheaper stock with a higher yield rate, so each dollar invested
+            The alternative is a cheaper stock with a higher yield rate, so each dollar invested
             earns more — but the shares you can buy with the proceeds pay fewer dollars overall
             than what you're selling.
           </span>

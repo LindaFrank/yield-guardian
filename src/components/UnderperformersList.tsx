@@ -55,7 +55,7 @@ export function UnderperformersList({
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Replacement Suggestions</span>
+              <span className="text-xs text-muted-foreground">Alternative Suggestions</span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </div>
           </button>
@@ -63,7 +63,7 @@ export function UnderperformersList({
       </div>
       
       <p className="mt-3 text-xs text-muted-foreground">
-        Click a stock to see replacement suggestions
+        Click a stock to see alternative suggestions
       </p>
     </div>
   );
