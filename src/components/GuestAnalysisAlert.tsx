@@ -73,16 +73,6 @@ export function GuestAnalysisAlert() {
               <Upload className="w-4 h-4" />
               Quick Start_Import your own portfolio
             </Button>
-            {paymentsEnabled && (
-              <Button
-                size="default"
-                className="w-full justify-center gap-2 shadow-glow py-3 text-sm"
-                onClick={() => fire('yg:open-subscription')}
-              >
-                <Save className="w-4 h-4" />
-                Save my portfolio
-              </Button>
-            )}
           </div>
         )}
       </div>
