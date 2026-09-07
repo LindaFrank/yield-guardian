@@ -150,6 +150,15 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
       <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <PaymentTestModeBanner />
         <DialogHeader>
+          <div className="flex flex-col items-center gap-2 pb-2">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <TrendingUp className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="font-semibold text-2xl">
+              <span className="text-foreground">Yield</span>{' '}
+              <span className="text-primary">Guardian</span>
+            </h2>
+          </div>
           <DialogTitle className="text-xl">
             {step === 'pricing' && 'Keep your portfolio working for you'}
             {step === 'auth' && (authMode === 'signup' ? 'Create your account' : 'Sign in to save')}
