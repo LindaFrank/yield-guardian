@@ -18,17 +18,7 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { GuestAnalysisAlert } from '@/components/GuestAnalysisAlert';
-import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide_Create_ver_2.pdf.asset.json';
-import qsg1 from '@/assets/quick-start-create-v2-1.jpg.asset.json';
-import qsg2 from '@/assets/quick-start-create-v2-2.jpg.asset.json';
-import qsg3 from '@/assets/quick-start-create-v2-3.jpg.asset.json';
-import qsg4 from '@/assets/quick-start-create-v2-4.jpg.asset.json';
-import qsg5 from '@/assets/quick-start-create-v2-5.jpg.asset.json';
-import qsg6 from '@/assets/quick-start-create-v2-6.jpg.asset.json';
-import qsg7 from '@/assets/quick-start-create-v2-7.jpg.asset.json';
-import qsg8 from '@/assets/quick-start-create-v2-8.jpg.asset.json';
 
-const quickStartPages = [qsg1, qsg2, qsg3, qsg4, qsg5, qsg6, qsg7, qsg8];
 
 export function Header() {
   const { user, signOut } = useAuth();
@@ -115,7 +105,7 @@ export function Header() {
           </div>
 
           {!user && (
-            <GuestAnalysisAlert pages={quickStartPages} pdfUrl={quickStartPdf.url} />
+            <GuestAnalysisAlert />
           )}
         </div>
       </header>

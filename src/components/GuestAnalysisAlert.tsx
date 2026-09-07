@@ -1,21 +1,14 @@
 import { useState } from 'react';
-import { HelpCircle, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { HelpCircle, X, BookOpen, Upload, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/analytics';
+import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 
-interface GuestAnalysisAlertProps {
-  pages: { url: string }[];
-  pdfUrl: string;
-}
-
-export function GuestAnalysisAlert({ pages, pdfUrl }: GuestAnalysisAlertProps) {
+export function GuestAnalysisAlert() {
   const [expanded, setExpanded] = useState(false);
-  const [page, setPage] = useState(0);
+  const { enabled: paymentsEnabled } = usePaymentsEnabled();
 
-  if (pages.length === 0) return null;
-
-  const nextPage = () => setPage((p) => Math.min(pages.length - 1, p + 1));
-  const prevPage = () => setPage((p) => Math.max(0, p - 1));
+  const fire = (name: string) => window.dispatchEvent(new CustomEvent(name));
 
   return (
     <div className="absolute top-4 right-4 z-[60] w-64 sm:w-80 max-w-[calc(100%-2rem)]">
@@ -48,51 +41,51 @@ export function GuestAnalysisAlert({ pages, pdfUrl }: GuestAnalysisAlertProps) {
         </div>
 
         {expanded && (
-          <div className="px-3 pb-3 space-y-3 border-t border-border/40">
-            <div className="relative pt-3">
-              <img
-                src={pages[page].url}
-                alt={`Guest guide page ${page + 1} of ${pages.length}`}
-                className="w-full rounded-md border border-border/60 bg-white object-contain"
-                style={{ maxHeight: '45vh' }}
-              />
-              <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-1 pointer-events-none">
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-7 w-7 rounded-full shadow pointer-events-auto disabled:opacity-30"
-                  onClick={prevPage}
-                  disabled={page === 0}
-                  aria-label="Previous guide page"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-7 w-7 rounded-full shadow pointer-events-auto disabled:opacity-30"
-                  onClick={nextPage}
-                  disabled={page === pages.length - 1}
-                  aria-label="Next guide page"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>
-                Page {page + 1} / {pages.length}
-              </span>
-              <a
-                href={pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-primary hover:underline underline-offset-4"
+          <div className="px-3 pb-3 pt-3 space-y-2 border-t border-border/40">
+            <p className="text-xs text-primary/90 leading-snug">
+              Nothing is saved when you leave. Take a quick walkthrough:
+            </p>
+            <Button
+              size="sm"
+              className="w-full justify-start gap-2 shadow-glow"
+              onClick={() => {
+                trackEvent('quick_start_create_open', {
+                  category: 'guide',
+                  label: 'Guest alert — Create Portfolio',
+                  userId: null,
+                });
+                fire('yg:open-quick-start-create');
+              }}
+            >
+              <BookOpen className="w-4 h-4" />
+              Quick Start_Create Portfolio
+            </Button>
+            <Button
+              size="sm"
+              className="w-full justify-start gap-2 shadow-glow"
+              onClick={() => {
+                trackEvent('quick_start_import_open', {
+                  category: 'guide',
+                  label: 'Guest alert — Import your own portfolio',
+                  userId: null,
+                });
+                fire('yg:open-quick-start-import');
+              }}
+            >
+              <Upload className="w-4 h-4" />
+              Quick Start_Import your own portfolio
+            </Button>
+            {paymentsEnabled && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full justify-start gap-2 border-2 border-primary/60 text-primary hover:bg-primary/10"
+                onClick={() => fire('yg:open-subscription')}
               >
-                Download PDF
-              </a>
-            </div>
+                <Save className="w-4 h-4" />
+                Save my portfolio
+              </Button>
+            )}
           </div>
         )}
       </div>
