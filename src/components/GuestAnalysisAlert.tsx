@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HelpCircle, X, BookOpen, Upload, Save } from 'lucide-react';
+import { HelpCircle, X, BookOpen, Upload, Save, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/analytics';
 import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
@@ -11,9 +11,9 @@ export function GuestAnalysisAlert() {
   const fire = (name: string) => window.dispatchEvent(new CustomEvent(name));
 
   return (
-    <div className="absolute top-4 right-4 z-[60] w-64 sm:w-80 max-w-[calc(100%-2rem)]">
-      <div className="rounded-lg border-[3px] border-primary/60 bg-card/95 backdrop-blur shadow-glow overflow-hidden">
-        <div className="flex items-center justify-between px-3 py-2 gap-2">
+    <div className="absolute top-4 right-4 z-[60] w-64 sm:w-80 max-w-[calc(100%-2rem)] flex flex-col items-end gap-2">
+      <div className="w-full rounded-xl border-[3px] border-primary/60 bg-card/95 backdrop-blur shadow-glow overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-2 gap-2 bg-primary/10 border-b border-primary/20">
           <span className="text-sm font-semibold text-foreground">Guest Analysis Mode</span>
           <Button
             variant="ghost"
@@ -41,7 +41,7 @@ export function GuestAnalysisAlert() {
         </div>
 
         {expanded && (
-          <div className="px-3 pb-3 pt-3 space-y-2 border-t border-border/40">
+          <div className="px-3 pb-3 pt-3 space-y-3 border-t border-border/40">
             <p className="text-xs text-primary/90 leading-snug">
               Nothing is saved when you leave. Take a quick walkthrough:
             </p>
@@ -77,9 +77,8 @@ export function GuestAnalysisAlert() {
             </Button>
             {paymentsEnabled && (
               <Button
-                size="sm"
-                variant="outline"
-                className="w-full justify-start gap-2 border-2 border-primary/60 text-primary hover:bg-primary/10"
+                size="default"
+                className="w-full justify-center gap-2 shadow-glow py-3 text-sm"
                 onClick={() => fire('yg:open-subscription')}
               >
                 <Save className="w-4 h-4" />
@@ -89,6 +88,20 @@ export function GuestAnalysisAlert() {
           </div>
         )}
       </div>
+
+      <Button
+        variant="default"
+        size="icon"
+        className="h-12 w-12 rounded-full shadow-glow bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback"
+        onClick={() => {
+          trackEvent('feedback_open', { category: 'feedback', userId: null });
+          window.dispatchEvent(new CustomEvent('yg:open-demo-feedback'));
+        }}
+        aria-label="Give feedback"
+        title="Feedback"
+      >
+        <MessageSquare className="w-5 h-5" />
+      </Button>
     </div>
   );
 }
