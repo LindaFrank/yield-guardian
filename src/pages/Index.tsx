@@ -469,9 +469,6 @@ const Index = () => {
                 Save my portfolio
               </Button>
             )}
-            <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
-              Sign in
-            </Button>
           </div>
         </div>
       )}
