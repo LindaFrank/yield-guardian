@@ -7,8 +7,9 @@ import {
   OptimizerMode,
   OptimizerResult,
 } from '@/lib/optimizer';
-import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote, Printer, Mail } from 'lucide-react';
+import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote, Printer, Mail, Info } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -21,6 +22,7 @@ import { usePaidFeatures } from '@/hooks/usePaidFeatures';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
+
 /** Blurs children when the visitor isn't a paid subscriber or admin. */
 function Teaser({ isPaid, children }: { isPaid: boolean; children: React.ReactNode }) {
   if (isPaid) return <>{children}</>;
@@ -31,6 +33,109 @@ function Teaser({ isPaid, children }: { isPaid: boolean; children: React.ReactNo
     >
       {children}
     </span>
+  );
+}
+
+/** Explains what "rest-of-year dividend" means and how the two cards compare. */
+function RestOfYearExplainer({
+  keepTicker,
+  switchLabel,
+  keepIncome,
+  switchIncome,
+  fracRemaining,
+  isPaid,
+}: {
+  keepTicker: string;
+  switchLabel: string;
+  keepIncome: number;
+  switchIncome: number;
+  fracRemaining: number;
+  isPaid: boolean;
+}) {
+  const delta = switchIncome - keepIncome;
+  const pctRemaining = Math.round(fracRemaining * 100);
+  const monthsLeft = Math.max(0, Math.round(fracRemaining * 12));
+  const label = isPaid ? switchLabel : 'the replacement';
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          aria-label="Explain rest-of-year dividend"
+          className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-foreground/70 hover:text-foreground underline decoration-dotted underline-offset-2 mt-2"
+        >
+          <Info className="w-3.5 h-3.5" />
+          What does this mean?
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Your dividends for the rest of this year</DialogTitle>
+          <DialogDescription>
+            A plain-English look at what changes between now and December 31.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 text-[13px] leading-relaxed text-muted-foreground">
+          <p>
+            “Rest-of-year div” is the dividend cash you can still expect to collect between today and
+            the end of this year — about {pctRemaining}% of the year
+            {monthsLeft > 0 ? ` (roughly ${monthsLeft} month${monthsLeft === 1 ? '' : 's'})` : ''} is left,
+            so we count only that share of a full year's payments.
+          </p>
+          <div className="rounded-md border-[2px] border-yield-negative/50 bg-yield-negative/5 p-3">
+            <div className="text-[11px] uppercase tracking-wide font-bold text-yield-negative mb-1">
+              Keep {keepTicker}
+            </div>
+            <p className="text-foreground/80">
+              Those shares stay put and pay you{' '}
+              <span className="font-mono font-bold">{formatCurrency(keepIncome)}</span> more this year.
+            </p>
+          </div>
+          <div
+            className={cn(
+              'rounded-md border-[2px] p-3',
+              delta >= 0
+                ? 'border-yield-positive/50 bg-yield-positive/5'
+                : 'border-yield-negative/50 bg-yield-negative/5',
+            )}
+          >
+            <div
+              className={cn(
+                'text-[11px] uppercase tracking-wide font-bold mb-1',
+                delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
+              )}
+            >
+              Switch to {label}
+            </div>
+            <p className="text-foreground/80">
+              You sell the {keepTicker} shares and put the same money into {label}, which pays you{' '}
+              <span className="font-mono font-bold">{formatCurrency(switchIncome)}</span> before year end.
+            </p>
+          </div>
+          <p>
+            The number in parentheses is the difference:{' '}
+            <span
+              className={cn(
+                'font-mono font-bold',
+                delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
+              )}
+            >
+              {delta >= 0 ? '+' : ''}
+              {formatCurrency(delta)}
+            </span>{' '}
+            {delta >= 0
+              ? 'in extra dividend cash you would collect this year by making the switch now.'
+              : 'less dividend cash this year — the switch raises your yield rate, but pays fewer dollars before December 31.'}
+          </p>
+          <p>
+            Switching earlier in the year captures more of this difference. Figures use each company's
+            current declared dividend rate and each stock's own payment calendar can shift the exact
+            timing; issuers can cut or suspend payments at any time.
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -362,6 +467,14 @@ export function ReplacementSuggestions({
                           <div className="text-[11px] text-foreground/80 font-medium">
                             rest-of-year div (<span className={cn('font-bold text-[13px]', delta >= 0 ? 'text-yield-positive' : 'text-yield-negative')}>{delta >= 0 ? '+' : ''}{formatCurrency(delta)}</span>)
                           </div>
+                          <RestOfYearExplainer
+                            keepTicker={removedStock.ticker}
+                            switchLabel={switchLabel}
+                            keepIncome={keepIncome}
+                            switchIncome={switchIncome}
+                            fracRemaining={fracRemaining}
+                            isPaid={isPaid}
+                          />
 
                         </div>
                       </div>
