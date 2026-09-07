@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Button } from '@/components/ui/button';
-import { HelpIconToggle } from '@/components/HelpIconToggle';
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -71,7 +71,6 @@ export function Header() {
             </div>
 
             <div className="flex items-center justify-end">
-              <HelpIconToggle />
               {user && (
                 <div className="flex items-center gap-3 ml-[100px]">
                   {isAdmin && (
