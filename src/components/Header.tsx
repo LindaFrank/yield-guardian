@@ -61,7 +61,7 @@ export function Header() {
   return (
     <>
       <header className="bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-5">
+        <div className="container mx-auto px-6 py-5 relative">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
             <div aria-hidden="true" />
 
@@ -113,6 +113,10 @@ export function Header() {
             <div className="h-[4px] w-[44%] bg-muted-foreground" />
             <span className="text-muted-foreground text-[16px] leading-none">▸</span>
           </div>
+
+          {!user && (
+            <GuestAnalysisAlert pages={quickStartPages} pdfUrl={quickStartPdf.url} />
+          )}
         </div>
       </header>
 
