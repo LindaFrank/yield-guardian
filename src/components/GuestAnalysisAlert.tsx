@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { HelpCircle, X, BookOpen, Upload, Save, MessageSquare } from 'lucide-react';
+import { HelpCircle, X, BookOpen, Upload, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/analytics';
-import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 
 export function GuestAnalysisAlert() {
   const [expanded, setExpanded] = useState(false);
-  const { enabled: paymentsEnabled } = usePaymentsEnabled();
 
   const fire = (name: string) => window.dispatchEvent(new CustomEvent(name));
 
