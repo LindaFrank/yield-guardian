@@ -8,12 +8,12 @@ export function HelpIconToggle() {
   return (
     <button
       onClick={toggle}
-      title={enabled ? 'Turn off Help Wizard' : 'Turn on Help Wizard'}
+      title={enabled ? 'Turn off Helper Wizard' : 'Turn on Helper Wizard'}
       className={cn(
         'relative p-2 rounded-lg transition-all duration-200',
         enabled
           ? 'border-2 border-primary text-primary bg-primary/10'
-          : 'border border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground'
+          : 'border-2 border-primary/60 text-primary bg-primary/5 hover:bg-primary/10'
       )}
     >
       <HelpCircle className="w-5 h-5" />
