@@ -467,6 +467,14 @@ export function ReplacementSuggestions({
                           <div className="text-[11px] text-foreground/80 font-medium">
                             rest-of-year div (<span className={cn('font-bold text-[13px]', delta >= 0 ? 'text-yield-positive' : 'text-yield-negative')}>{delta >= 0 ? '+' : ''}{formatCurrency(delta)}</span>)
                           </div>
+                          <RestOfYearExplainer
+                            keepTicker={removedStock.ticker}
+                            switchLabel={switchLabel}
+                            keepIncome={keepIncome}
+                            switchIncome={switchIncome}
+                            fracRemaining={fracRemaining}
+                            isPaid={isPaid}
+                          />
 
                         </div>
                       </div>
