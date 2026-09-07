@@ -72,7 +72,7 @@ function RestOfYearExplainer({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Your dividends for the rest of this year</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-[17px] font-medium text-primary">
             A plain-English look at what changes between now and December 31.
           </DialogDescription>
         </DialogHeader>
