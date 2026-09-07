@@ -39,6 +39,10 @@ export default {
           DEFAULT: "hsl(var(--feedback))",
           foreground: "hsl(var(--feedback-foreground))",
         },
+        promo: {
+          DEFAULT: "hsl(var(--promo))",
+          foreground: "hsl(var(--promo-foreground))",
+        },
 
         muted: {
           DEFAULT: "hsl(var(--muted))",

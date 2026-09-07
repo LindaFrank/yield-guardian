@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { HelpCircle, X, BookOpen, Upload, Save, MessageSquare } from 'lucide-react';
+import { HelpCircle, X, BookOpen, Upload, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/analytics';
-import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 
 export function GuestAnalysisAlert() {
   const [expanded, setExpanded] = useState(false);
-  const { enabled: paymentsEnabled } = usePaymentsEnabled();
 
   const fire = (name: string) => window.dispatchEvent(new CustomEvent(name));
 
@@ -75,16 +73,6 @@ export function GuestAnalysisAlert() {
               <Upload className="w-4 h-4" />
               Quick Start_Import your own portfolio
             </Button>
-            {paymentsEnabled && (
-              <Button
-                size="default"
-                className="w-full justify-center gap-2 shadow-glow py-3 text-sm"
-                onClick={() => fire('yg:open-subscription')}
-              >
-                <Save className="w-4 h-4" />
-                Save my portfolio
-              </Button>
-            )}
           </div>
         )}
       </div>

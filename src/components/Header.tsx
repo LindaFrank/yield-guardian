@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { TrendingUp, LogOut, User, ShieldCheck } from 'lucide-react';
+import { TrendingUp, LogOut, User, ShieldCheck, Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 import { Button } from '@/components/ui/button';
+import { trackEvent } from '@/lib/analytics';
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -105,6 +107,22 @@ export function Header() {
 
           {!user && (
             <GuestAnalysisAlert />
+          )}
+
+          {!user && (
+            <div className="flex justify-center mt-4">
+              <Button
+                size="default"
+                className="gap-2 bg-promo text-promo-foreground hover:bg-promo/90 border-2 border-primary shadow-glow px-6 py-3 text-sm font-semibold"
+                onClick={() => {
+                  trackEvent('save_portfolio_header_click', { category: 'conversion', userId: null });
+                  window.dispatchEvent(new CustomEvent('yg:open-subscription'));
+                }}
+              >
+                <Save className="w-4 h-4" />
+                Save my portfolio
+              </Button>
+            </div>
           )}
         </div>
       </header>
