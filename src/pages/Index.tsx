@@ -58,7 +58,6 @@ const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, q
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
-import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged, trackEvent } from '@/lib/analytics';
@@ -78,7 +77,7 @@ const Index = () => {
   const removeTicker = useRemoveTicker();
   const updateShares = useUpdateShares();
   const { data: stocksWithShares } = useUserStocksWithShares();
-  const { enabled: paymentsEnabled } = usePaymentsEnabled();
+
 
   // Guest mode: no account — portfolio lives in local state for this session only
   const isGuest = !user;
@@ -409,13 +408,16 @@ const Index = () => {
     const openCreate = () => setQuickStartOpen(true);
     const openImport = () => setQuickStartImportOpen(true);
     const openSub = () => setSubscriptionOpen(true);
+    const openFeedback = () => setFeedbackOpen(true);
     window.addEventListener('yg:open-quick-start-create', openCreate);
     window.addEventListener('yg:open-quick-start-import', openImport);
     window.addEventListener('yg:open-subscription', openSub);
+    window.addEventListener('yg:open-demo-feedback', openFeedback);
     return () => {
       window.removeEventListener('yg:open-quick-start-create', openCreate);
       window.removeEventListener('yg:open-quick-start-import', openImport);
       window.removeEventListener('yg:open-subscription', openSub);
+      window.removeEventListener('yg:open-demo-feedback', openFeedback);
     };
   }, []);
 
@@ -463,30 +465,6 @@ const Index = () => {
       
       <Header />
 
-      {isGuest && (
-        <div className="border-b-2 border-primary/30 bg-primary/5">
-          <div className="container mx-auto px-6 py-2 flex flex-wrap items-center justify-end gap-2">
-            <Button size="sm" className="shadow-glow" onClick={() => { trackEvent('quick_start_create_open', { category: 'guide', label: 'Quick Start_Create Portfolio', userId: user?.id ?? null }); setQuickStartOpen(true); }}>
-              Quick Start_Create Portfolio
-            </Button>
-            <Button size="sm" className="shadow-glow" onClick={() => { trackEvent('quick_start_import_open', { category: 'guide', label: 'Quick Start_Import your own portfolio', userId: user?.id ?? null }); setQuickStartImportOpen(true); }}>
-              Quick Start_Import your own portfolio
-            </Button>
-            <Button
-              size="sm"
-              className="bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback"
-              onClick={() => { trackEvent('feedback_open', { category: 'feedback', userId: user?.id ?? null }); setFeedbackOpen(true); }}
-            >
-              Feedback
-            </Button>
-            {paymentsEnabled && (
-              <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
-                Save my portfolio
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
 
       <Dialog open={quickStartOpen} onOpenChange={(o) => setQuickStartOpen(o)}>
         <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
