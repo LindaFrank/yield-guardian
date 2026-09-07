@@ -139,11 +139,11 @@ export default function Auth() {
               style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.3) 0%, transparent 70%)' }}
               animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} />
             <div className="relative p-4 rounded-2xl bg-primary/10 border border-primary/20 backdrop-blur-sm">
-              <TrendingUp className="w-12 h-12 text-primary" />
+              <TrendingUp className="w-[52px] h-[52px] text-primary" />
             </div>
           </motion.div>
 
-          <motion.h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}>
+          <motion.h1 className="text-[40px] sm:text-[52px] font-bold tracking-tight mb-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}>
             <span className="text-foreground">Yield</span>{' '}
             <motion.span className="text-primary inline-block"
               animate={{ textShadow: ['0 0 20px hsl(var(--primary) / 0)', '0 0 20px hsl(var(--primary) / 0.5)', '0 0 20px hsl(var(--primary) / 0)'] }}
