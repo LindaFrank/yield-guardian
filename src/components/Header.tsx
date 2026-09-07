@@ -50,13 +50,13 @@ export function Header() {
     <>
       <header className="bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between relative">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10">
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
-              <div>
-                <h1 className="font-semibold text-[21px]">Yield Guardian</h1>
+              <div className="md:hidden">
+                <h1 className="font-semibold text-[21px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
                 <div className="flex items-center gap-1 my-0.5">
                   <span className="text-muted-foreground/90 text-[10px] leading-none">◂</span>
                   <div className="h-[3px] w-11 bg-muted-foreground/60" />
@@ -66,6 +66,18 @@ export function Header() {
                 </div>
                 <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
               </div>
+            </div>
+
+            <div className="hidden md:flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              <h1 className="font-semibold text-[21px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
+              <div className="flex items-center gap-1 my-0.5">
+                <span className="text-muted-foreground/90 text-[10px] leading-none">◂</span>
+                <div className="h-[3px] w-11 bg-muted-foreground/60" />
+                <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
+                <div className="h-[3px] w-11 bg-muted-foreground/60" />
+                <span className="text-muted-foreground/90 text-[10px] leading-none">▸</span>
+              </div>
+              <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
             <div className="flex items-center">
               <HelpIconToggle />
