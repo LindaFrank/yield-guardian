@@ -551,7 +551,9 @@ const Index = () => {
 
 
       
-      <main className="container mx-auto px-6 py-8">
+      <main className="relative container mx-auto px-6 py-8">
+        {isGuest && <GuestAnalysisAlert pages={quickStartPages} pdfUrl={quickStartPdf.url} />}
+
         {/* Live Data Status */}
         <HelpTooltip text="This is used to display instructions or messages." side="bottom">
           <div className="mb-4">
