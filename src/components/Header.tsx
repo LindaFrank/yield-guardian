@@ -115,7 +115,7 @@ export function Header() {
           </div>
 
           {!user && (
-            <GuestAnalysisAlert pages={quickStartPages} pdfUrl={quickStartPdf.url} />
+            <GuestAnalysisAlert />
           )}
         </div>
       </header>
