@@ -26,6 +26,7 @@ import { AddStockModal } from '@/components/AddStockModal';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
+import { HelpIconToggle } from '@/components/HelpIconToggle';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
 import { RedScrollContainer } from '@/components/RedScrollContainer';
 import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide_Create_ver_2.pdf.asset.json';
@@ -563,28 +564,31 @@ const Index = () => {
       
       <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}
-        <HelpTooltip text="This is used to display instructions or messages." side="bottom">
-          <div className="mb-4">
-            {(isLoading || portfolioLoading) && (
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-                Fetching live market data…
-              </div>
-            )}
-            {!isLoading && !portfolioLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Live data · Refreshes every 5 min
-              </div>
-            )}
-            {!isLoading && !portfolioLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
-                Waiting for live feed…
-              </div>
-            )}
-          </div>
-        </HelpTooltip>
+        <div className="mb-4 flex items-center justify-between">
+          <HelpTooltip text="Market data is refreshed automatically every few minutes." side="bottom">
+            <div>
+              {(isLoading || portfolioLoading) && (
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                  Fetching live market data…
+                </div>
+              )}
+              {!isLoading && !portfolioLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                  Live data · Refreshes every 5 min
+                </div>
+              )}
+              {!isLoading && !portfolioLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
+                  Waiting for live feed…
+                </div>
+              )}
+            </div>
+          </HelpTooltip>
+          <HelpIconToggle />
+        </div>
 
         {/* New user: show onboarding wizard prominently first */}
         {showStockFinder && (
