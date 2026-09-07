@@ -19,7 +19,7 @@ export function GuestAnalysisAlert({ pages, pdfUrl }: GuestAnalysisAlertProps) {
 
   return (
     <div className="absolute top-4 right-4 z-[60] w-64 sm:w-80 max-w-[calc(100%-2rem)]">
-      <div className="rounded-lg border-2 border-primary/30 bg-card/95 backdrop-blur shadow-glow overflow-hidden">
+      <div className="rounded-lg border-[3px] border-primary/60 bg-card/95 backdrop-blur shadow-glow overflow-hidden">
         <div className="flex items-center justify-between px-3 py-2 gap-2">
           <span className="text-sm font-semibold text-foreground">Guest Analysis Mode</span>
           <Button
