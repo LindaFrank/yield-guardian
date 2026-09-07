@@ -59,9 +59,9 @@ export function Header() {
                 <h1 className="font-semibold text-[21px]">Yield Guardian</h1>
                 <div className="flex items-center gap-1 my-0.5">
                   <span className="text-muted-foreground/90 text-[10px] leading-none">◂</span>
-                  <div className="h-[2px] w-10 bg-muted-foreground/60" />
+                  <div className="h-[3px] w-11 bg-muted-foreground/60" />
                   <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
-                  <div className="h-[2px] w-10 bg-muted-foreground/60" />
+                  <div className="h-[3px] w-11 bg-muted-foreground/60" />
                   <span className="text-muted-foreground/90 text-[10px] leading-none">▸</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
