@@ -451,33 +451,28 @@ const Index = () => {
 
       {isGuest && (
         <div className="border-b-2 border-primary/30 bg-primary/5">
-          <div className="container mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Guest analysis</span> — analyze any portfolio without an account. Nothing is saved when you leave.
-            </p>
-            <div className="flex items-center gap-2">
-              <Button size="sm" className="shadow-glow" onClick={() => { trackEvent('quick_start_create_open', { category: 'guide', label: 'Quick Start_Create Portfolio', userId: user?.id ?? null }); setQuickStartOpen(true); }}>
-                Quick Start_Create Portfolio
+          <div className="container mx-auto px-6 py-2 flex flex-wrap items-center justify-end gap-2">
+            <Button size="sm" className="shadow-glow" onClick={() => { trackEvent('quick_start_create_open', { category: 'guide', label: 'Quick Start_Create Portfolio', userId: user?.id ?? null }); setQuickStartOpen(true); }}>
+              Quick Start_Create Portfolio
+            </Button>
+            <Button size="sm" className="shadow-glow" onClick={() => { trackEvent('quick_start_import_open', { category: 'guide', label: 'Quick Start_Import your own portfolio', userId: user?.id ?? null }); setQuickStartImportOpen(true); }}>
+              Quick Start_Import your own portfolio
+            </Button>
+            <Button
+              size="sm"
+              className="bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback"
+              onClick={() => { trackEvent('feedback_open', { category: 'feedback', userId: user?.id ?? null }); setFeedbackOpen(true); }}
+            >
+              Feedback
+            </Button>
+            {paymentsEnabled && (
+              <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
+                Save my portfolio
               </Button>
-              <Button size="sm" className="shadow-glow" onClick={() => { trackEvent('quick_start_import_open', { category: 'guide', label: 'Quick Start_Import your own portfolio', userId: user?.id ?? null }); setQuickStartImportOpen(true); }}>
-                Quick Start_Import your own portfolio
-              </Button>
-              <Button
-                size="sm"
-                className="bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback"
-                onClick={() => { trackEvent('feedback_open', { category: 'feedback', userId: user?.id ?? null }); setFeedbackOpen(true); }}
-              >
-                Feedback
-              </Button>
-              {paymentsEnabled && (
-                <Button size="sm" className="shadow-glow" onClick={() => setSubscriptionOpen(true)}>
-                  Save my portfolio
-                </Button>
-              )}
-              <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
-                Sign in
-              </Button>
-            </div>
+            )}
+            <Button variant="outline" size="sm" className="border-2 border-primary/50" onClick={() => navigate('/auth')}>
+              Sign in
+            </Button>
           </div>
         </div>
       )}
