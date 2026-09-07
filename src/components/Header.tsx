@@ -109,7 +109,7 @@ export function Header() {
             <GuestAnalysisAlert />
           )}
 
-          {!user && <SavePortfolioButton />}
+          {!user && <SavePortfolioHeaderButton />}
         </div>
       </header>
 
