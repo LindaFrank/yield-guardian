@@ -56,7 +56,7 @@ export function Header() {
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="font-semibold text-lg">Yield Guardian</h1>
+                <h1 className="font-semibold text-[21px]">Yield Guardian</h1>
                 <div className="flex items-center gap-1 my-0.5">
                   <span className="text-muted-foreground/90 text-[10px] leading-none">◂</span>
                   <div className="h-[2px] w-10 bg-muted-foreground/60" />
