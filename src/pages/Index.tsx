@@ -28,7 +28,6 @@ import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
 import { RedScrollContainer } from '@/components/RedScrollContainer';
-import { GuestAnalysisAlert } from '@/components/GuestAnalysisAlert';
 import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide_Create_ver_2.pdf.asset.json';
 import qsg1 from '@/assets/quick-start-create-v2-1.jpg.asset.json';
 import qsg2 from '@/assets/quick-start-create-v2-2.jpg.asset.json';
@@ -551,9 +550,7 @@ const Index = () => {
 
 
       
-      <main className="relative container mx-auto px-6 py-8">
-        {isGuest && <GuestAnalysisAlert pages={quickStartPages} pdfUrl={quickStartPdf.url} />}
-
+      <main className="container mx-auto px-6 py-8">
         {/* Live Data Status */}
         <HelpTooltip text="This is used to display instructions or messages." side="bottom">
           <div className="mb-4">
