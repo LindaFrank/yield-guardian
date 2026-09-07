@@ -404,6 +404,20 @@ const Index = () => {
     setReplacementDialogOpen(true);
   };
 
+  useEffect(() => {
+    const openCreate = () => setQuickStartOpen(true);
+    const openImport = () => setQuickStartImportOpen(true);
+    const openSub = () => setSubscriptionOpen(true);
+    window.addEventListener('yg:open-quick-start-create', openCreate);
+    window.addEventListener('yg:open-quick-start-import', openImport);
+    window.addEventListener('yg:open-subscription', openSub);
+    return () => {
+      window.removeEventListener('yg:open-quick-start-create', openCreate);
+      window.removeEventListener('yg:open-quick-start-import', openImport);
+      window.removeEventListener('yg:open-subscription', openSub);
+    };
+  }, []);
+
   const handleGenerateReport = async () => {
     setReportGenerating(true);
     try {
