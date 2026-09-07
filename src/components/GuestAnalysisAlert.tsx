@@ -11,7 +11,7 @@ export function GuestAnalysisAlert() {
   const fire = (name: string) => window.dispatchEvent(new CustomEvent(name));
 
   return (
-    <div className="absolute top-4 right-4 z-[60] w-64 sm:w-80 max-w-[calc(100%-2rem)] flex flex-col items-end gap-2">
+    <div className="absolute top-4 right-4 z-[60] w-64 sm:w-80 max-w-[calc(100%-2rem)] flex flex-col items-center gap-2">
       <div className="w-full rounded-xl border-[3px] border-primary/60 bg-card/95 backdrop-blur shadow-glow overflow-hidden">
         <div className="flex items-center justify-between px-3 py-2 gap-2 bg-primary/10 border-b border-primary/20">
           <span className="text-sm font-semibold text-foreground">Guest Analysis Mode</span>
@@ -91,15 +91,15 @@ export function GuestAnalysisAlert() {
 
       <Button
         variant="default"
-        className="h-16 w-16 rounded-full shadow-glow bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback flex flex-col items-center justify-center gap-0.5 p-0"
+        className="h-20 w-20 rounded-full shadow-glow bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback flex flex-col items-center justify-center gap-1 p-0"
         onClick={() => {
           trackEvent('feedback_open', { category: 'feedback', userId: null });
           window.dispatchEvent(new CustomEvent('yg:open-demo-feedback'));
         }}
         aria-label="Give feedback"
       >
-        <MessageSquare className="w-5 h-5" />
-        <span className="text-[10px] leading-none font-medium">Feedback</span>
+        <MessageSquare className="w-6 h-6" />
+        <span className="text-[11px] leading-none font-medium">Feedback</span>
       </Button>
     </div>
   );
