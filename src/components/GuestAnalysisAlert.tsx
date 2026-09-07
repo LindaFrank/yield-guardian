@@ -79,14 +79,21 @@ export function GuestAnalysisAlert() {
 
       <Button
         variant="default"
-        className="h-7 w-7 rounded-full shadow-glow bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 flex items-center justify-center p-0"
+        className="rounded-full p-0 flex items-center justify-center text-white font-semibold hover:opacity-90"
+        style={{
+          width: '90px',
+          height: '90px',
+          backgroundColor: '#147D72',
+          border: '5px solid #F4B942',
+          boxShadow: 'none',
+        }}
         onClick={() => {
           trackEvent('feedback_open', { category: 'feedback', userId: null });
           window.dispatchEvent(new CustomEvent('yg:open-demo-feedback'));
         }}
         aria-label="Give feedback"
       >
-        <MessageSquare className="w-3 h-3" />
+        Feedback
       </Button>
     </div>
   );
