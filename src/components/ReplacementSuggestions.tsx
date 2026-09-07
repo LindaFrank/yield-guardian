@@ -55,7 +55,7 @@ function RestOfYearExplainer({
   const delta = switchIncome - keepIncome;
   const pctRemaining = Math.round(fracRemaining * 100);
   const monthsLeft = Math.max(0, Math.round(fracRemaining * 12));
-  const label = isPaid ? switchLabel : 'the replacement';
+  const label = isPaid ? switchLabel : 'the alternative';
 
   return (
     <Dialog>
@@ -245,13 +245,13 @@ export function ReplacementSuggestions({
         <div className="flex items-center justify-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-primary" />
           <span className="font-medium">
-            {isDefaultMode ? 'Matching Stocks' : 'Replacement Suggestions'}
+            {isDefaultMode ? 'Matching Stocks' : 'Alternative Suggestions'}
           </span>
         </div>
         <p className="text-muted-foreground">
           {isDefaultMode
             ? 'No matching stocks currently exceed your target yield'
-            : 'No replacement stocks meet your current yield target'}
+            : 'No alternative stocks meet your current yield target'}
         </p>
       </div>
     );
@@ -277,7 +277,7 @@ export function ReplacementSuggestions({
           <div className="mb-4 p-3 rounded-lg border-4 border-primary/30 bg-primary/5 space-y-3">
             <div className="flex items-center gap-2">
               <Wand2 className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold">Replacement Strategy</span>
+              <span className="text-sm font-semibold">Alternative Strategy</span>
             </div>
 
             {/* Mode toggle */}
@@ -575,7 +575,7 @@ export function ReplacementSuggestions({
 
           return baseRows;
         })().map((row, idx) => {
-          // Find matching ReplacementCandidate metadata for display badges
+          // Find matching candidate metadata for display badges
           const meta = candidates.find((c) => c.stock.ticker === row.stock.ticker);
           const yieldVal = meta?.yield ?? (row.stock.annualDividend / row.stock.currentPrice) * 100;
           const stabilityScore = meta?.stabilityScore ?? 2;
@@ -801,7 +801,7 @@ export function ReplacementSuggestions({
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
                 {displayRows && (() => {
                   // In conservative mode, project the same trade into THIS card's ticker
-                  // so every replacement shows the same income breakdown as the solver pick.
+                  // so every alternative shows the same income breakdown as the solver pick.
                   let projShares = row.shares;
                   let projCost = row.cost;
                   let projIncome = row.income;

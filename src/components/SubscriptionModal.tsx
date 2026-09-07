@@ -139,7 +139,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
 
   const features = [
     { icon: BarChart3, label: 'Continuous yield monitoring' },
-    { icon: Zap, label: 'Smart replacement alternatives' },
+    { icon: Zap, label: 'Smart alternatives' },
     { icon: TrendingUp, label: 'Track income improvements' },
     { icon: Bell, label: 'New opportunities as markets change' },
     { icon: Shield, label: 'Cancel anytime' },

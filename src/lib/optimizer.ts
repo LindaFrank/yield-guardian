@@ -100,7 +100,7 @@ export interface OptimizerResult {
 const noTrade = (
   underperformer: Stock,
   mode: OptimizerMode,
-  message = 'No replacement candidates available.',
+  message = 'No alternative candidates available.',
 ): OptimizerResult => ({
   status: 'no-trade',
   message,

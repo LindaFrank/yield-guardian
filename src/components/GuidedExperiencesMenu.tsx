@@ -25,8 +25,8 @@ export const GUIDED_EXPERIENCES = [
   {
     id: 'smart-swaps',
     icon: Repeat,
-    title: 'Meet Ron and see how he can replace stocks not producing a dividend',
-    blurb: 'See how a single swap changes annual dividend income, share for share.',
+    title: 'Meet Ron and see alternatives for stocks not producing a dividend',
+    blurb: 'See how a single switch changes annual dividend income, share for share.',
     loomId: '',
   },
 ] as const;
