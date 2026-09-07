@@ -87,7 +87,7 @@ export function GuestAnalysisAlert() {
         aria-label="Give feedback"
       >
         <MessageSquare className="w-6 h-6" />
-        <span className="text-[11px] leading-none font-medium">Feedback</span>
+        <span className="text-[14px] leading-none font-medium">Feedback</span>
       </Button>
     </div>
   );
