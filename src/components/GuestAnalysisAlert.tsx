@@ -79,7 +79,7 @@ export function GuestAnalysisAlert() {
 
       <Button
         variant="default"
-        className="h-20 w-20 rounded-full shadow-glow bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback flex flex-col items-center justify-center gap-1 p-0"
+        className="h-20 w-20 rounded-full shadow-glow bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 flex flex-col items-center justify-center gap-1 p-0"
         onClick={() => {
           trackEvent('feedback_open', { category: 'feedback', userId: null });
           window.dispatchEvent(new CustomEvent('yg:open-demo-feedback'));
