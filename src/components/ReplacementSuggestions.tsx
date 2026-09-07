@@ -55,7 +55,7 @@ function RestOfYearExplainer({
   const delta = switchIncome - keepIncome;
   const pctRemaining = Math.round(fracRemaining * 100);
   const monthsLeft = Math.max(0, Math.round(fracRemaining * 12));
-  const label = isPaid ? switchLabel : 'the replacement';
+  const label = isPaid ? switchLabel : 'the alternative';
 
   return (
     <Dialog>
