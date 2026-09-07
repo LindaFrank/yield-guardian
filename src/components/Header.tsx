@@ -55,9 +55,9 @@ export function Header() {
 
             <div className="flex flex-col items-center">
               <div className="p-2 rounded-lg bg-primary/10 mb-1">
-                <TrendingUp className="w-7 h-7 text-primary" />
+                <TrendingUp className="w-8 h-8 text-primary" />
               </div>
-              <h1 className="font-semibold text-[27px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
+              <h1 className="font-semibold text-[31px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
               <div className="flex items-center gap-1 my-2">
                 <span className="text-muted-foreground text-[16px] leading-none">◂</span>
                 <div className="h-[5px] w-11 bg-muted-foreground" />
