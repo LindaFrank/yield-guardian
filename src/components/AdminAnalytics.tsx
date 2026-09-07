@@ -119,10 +119,10 @@ export function AdminAnalytics() {
         </div>
       </div>
 
-      {/* Replacements */}
+      {/* Alternatives */}
       <div>
         <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-          <Repeat className="w-4 h-4" /> Replacements Applied
+          <Repeat className="w-4 h-4" /> Alternatives Applied
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Stat label="Total swaps" value={m.replacements.total} />

@@ -138,7 +138,7 @@ const Index = () => {
   // Fetch live data for portfolio tickers
   const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
 
-  // Fetch live quotes for candidate replacement stocks
+  // Fetch live quotes for candidate alternative stocks
   const { data: liveCandidates } = useStockQuotes(candidateTickers);
 
   // Keep local portfolio state in sync when user/account tickers change
@@ -279,7 +279,7 @@ const Index = () => {
   }, [user, stocks.length, portfolioStats.value, portfolioStats.income, underperformers.length]);
 
 
-  // Build a live market stocks pool for replacement suggestions
+  // Build a live market stocks pool for alternative suggestions
   const liveMarketStocks = useMemo(() => {
     if (!liveCandidates || liveCandidates.length === 0) return [];
     return liveCandidates.map((live) => {
@@ -731,7 +731,7 @@ const Index = () => {
           </HelpTooltip>
         </div>
 
-        {/* Combined Underperformers + Replacements panel (above Income Impact) */}
+        {/* Combined Underperformers + Alternatives panel (above Income Impact) */}
         {!showStockFinder && underperformers.length > 0 && (
           <section id="replacement-suggestions-section" className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
             <UnderperformersPanel
@@ -849,14 +849,14 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Replacement Suggestions Dialog */}
+          {/* Alternative Suggestions Dialog */}
           <Dialog open={replacementDialogOpen} onOpenChange={setReplacementDialogOpen}>
             <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
                   {selectedUnderperformer
-                    ? `Replacements for ${selectedUnderperformer.ticker}`
+                    ? `Alternatives for ${selectedUnderperformer.ticker}`
                     : 'Matching Stocks'}
                 </DialogTitle>
               </DialogHeader>
