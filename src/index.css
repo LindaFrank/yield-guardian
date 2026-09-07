@@ -47,6 +47,7 @@
     --feedback-foreground: 0 0% 100%;
     --promo: 320 80% 55%;
     --promo-foreground: 0 0% 100%;
+    --promo-violet: 270 80% 60%;
 
 
     /* Approach accents */
@@ -56,6 +57,7 @@
     /* Gradients */
     --gradient-card: linear-gradient(135deg, hsl(222 47% 10%) 0%, hsl(222 47% 8%) 100%);
     --gradient-primary: linear-gradient(135deg, hsl(165 82% 51%) 0%, hsl(158 64% 52%) 100%);
+    --gradient-promo: linear-gradient(135deg, hsl(var(--promo)) 0%, hsl(var(--promo-violet)) 100%);
     --gradient-glow: radial-gradient(ellipse at center, hsl(165 82% 51% / 0.15) 0%, transparent 70%);
 
     /* Shadows */
