@@ -108,6 +108,8 @@ export function Header() {
           {!user && (
             <GuestAnalysisAlert />
           )}
+
+          {!user && <SavePortfolioButton />}
         </div>
       </header>
 
