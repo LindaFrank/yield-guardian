@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HelpCircle, X, BookOpen, Upload, MessageSquare } from 'lucide-react';
+import { HelpCircle, X, BookOpen, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/analytics';
 
