@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { TrendingUp, LogOut, User, ShieldCheck } from 'lucide-react';
+import { TrendingUp, LogOut, User, ShieldCheck, Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 import { Button } from '@/components/ui/button';
+import { trackEvent } from '@/lib/analytics';
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
