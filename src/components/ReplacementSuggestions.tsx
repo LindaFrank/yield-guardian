@@ -63,7 +63,7 @@ function RestOfYearExplainer({
         <button
           type="button"
           aria-label="Explain rest-of-year dividend"
-          className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-foreground/70 hover:text-foreground underline decoration-dotted underline-offset-2 mt-2"
+          className="inline-flex items-center gap-1 text-[14px] font-semibold uppercase tracking-wide text-foreground/90 hover:text-foreground underline decoration-dotted underline-offset-2 mt-2"
         >
           <Info className="w-3.5 h-3.5" />
           What does this mean?
@@ -76,7 +76,7 @@ function RestOfYearExplainer({
             A plain-English look at what changes between now and December 31.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-3 text-[13px] leading-relaxed text-muted-foreground">
+        <div className="space-y-3 text-[16px] leading-relaxed text-foreground/95">
           <p>
             “Rest-of-year div” is the dividend cash you can still expect to collect between today and
             the end of this year — about {pctRemaining}% of the year
@@ -84,10 +84,10 @@ function RestOfYearExplainer({
             so we count only that share of a full year's payments.
           </p>
           <div className="rounded-md border-[2px] border-yield-negative/50 bg-yield-negative/5 p-3">
-            <div className="text-[11px] uppercase tracking-wide font-bold text-yield-negative mb-1">
+            <div className="text-[14px] uppercase tracking-wide font-bold text-yield-negative mb-1">
               Keep {keepTicker}
             </div>
-            <p className="text-foreground/80">
+            <p className="text-foreground/95">
               Those shares stay put and pay you{' '}
               <span className="font-mono font-bold">{formatCurrency(keepIncome)}</span> more this year.
             </p>
@@ -102,13 +102,13 @@ function RestOfYearExplainer({
           >
             <div
               className={cn(
-                'text-[11px] uppercase tracking-wide font-bold mb-1',
+                'text-[14px] uppercase tracking-wide font-bold mb-1',
                 delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
               )}
             >
               Switch to {label}
             </div>
-            <p className="text-foreground/80">
+            <p className="text-foreground/95">
               You sell the {keepTicker} shares and put the same money into {label}, which pays you{' '}
               <span className="font-mono font-bold">{formatCurrency(switchIncome)}</span> before year end.
             </p>
