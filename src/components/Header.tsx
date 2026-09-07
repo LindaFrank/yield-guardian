@@ -49,9 +49,11 @@ export function Header() {
   return (
     <>
       <header className="bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between relative">
-            <div className="md:hidden flex flex-col items-center mx-auto">
+        <div className="container mx-auto px-6 py-5">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+            <div aria-hidden="true" />
+
+            <div className="flex flex-col items-center">
               <div className="p-2 rounded-lg bg-primary/10 mb-1">
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
@@ -66,21 +68,7 @@ export function Header() {
               <p className="text-[14px] text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
 
-            <div className="hidden md:flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <div className="p-2 rounded-lg bg-primary/10 mb-1">
-                <TrendingUp className="w-6 h-6 text-primary" />
-              </div>
-              <h1 className="font-semibold text-[25px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
-              <div className="flex items-center gap-1 my-2">
-                <span className="text-muted-foreground/90 text-[10px] leading-none">◂</span>
-                <div className="h-[5px] w-11 bg-muted-foreground" />
-                <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
-                <div className="h-[5px] w-11 bg-muted-foreground" />
-                <span className="text-muted-foreground/90 text-[10px] leading-none">▸</span>
-              </div>
-              <p className="text-[14px] text-muted-foreground">Portfolio Yield Analysis</p>
-            </div>
-            <div className="flex items-center md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2">
+            <div className="flex items-center justify-end">
               <HelpIconToggle />
               {user && (
                 <div className="flex items-center gap-3 ml-[100px]">
