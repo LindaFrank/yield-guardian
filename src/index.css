@@ -45,9 +45,9 @@
     --yield-neutral: 215 20% 55%;
     --feedback: 214 90% 54%;
     --feedback-foreground: 0 0% 100%;
-    --promo: 340 80% 45%;
+    --promo: 300 100% 50%;
     --promo-foreground: 0 0% 100%;
-    --promo-violet: 320 80% 45%;
+    --promo-violet: 300 100% 50%;
 
 
 
@@ -97,7 +97,7 @@
     --destructive-foreground: 210 40% 98%;
     --feedback: 214 90% 54%;
     --feedback-foreground: 0 0% 100%;
-    --promo: 340 80% 45%;
+    --promo: 300 100% 50%;
     --promo-foreground: 0 0% 100%;
 
     --border: 217 33% 17%;
