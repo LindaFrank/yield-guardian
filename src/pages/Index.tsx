@@ -558,8 +558,8 @@ const Index = () => {
                 </div>
               )}
               {!isLoading && !portfolioLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
+                <div className="text-base text-primary flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
                   Waiting for live feed…
                 </div>
               )}

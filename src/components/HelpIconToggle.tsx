@@ -10,8 +10,8 @@ export function HelpIconToggle() {
       onClick={toggle}
       title={enabled ? 'Turn off Helper Wizard' : 'Turn on Helper Wizard'}
       className={cn(
-        'flex items-center gap-1.5 text-sm font-medium transition-colors duration-200',
-        enabled ? 'text-primary' : 'text-primary/80 hover:text-primary'
+        'flex items-center gap-1.5 text-base font-medium transition-colors duration-200',
+        enabled ? 'text-primary' : 'text-primary hover:text-primary/90'
       )}
     >
       <HelpCircle className="w-5 h-5" />
