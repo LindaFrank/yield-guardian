@@ -56,7 +56,7 @@ export function Header() {
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <h1 className="font-semibold text-[25px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
-              <div className="flex items-center gap-1 my-0.5">
+              <div className="flex items-center gap-1 my-2">
                 <span className="text-muted-foreground/90 text-[10px] leading-none">◂</span>
                 <div className="h-[5px] w-11 bg-muted-foreground" />
                 <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
@@ -71,7 +71,7 @@ export function Header() {
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <h1 className="font-semibold text-[25px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
-              <div className="flex items-center gap-1 my-0.5">
+              <div className="flex items-center gap-1 my-2">
                 <span className="text-muted-foreground/90 text-[10px] leading-none">◂</span>
                 <div className="h-[5px] w-11 bg-muted-foreground" />
                 <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
@@ -106,7 +106,7 @@ export function Header() {
               )}
             </div>
           </div>
-          <div className="flex items-center justify-center gap-1 mt-3">
+          <div className="flex items-center justify-center gap-1 mt-6">
             <span className="text-muted-foreground/80 text-[10px] leading-none">◂</span>
             <div className="h-[4px] w-[44%] bg-muted-foreground" />
             <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
