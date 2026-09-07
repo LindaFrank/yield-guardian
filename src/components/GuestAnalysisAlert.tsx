@@ -91,15 +91,15 @@ export function GuestAnalysisAlert() {
 
       <Button
         variant="default"
-        className="rounded-full shadow-glow bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback px-4 py-2 gap-2"
+        className="h-16 w-16 rounded-full shadow-glow bg-feedback text-feedback-foreground hover:bg-feedback/90 border-2 border-feedback flex flex-col items-center justify-center gap-0.5 p-0"
         onClick={() => {
           trackEvent('feedback_open', { category: 'feedback', userId: null });
           window.dispatchEvent(new CustomEvent('yg:open-demo-feedback'));
         }}
         aria-label="Give feedback"
       >
-        <MessageSquare className="w-4 h-4" />
-        Feedback
+        <MessageSquare className="w-5 h-5" />
+        <span className="text-[10px] leading-none font-medium">Feedback</span>
       </Button>
     </div>
   );
