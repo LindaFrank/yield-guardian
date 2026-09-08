@@ -109,7 +109,7 @@ export function Header({ onGuestReset }: HeaderProps) {
           </div>
 
           {!user && (
-            <GuestAnalysisAlert />
+            <GuestAnalysisAlert onReset={onGuestReset} />
           )}
 
           {!user && (

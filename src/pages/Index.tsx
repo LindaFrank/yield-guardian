@@ -485,7 +485,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       
-      <Header />
+      <Header onGuestReset={handleResetGuestPortfolio} />
 
 
       <Dialog open={quickStartOpen} onOpenChange={(o) => setQuickStartOpen(o)}>
