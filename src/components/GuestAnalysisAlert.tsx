@@ -12,14 +12,10 @@ export function GuestAnalysisAlert() {
     <div className="absolute top-4 right-4 z-[60] w-64 sm:w-80 max-w-[calc(100%-2rem)] flex flex-col items-center gap-4">
       <div className="w-full rounded-xl border-[3px] border-primary/60 bg-card/95 backdrop-blur shadow-glow overflow-hidden">
           <div className="flex items-center justify-between px-3 py-2 gap-2 bg-primary/10 border-b border-primary/20">
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-foreground">Guest Analysis Mode</span>
-              <span className="text-xs text-destructive font-medium">Click here.</span>
-            </div>
+            <span className="text-sm font-semibold text-foreground">Guest Analysis Mode</span>
             <Button
             variant="ghost"
-            size="icon"
-            className="h-7 w-7 shrink-0"
+            className="h-auto w-auto min-w-[76px] shrink-0 flex-col items-center gap-0.5 px-2 py-1"
             onClick={() => {
               setExpanded((v) => {
                 const next = !v;
@@ -36,7 +32,10 @@ export function GuestAnalysisAlert() {
             {expanded ? (
               <X className="w-4 h-4 text-muted-foreground" />
             ) : (
-              <HelpCircle className="w-4 h-4 text-primary" />
+              <>
+                <HelpCircle className="w-4 h-4 text-primary" />
+                <span className="text-[10px] text-destructive font-medium leading-none">Click here.</span>
+              </>
             )}
           </Button>
         </div>
