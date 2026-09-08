@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { HelpCircle, X, BookOpen, Upload } from 'lucide-react';
+import { HelpCircle, X, BookOpen, Upload, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/analytics';
 
-export function GuestAnalysisAlert() {
+interface GuestAnalysisAlertProps {
+  onReset?: () => void;
+}
+
+export function GuestAnalysisAlert({ onReset }: GuestAnalysisAlertProps) {
   const [expanded, setExpanded] = useState(false);
 
   const fire = (name: string) => window.dispatchEvent(new CustomEvent(name));
@@ -75,6 +79,24 @@ export function GuestAnalysisAlert() {
               <Upload className="w-4 h-4" />
               Quick Start_Import your own portfolio
             </Button>
+            <div className="pt-2 border-t border-border/40">
+              <p className="text-[11px] text-muted-foreground leading-snug mb-2">
+                Want to start fresh? Clear your temporary demo portfolio.
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full justify-start gap-2 border-[3px] border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => {
+                  trackEvent('guest_reset_click', { category: 'guest', label: 'reset button', userId: null });
+                  onReset?.();
+                  setExpanded(false);
+                }}
+              >
+                <RotateCcw className="w-4 h-4" />
+                Start over
+              </Button>
+            </div>
           </div>
         )}
       </div>

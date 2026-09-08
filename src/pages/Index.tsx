@@ -367,6 +367,28 @@ const Index = () => {
     removeTicker.mutate(ticker);
   };
 
+  const handleResetGuestPortfolio = () => {
+    setGuestTickers([]);
+    setGuestShares({});
+    setStocks([]);
+    setSelectedUnderperformer(null);
+    setIncomeDeltaByTicker({});
+    setWizardDismissed(false);
+    setShowFindStocksFlow(false);
+    setFindStocksStep(0);
+    setReportBytes(null);
+    setReplacementDialogOpen(false);
+    trackEvent('guest_portfolio_reset', {
+      category: 'guest',
+      label: 'start over',
+      userId: null,
+    });
+    toast({
+      title: 'Demo reset',
+      description: 'Your temporary portfolio has been cleared. Start fresh whenever you like.',
+    });
+  };
+
   const handleSellShares = (ticker: string, sellShares: number) => {
     const currentShares = sharesList.find((s) => s.ticker === ticker)?.shares_owned ?? 0;
     const remainingShares = Math.max(0, currentShares - Math.floor(sellShares));
