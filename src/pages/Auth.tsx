@@ -206,28 +206,20 @@ export default function Auth() {
                <ArrowRight className="w-4 h-4" />
               </Button>
               <GuidedExperiencesMenu />
-              <div className="flex items-center justify-center gap-3 text-xs">
-                {mode === 'signin' && (
-                  <>
-                    <span className="font-medium text-foreground flex items-center gap-1">
-                      <ArrowRight className="w-3 h-3" /> Sign in
-                    </span>
-                    <div className="h-px w-10 bg-border" />
-                    <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signup')}>
-                      <ArrowRight className="w-3 h-3" /> Sign up
-                    </button>
-                  </>
+              <div className="w-full flex items-center justify-between text-xs px-1">
+                {mode === 'signin' ? (
+                  <span className="font-medium text-foreground">Sign in</span>
+                ) : (
+                  <button type="button" className="text-muted-foreground hover:text-foreground flex items-center gap-1" onClick={() => setMode('signin')}>
+                    <ArrowRight className="w-3 h-3" /> Sign in
+                  </button>
                 )}
-                {mode === 'signup' && (
-                  <>
-                    <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signin')}>
-                      <ArrowRight className="w-3 h-3" /> Sign in
-                    </button>
-                    <div className="h-px w-10 bg-border" />
-                    <span className="font-medium text-foreground flex items-center gap-1">
-                      <ArrowRight className="w-3 h-3" /> Sign up
-                    </span>
-                  </>
+                {mode === 'signin' ? (
+                  <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signup')}>
+                    Don't have an account? Sign up <ArrowRight className="w-3 h-3" />
+                  </button>
+                ) : (
+                  <span className="font-medium text-foreground">Create account</span>
                 )}
               </div>
             </motion.div>
