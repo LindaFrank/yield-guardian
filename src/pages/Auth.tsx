@@ -220,7 +220,7 @@ export default function Auth() {
               </div>
               <div className="relative gradient-card rounded-xl border border-border/50 shadow-elevated backdrop-blur-sm p-4">
                 {mode !== 'forgot' && (
-                  <div className="space-y-2 mb-4">
+                  <div className="space-y-1 mb-2">
                     <Button type="button" variant="outline" className="w-full" onClick={() => oauth('google')}>
                       <Mail className="w-4 h-4 mr-2" /> Continue with Google
                     </Button>
