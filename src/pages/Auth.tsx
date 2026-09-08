@@ -244,7 +244,7 @@ export default function Auth() {
                   )}
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium">Email</label>
-                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required maxLength={255} placeholder="you@example.com" />
+                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required maxLength={255} placeholder="you@example.com" className="border border-muted-foreground/50 bg-card/50" />
                   </div>
                   {mode !== 'forgot' && (
                     <div className="space-y-1.5">
@@ -256,7 +256,7 @@ export default function Auth() {
                           </button>
                         )}
                       </div>
-                      <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} placeholder={mode === 'signup' ? 'At least 8 characters' : ''} />
+                      <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} placeholder={mode === 'signup' ? 'At least 8 characters' : ''} className="border border-muted-foreground/50 bg-card/50" />
                     </div>
                   )}
                   {mode === 'signup' && inviteRequired && (
