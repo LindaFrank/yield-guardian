@@ -169,7 +169,7 @@ export default function Auth() {
 
           <AnimatePresence>
             {!showForm && (
-              <motion.div className="mt-8 overflow-hidden max-w-md w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={{ delay: 1, duration: 0.5 }}>
+              <motion.div className="mt-3 overflow-hidden max-w-md w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={{ delay: 1, duration: 0.5 }}>
                 <motion.div className="flex items-center gap-6 font-mono text-xs text-muted-foreground whitespace-nowrap" animate={{ x: ['0%', '-50%'] }} transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}>
                   {[...TICKER_DATA, ...TICKER_DATA].map(({ symbol, yield: y, up }, i) => (
                     <span key={`${symbol}-${i}`} className="flex items-center gap-1">
