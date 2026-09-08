@@ -3,12 +3,12 @@ import { useHelpWizard } from '@/contexts/HelpWizardContext';
 import { cn } from '@/lib/utils';
 
 export function HelpIconToggle() {
-  const { enabled, toggle } = useHelpWizard();
+  const { enabled, enable } = useHelpWizard();
 
   return (
     <button
-      onClick={toggle}
-      title={enabled ? 'Turn off Helper Wizard' : 'Turn on Helper Wizard'}
+      onClick={enable}
+      title="Turn on Helper Wizard"
       className={cn(
         'flex items-center gap-1.5 text-base font-medium transition-colors duration-200',
         enabled ? 'text-primary' : 'text-primary hover:text-primary/90'
@@ -19,3 +19,4 @@ export function HelpIconToggle() {
     </button>
   );
 }
+
