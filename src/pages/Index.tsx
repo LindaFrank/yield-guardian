@@ -541,57 +541,6 @@ const Index = () => {
 
       
       <main className="container mx-auto px-6 py-8">
-        {/* Live Data Status */}
-        <div className="mb-4 flex items-center justify-between">
-          <HelpTooltip text="Market data is refreshed automatically every few minutes." side="bottom">
-            <div>
-              {(isLoading || portfolioLoading) && (
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-                  Fetching live market data…
-                </div>
-              )}
-              {!isLoading && !portfolioLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                  Live data · Refreshes every 5 min
-                </div>
-              )}
-              {!isLoading && !portfolioLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
-                <div className="text-base text-primary flex items-center gap-2">
-                  <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  Waiting for live feed…
-                </div>
-              )}
-            </div>
-          </HelpTooltip>
-          <HelpIconToggle />
-        </div>
-
-        {/* New user: show onboarding wizard prominently first */}
-        {showStockFinder && (
-          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
-            <EmptyPortfolio
-              onSelectStocks={() => setAddStockOpen(true)}
-              onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-              onAddStock={handleAddStock}
-              onYieldChange={setTargetYield}
-              currentYield={targetYield}
-              onDone={() => {
-                setWizardDismissed(true);
-                setShowFindStocksFlow(false);
-                setFindStocksStep(0);
-              }}
-              onCancel={() => {
-                setShowFindStocksFlow(false);
-                setFindStocksStep(0);
-              }}
-              initialStep={showFindStocksFlow ? findStocksStep : 0}
-              existingTickers={stocks.map((s) => s.ticker)}
-            />
-          </section>
-        )}
-
         {/* Sticky Action Bar */}
         {wizardDone && (
           <div className="sticky top-[100px] z-40 mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-background px-3 py-2 shadow-glow animate-fade-in">
@@ -684,6 +633,57 @@ const Index = () => {
               </div>
             )}
           </div>
+        )}
+
+        {/* Live Data Status */}
+        <div className="mb-4 flex items-center justify-between">
+          <HelpTooltip text="Market data is refreshed automatically every few minutes." side="bottom">
+            <div>
+              {(isLoading || portfolioLoading) && (
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                  Fetching live market data…
+                </div>
+              )}
+              {!isLoading && !portfolioLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                  Live data · Refreshes every 5 min
+                </div>
+              )}
+              {!isLoading && !portfolioLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
+                <div className="text-base text-primary flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  Waiting for live feed…
+                </div>
+              )}
+            </div>
+          </HelpTooltip>
+          <HelpIconToggle />
+        </div>
+
+        {/* New user: show onboarding wizard prominently first */}
+        {showStockFinder && (
+          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
+            <EmptyPortfolio
+              onSelectStocks={() => setAddStockOpen(true)}
+              onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+              onAddStock={handleAddStock}
+              onYieldChange={setTargetYield}
+              currentYield={targetYield}
+              onDone={() => {
+                setWizardDismissed(true);
+                setShowFindStocksFlow(false);
+                setFindStocksStep(0);
+              }}
+              onCancel={() => {
+                setShowFindStocksFlow(false);
+                setFindStocksStep(0);
+              }}
+              initialStep={showFindStocksFlow ? findStocksStep : 0}
+              existingTickers={stocks.map((s) => s.ticker)}
+            />
+          </section>
         )}
 
         {/* Stats Overview */}
