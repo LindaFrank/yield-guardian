@@ -132,9 +132,9 @@ export default function Auth() {
           animate={{ x: ['10%', '-5%', '10%'], y: ['20%', '5%', '20%'] }} transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }} />
       </div>
 
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-10">
-        <motion.div className="flex flex-col items-center" animate={{ marginBottom: showForm ? 24 : 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
-          <motion.div className="relative mb-6 mt-5" initial={{ scale: 0, rotate: -180 }} animate={{ scale: showForm ? 0.8 : 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }}>
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-4">
+        <motion.div className="flex flex-col items-center" animate={{ marginBottom: showForm ? 12 : 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
+          <motion.div className="relative mb-1 mt-2" initial={{ scale: 0, rotate: -180 }} animate={{ scale: showForm ? 0.8 : 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }}>
             <motion.div className="absolute -inset-4 rounded-3xl opacity-50"
               style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.3) 0%, transparent 70%)' }}
               animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} />
@@ -155,7 +155,7 @@ export default function Auth() {
 
           <AnimatePresence>
             {!showForm && (
-              <motion.div className="flex flex-wrap justify-center gap-3 mt-6" exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={{ duration: 0.4 }}>
+              <motion.div className="flex flex-wrap justify-center gap-3 mt-3" exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={{ duration: 0.4 }}>
                 {[{ icon: BarChart3, label: 'Live Yield Analysis' }, { icon: Shield, label: 'Underperformer Detection' }, { icon: Zap, label: 'Smart alternatives' }].map(({ icon: Icon, label }, i) => (
                   <motion.div key={label} className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border/50 text-sm text-muted-foreground backdrop-blur-sm"
                     initial={{ opacity: 0, y: 15, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -169,7 +169,7 @@ export default function Auth() {
 
           <AnimatePresence>
             {!showForm && (
-              <motion.div className="mt-8 overflow-hidden max-w-md w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={{ delay: 1, duration: 0.5 }}>
+              <motion.div className="mt-3 overflow-hidden max-w-md w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={{ delay: 1, duration: 0.5 }}>
                 <motion.div className="flex items-center gap-6 font-mono text-xs text-muted-foreground whitespace-nowrap" animate={{ x: ['0%', '-50%'] }} transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}>
                   {[...TICKER_DATA, ...TICKER_DATA].map(({ symbol, yield: y, up }, i) => (
                     <span key={`${symbol}-${i}`} className="flex items-center gap-1">
@@ -186,7 +186,7 @@ export default function Auth() {
         <AnimatePresence>
           {showForm && (
             <motion.div
-              className="w-full max-w-sm mb-4 flex flex-col items-center gap-3"
+              className="w-full max-w-sm mb-2 flex flex-col items-center gap-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.5 }}
@@ -214,20 +214,20 @@ export default function Auth() {
         <AnimatePresence>
           {showForm && (
             <motion.div className="w-full max-w-sm" initial={{ opacity: 0, y: 30, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', stiffness: 250, damping: 25 }}>
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-2 px-1">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-1 px-1">
                 <LogIn className="w-4 h-4 text-primary" />
                 {title}
               </div>
-              <div className="relative gradient-card rounded-xl border border-border/50 shadow-elevated backdrop-blur-sm p-6">
+              <div className="relative gradient-card rounded-xl border border-border/50 shadow-elevated backdrop-blur-sm p-4">
                 {mode !== 'forgot' && (
-                  <div className="space-y-2 mb-4">
+                  <div className="space-y-1 mb-2">
                     <Button type="button" variant="outline" className="w-full" onClick={() => oauth('google')}>
                       <Mail className="w-4 h-4 mr-2" /> Continue with Google
                     </Button>
                     <Button type="button" variant="outline" className="w-full" onClick={() => oauth('apple')}>
                       <Apple className="w-4 h-4 mr-2" /> Continue with Apple
                     </Button>
-                    <div className="flex items-center gap-2 my-3">
+                    <div className="flex items-center gap-2 my-2">
                       <div className="h-px flex-1 bg-border/50" />
                       <span className="text-[10px] uppercase tracking-widest text-muted-foreground">or</span>
                       <div className="h-px flex-1 bg-border/50" />
@@ -235,7 +235,7 @@ export default function Auth() {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-3">
+                <form onSubmit={handleSubmit} className="space-y-2">
                   {mode === 'signup' && (
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium">Your name</label>
@@ -274,7 +274,7 @@ export default function Auth() {
                 </form>
 
                 {mode !== 'signin' && (
-                  <div className="text-center text-xs text-muted-foreground mt-4">
+                  <div className="text-center text-xs text-muted-foreground mt-2">
                     {mode === 'signup' && (
                       <>Already have an account?{' '}<button className="text-primary hover:underline" onClick={() => setMode('signin')}>Sign in</button></>
                     )}
