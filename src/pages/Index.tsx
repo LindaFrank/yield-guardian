@@ -369,7 +369,16 @@ const Index = () => {
       });
       return;
     }
-    removeTicker.mutate(ticker);
+    removeTicker.mutate(ticker, {
+      onError: () => {
+        toast({
+          title: `Couldn't remove ${ticker}`,
+          description: 'We could not save that change. Please check your connection and try again.',
+          variant: 'destructive',
+        });
+      },
+    });
+
   };
 
   const handleResetGuestPortfolio = () => {
