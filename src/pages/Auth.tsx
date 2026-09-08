@@ -186,7 +186,7 @@ export default function Auth() {
         <AnimatePresence>
           {showForm && (
             <motion.div
-              className="w-full max-w-sm mb-4 flex flex-col items-center gap-3"
+              className="w-full max-w-sm mb-2 flex flex-col items-center gap-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.5 }}
