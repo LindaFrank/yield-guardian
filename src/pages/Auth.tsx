@@ -268,21 +268,36 @@ export default function Auth() {
                   )}
                   <Button type="submit" className="w-full group" disabled={loading}>
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                      <>{cta}<ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" /></>
+                      mode === 'signin' ? cta : <>{cta}<ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" /></>
                     )}
                   </Button>
                 </form>
 
-                {mode !== 'signin' && (
-                  <div className="text-center text-xs text-muted-foreground mt-2">
-                    {mode === 'signup' && (
-                      <>Already have an account?{' '}<button className="text-primary hover:underline" onClick={() => setMode('signin')}>Sign in</button></>
-                    )}
-                    {mode === 'forgot' && (
-                      <button className="text-primary hover:underline" onClick={() => setMode('signin')}>Back to sign in</button>
-                    )}
-                  </div>
-                )}
+                <div className="flex items-center justify-center gap-3 mt-3 text-xs">
+                  {mode === 'signin' && (
+                    <>
+                      <span className="font-medium text-foreground">Sign in</span>
+                      <div className="h-px w-10 bg-border" />
+                      <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signup')}>
+                        Sign up <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </>
+                  )}
+                  {mode === 'signup' && (
+                    <>
+                      <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signin')}>
+                        <ArrowRight className="w-3 h-3 rotate-180" /> Sign in
+                      </button>
+                      <div className="h-px w-10 bg-border" />
+                      <span className="font-medium text-foreground flex items-center gap-1">
+                        Sign up <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </>
+                  )}
+                  {mode === 'forgot' && (
+                    <button type="button" className="text-primary hover:underline" onClick={() => setMode('signin')}>Back to sign in</button>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}
