@@ -132,7 +132,7 @@ export default function Auth() {
           animate={{ x: ['10%', '-5%', '10%'], y: ['20%', '5%', '20%'] }} transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }} />
       </div>
 
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-10">
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-4">
         <motion.div className="flex flex-col items-center" animate={{ marginBottom: showForm ? 24 : 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
           <motion.div className="relative mb-6 mt-5" initial={{ scale: 0, rotate: -180 }} animate={{ scale: showForm ? 0.8 : 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }}>
             <motion.div className="absolute -inset-4 rounded-3xl opacity-50"
