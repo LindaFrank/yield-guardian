@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft, Search, Loader2 } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -71,6 +72,7 @@ const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
 
 const Index = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
   const addTicker = useAddTicker();
@@ -150,20 +152,29 @@ const Index = () => {
       return;
     }
 
-    if (liveStocks && liveStocks.length > 0) {
-      const merged = liveStocks
-        // Never show a holding that is no longer in the portfolio list (e.g. a
-        // just-removed ticker still present in a cached quote response).
-        .filter((live) => tickers.includes(live.ticker))
-        .map((live) => {
-          const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
-          return {
-            ...live,
-            sector: live.sector || mock?.sector || 'Unknown',
-          };
-        });
-      setStocks(merged);
-    }
+    setStocks((prev) => {
+      // Always drop any ticker that is no longer in the portfolio list, even
+      // while the fresh live quote is still loading. This prevents a removed
+      // card from lingering until the next quote response arrives.
+      const stillRelevant = prev.filter((s) => tickers.includes(s.ticker));
+
+      if (liveStocks && liveStocks.length > 0) {
+        const merged = liveStocks
+          // Never show a holding that is no longer in the portfolio list (e.g. a
+          // just-removed ticker still present in a cached quote response).
+          .filter((live) => tickers.includes(live.ticker))
+          .map((live) => {
+            const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
+            return {
+              ...live,
+              sector: live.sector || mock?.sector || 'Unknown',
+            };
+          });
+        return merged;
+      }
+
+      return stillRelevant;
+    });
   }, [tickers, liveStocks]);
 
 
@@ -369,6 +380,20 @@ const Index = () => {
       });
       return;
     }
+
+    // Optimistically update React Query cache so the ticker list drops the
+    // removed stock before the next render. This prevents the live-feed sync
+    // effect from briefly restoring the deleted card while the mutation's
+    // optimistic update is still pending.
+    if (user) {
+      const tickersKey = ['user-stocks', user.id];
+      const sharesKey = ['user-stocks-shares', user.id];
+      queryClient.setQueryData<string[]>(tickersKey, (prev) => prev?.filter((t) => t !== ticker) ?? []);
+      queryClient.setQueryData<{ ticker: string; shares_owned: number }[]>(sharesKey, (prev) =>
+        prev?.filter((s) => s.ticker !== ticker) ?? []
+      );
+    }
+
     removeTicker.mutate(ticker, {
       onError: () => {
         toast({
