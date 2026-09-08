@@ -107,12 +107,38 @@ export function useRemoveTicker() {
         .eq('ticker', ticker);
       if (error) throw error;
     },
-    onSuccess: () => {
+    // Optimistically drop the ticker so the card disappears immediately, even
+    // before the server round-trip finishes (and so a background refetch of the
+    // live-quote query cannot momentarily resurrect the removed card).
+    onMutate: async (ticker: string) => {
+      const tickersKey = ['user-stocks', user?.id];
+      const sharesKey = ['user-stocks-shares', user?.id];
+      await Promise.all([
+        qc.cancelQueries({ queryKey: tickersKey }),
+        qc.cancelQueries({ queryKey: sharesKey }),
+      ]);
+      const prevTickers = qc.getQueryData<string[]>(tickersKey);
+      const prevShares = qc.getQueryData<UserStockEntry[]>(sharesKey);
+      if (prevTickers) {
+        qc.setQueryData<string[]>(tickersKey, prevTickers.filter((t) => t !== ticker));
+      }
+      if (prevShares) {
+        qc.setQueryData<UserStockEntry[]>(sharesKey, prevShares.filter((s) => s.ticker !== ticker));
+      }
+      return { prevTickers, prevShares, tickersKey, sharesKey };
+    },
+    onError: (_err, _ticker, ctx) => {
+      if (!ctx) return;
+      if (ctx.prevTickers) qc.setQueryData(ctx.tickersKey, ctx.prevTickers);
+      if (ctx.prevShares) qc.setQueryData(ctx.sharesKey, ctx.prevShares);
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['user-stocks'] });
       qc.invalidateQueries({ queryKey: ['user-stocks-shares'] });
     },
   });
 }
+
 
 export function useUpdateShares() {
   const { user } = useAuth();

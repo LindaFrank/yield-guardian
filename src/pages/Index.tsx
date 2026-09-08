@@ -151,16 +151,21 @@ const Index = () => {
     }
 
     if (liveStocks && liveStocks.length > 0) {
-      const merged = liveStocks.map((live) => {
-        const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
-        return {
-          ...live,
-          sector: live.sector || mock?.sector || 'Unknown',
-        };
-      });
+      const merged = liveStocks
+        // Never show a holding that is no longer in the portfolio list (e.g. a
+        // just-removed ticker still present in a cached quote response).
+        .filter((live) => tickers.includes(live.ticker))
+        .map((live) => {
+          const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
+          return {
+            ...live,
+            sector: live.sector || mock?.sector || 'Unknown',
+          };
+        });
       setStocks(merged);
     }
   }, [tickers, liveStocks]);
+
 
   // Track whether we've already notified the user that the feed went live
   const feedNotifiedRef = useRef(false);
@@ -364,7 +369,16 @@ const Index = () => {
       });
       return;
     }
-    removeTicker.mutate(ticker);
+    removeTicker.mutate(ticker, {
+      onError: () => {
+        toast({
+          title: `Couldn't remove ${ticker}`,
+          description: 'We could not save that change. Please check your connection and try again.',
+          variant: 'destructive',
+        });
+      },
+    });
+
   };
 
   const handleResetGuestPortfolio = () => {
