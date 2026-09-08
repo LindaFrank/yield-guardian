@@ -203,9 +203,33 @@ export default function Auth() {
                   <BarChart3 className="w-4 h-4" />
                   Analyze a portfolio — no account needed
                 </span>
-                <ArrowRight className="w-4 h-4" />
+               <ArrowRight className="w-4 h-4" />
               </Button>
               <GuidedExperiencesMenu />
+              <div className="flex items-center justify-center gap-3 text-xs">
+                {mode === 'signin' && (
+                  <>
+                    <span className="font-medium text-foreground flex items-center gap-1">
+                      <ArrowRight className="w-3 h-3" /> Sign in
+                    </span>
+                    <div className="h-px w-10 bg-border" />
+                    <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signup')}>
+                      <ArrowRight className="w-3 h-3" /> Sign up
+                    </button>
+                  </>
+                )}
+                {mode === 'signup' && (
+                  <>
+                    <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signin')}>
+                      <ArrowRight className="w-3 h-3" /> Sign in
+                    </button>
+                    <div className="h-px w-10 bg-border" />
+                    <span className="font-medium text-foreground flex items-center gap-1">
+                      <ArrowRight className="w-3 h-3" /> Sign up
+                    </span>
+                  </>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -273,31 +297,13 @@ export default function Auth() {
                   </Button>
                 </form>
 
-                <div className="flex items-center justify-center gap-3 mt-3 text-xs">
-                  {mode === 'signin' && (
-                    <>
-                      <span className="font-medium text-foreground">Sign in</span>
-                      <div className="h-px w-10 bg-border" />
-                      <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signup')}>
-                        Sign up <ArrowRight className="w-3 h-3" />
-                      </button>
-                    </>
-                  )}
-                  {mode === 'signup' && (
-                    <>
-                      <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signin')}>
-                        <ArrowRight className="w-3 h-3 rotate-180" /> Sign in
-                      </button>
-                      <div className="h-px w-10 bg-border" />
-                      <span className="font-medium text-foreground flex items-center gap-1">
-                        Sign up <ArrowRight className="w-3 h-3" />
-                      </span>
-                    </>
-                  )}
-                  {mode === 'forgot' && (
-                    <button type="button" className="text-primary hover:underline" onClick={() => setMode('signin')}>Back to sign in</button>
-                  )}
-                </div>
+                {mode === 'forgot' && (
+                  <div className="text-center mt-3 text-xs">
+                    <button type="button" className="text-primary hover:underline flex items-center gap-1 mx-auto" onClick={() => setMode('signin')}>
+                      <ArrowRight className="w-3 h-3" /> Back to sign in
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
