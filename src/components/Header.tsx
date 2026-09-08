@@ -62,11 +62,11 @@ export function Header() {
                 <TrendingUp className="w-8 h-8 text-primary" />
               </div>
               <h1 className="font-semibold text-[31px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
-              <div className="flex items-center gap-1 my-2">
+              <div className="flex items-center gap-1 my-2 w-full">
                 <span className="text-muted-foreground text-[16px] leading-none">◂</span>
-                <div className="h-[5px] w-11 bg-muted-foreground" />
+                <div className="h-[5px] flex-1 bg-muted-foreground" />
                 <span className="text-muted-foreground text-[14px] leading-none font-mono">//</span>
-                <div className="h-[5px] w-11 bg-muted-foreground" />
+                <div className="h-[5px] flex-1 bg-muted-foreground" />
                 <span className="text-muted-foreground text-[16px] leading-none">▸</span>
               </div>
               <p className="text-[14px] text-muted-foreground">Portfolio Yield Analysis</p>
