@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { HelpCircle, X, BookOpen, Upload, LogIn } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { HelpCircle, X, BookOpen, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/analytics';
 
 export function GuestAnalysisAlert() {
   const [expanded, setExpanded] = useState(false);
-  const navigate = useNavigate();
 
   const fire = (name: string) => window.dispatchEvent(new CustomEvent(name));
 
@@ -77,24 +75,6 @@ export function GuestAnalysisAlert() {
               <Upload className="w-4 h-4" />
               Quick Start_Import your own portfolio
             </Button>
-
-            <div className="pt-2 border-t border-border/40 space-y-1.5">
-              <p className="text-[11px] text-blue-400 leading-snug">
-                Already have an account? Signing in starts a fresh session, so anything entered in "Guest Analysis Mode" will be cleared.
-              </p>
-              <Button
-                size="sm"
-                variant="outline"
-                className="w-full justify-start gap-2 border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary"
-                onClick={() => {
-                  trackEvent('guest_sign_in_click', { category: 'entry', label: 'Guest alert — Sign in', userId: null });
-                  navigate('/auth');
-                }}
-              >
-                <LogIn className="w-4 h-4" />
-                Sign in to my account
-              </Button>
-            </div>
           </div>
         )}
       </div>
