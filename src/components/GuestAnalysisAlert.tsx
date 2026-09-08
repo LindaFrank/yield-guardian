@@ -15,7 +15,7 @@ export function GuestAnalysisAlert() {
             <span className="text-sm font-semibold text-foreground">Guest Analysis Mode</span>
             <Button
             variant="ghost"
-            className="h-auto w-auto min-w-[76px] shrink-0 flex-col items-center gap-0.5 px-2 py-1"
+            className="h-auto w-auto min-w-[76px] shrink-0 flex-col items-center gap-0.5 px-2 py-1 border-0"
             onClick={() => {
               setExpanded((v) => {
                 const next = !v;
