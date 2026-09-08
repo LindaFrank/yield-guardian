@@ -380,6 +380,20 @@ const Index = () => {
       });
       return;
     }
+
+    // Optimistically update React Query cache so the ticker list drops the
+    // removed stock before the next render. This prevents the live-feed sync
+    // effect from briefly restoring the deleted card while the mutation's
+    // optimistic update is still pending.
+    if (user) {
+      const tickersKey = ['user-stocks', user.id];
+      const sharesKey = ['user-stocks-shares', user.id];
+      queryClient.setQueryData<string[]>(tickersKey, (prev) => prev?.filter((t) => t !== ticker) ?? []);
+      queryClient.setQueryData<{ ticker: string; shares_owned: number }[]>(sharesKey, (prev) =>
+        prev?.filter((s) => s.ticker !== ticker) ?? []
+      );
+    }
+
     removeTicker.mutate(ticker, {
       onError: () => {
         toast({
