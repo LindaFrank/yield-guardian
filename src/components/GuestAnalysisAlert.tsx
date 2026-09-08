@@ -34,7 +34,7 @@ export function GuestAnalysisAlert() {
             ) : (
               <>
                 <HelpCircle className="w-4 h-4 text-primary" />
-                <span className="text-[10px] text-destructive font-medium leading-none">Click here.</span>
+                <span className="text-[10px] text-amber-500 font-medium leading-none">Click here.</span>
               </>
             )}
           </Button>
