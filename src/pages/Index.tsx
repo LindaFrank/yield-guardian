@@ -150,20 +150,29 @@ const Index = () => {
       return;
     }
 
-    if (liveStocks && liveStocks.length > 0) {
-      const merged = liveStocks
-        // Never show a holding that is no longer in the portfolio list (e.g. a
-        // just-removed ticker still present in a cached quote response).
-        .filter((live) => tickers.includes(live.ticker))
-        .map((live) => {
-          const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
-          return {
-            ...live,
-            sector: live.sector || mock?.sector || 'Unknown',
-          };
-        });
-      setStocks(merged);
-    }
+    setStocks((prev) => {
+      // Always drop any ticker that is no longer in the portfolio list, even
+      // while the fresh live quote is still loading. This prevents a removed
+      // card from lingering until the next quote response arrives.
+      const stillRelevant = prev.filter((s) => tickers.includes(s.ticker));
+
+      if (liveStocks && liveStocks.length > 0) {
+        const merged = liveStocks
+          // Never show a holding that is no longer in the portfolio list (e.g. a
+          // just-removed ticker still present in a cached quote response).
+          .filter((live) => tickers.includes(live.ticker))
+          .map((live) => {
+            const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
+            return {
+              ...live,
+              sector: live.sector || mock?.sector || 'Unknown',
+            };
+          });
+        return merged;
+      }
+
+      return stillRelevant;
+    });
   }, [tickers, liveStocks]);
 
 
