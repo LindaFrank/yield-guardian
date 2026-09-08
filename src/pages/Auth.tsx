@@ -214,7 +214,7 @@ export default function Auth() {
         <AnimatePresence>
           {showForm && (
             <motion.div className="w-full max-w-sm" initial={{ opacity: 0, y: 30, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', stiffness: 250, damping: 25 }}>
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-2 px-1">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-1 px-1">
                 <LogIn className="w-4 h-4 text-primary" />
                 {title}
               </div>
