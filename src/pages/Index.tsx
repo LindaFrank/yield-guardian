@@ -145,12 +145,17 @@ const Index = () => {
 
   // Keep local portfolio state in sync when user/account tickers change
   useEffect(() => {
+    // While the saved portfolio is still loading, keep whatever is on screen —
+    // clearing here would make an existing portfolio flash away on reload.
+    if (portfolioLoading) return;
+
     // Critical for new accounts: never keep stale stocks from a previous session/user
     if (tickers.length === 0) {
       setStocks([]);
       setSelectedUnderperformer(null);
       return;
     }
+
 
     setStocks((prev) => {
       // Always drop any ticker that is no longer in the portfolio list, even
