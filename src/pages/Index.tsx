@@ -592,18 +592,6 @@ const Index = () => {
           </section>
         )}
 
-        {/* Stats Overview */}
-        <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
-          <PortfolioStats
-            stocks={stocks}
-            sharesMap={Object.fromEntries(
-              sharesList.map(s => [s.ticker, s.shares_owned])
-            )}
-            targetYield={targetYield}
-            underperformerCount={underperformers.length}
-          />
-        </section>
-
         {/* Sticky Action Bar */}
         {wizardDone && (
           <div className="sticky top-[100px] z-40 mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-background px-3 py-2 shadow-glow animate-fade-in">
@@ -697,6 +685,18 @@ const Index = () => {
             )}
           </div>
         )}
+
+        {/* Stats Overview */}
+        <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
+          <PortfolioStats
+            stocks={stocks}
+            sharesMap={Object.fromEntries(
+              sharesList.map(s => [s.ticker, s.shares_owned])
+            )}
+            targetYield={targetYield}
+            underperformerCount={underperformers.length}
+          />
+        </section>
 
         {/* Row 1: Income YTD + Yield slider */}
         <div className="space-y-4">
