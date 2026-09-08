@@ -138,8 +138,8 @@ export default function Auth() {
             <motion.div className="absolute -inset-4 rounded-3xl opacity-50"
               style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.3) 0%, transparent 70%)' }}
               animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} />
-            <div className="relative p-2 rounded-xl bg-primary/10 border border-primary/20 backdrop-blur-sm">
-              <TrendingUp className="w-[38px] h-[38px] text-primary" />
+            <div className="relative p-3 rounded-xl bg-primary/10 border border-primary/20 backdrop-blur-sm">
+              <TrendingUp className="w-[58px] h-[58px] text-primary" />
             </div>
           </motion.div>
 
