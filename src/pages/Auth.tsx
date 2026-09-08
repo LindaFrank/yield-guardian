@@ -134,7 +134,7 @@ export default function Auth() {
 
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-4">
         <motion.div className="flex flex-col items-center" animate={{ marginBottom: showForm ? 12 : 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
-          <motion.div className="relative mb-6 mt-5" initial={{ scale: 0, rotate: -180 }} animate={{ scale: showForm ? 0.8 : 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }}>
+          <motion.div className="relative mb-1 mt-2" initial={{ scale: 0, rotate: -180 }} animate={{ scale: showForm ? 0.8 : 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }}>
             <motion.div className="absolute -inset-4 rounded-3xl opacity-50"
               style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.3) 0%, transparent 70%)' }}
               animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} />
