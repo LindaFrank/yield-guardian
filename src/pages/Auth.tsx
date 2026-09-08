@@ -227,7 +227,7 @@ export default function Auth() {
                     <Button type="button" variant="outline" className="w-full" onClick={() => oauth('apple')}>
                       <Apple className="w-4 h-4 mr-2" /> Continue with Apple
                     </Button>
-                    <div className="flex items-center gap-2 my-3">
+                    <div className="flex items-center gap-2 my-2">
                       <div className="h-px flex-1 bg-border/50" />
                       <span className="text-[10px] uppercase tracking-widest text-muted-foreground">or</span>
                       <div className="h-px flex-1 bg-border/50" />
