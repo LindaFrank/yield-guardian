@@ -21,8 +21,11 @@ import {
 } from '@/components/ui/alert-dialog';
 import { GuestAnalysisAlert } from '@/components/GuestAnalysisAlert';
 
+interface HeaderProps {
+  onGuestReset?: () => void;
+}
 
-export function Header() {
+export function Header({ onGuestReset }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
@@ -106,7 +109,7 @@ export function Header() {
           </div>
 
           {!user && (
-            <GuestAnalysisAlert />
+            <GuestAnalysisAlert onReset={onGuestReset} />
           )}
 
           {!user && (
