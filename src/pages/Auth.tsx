@@ -235,7 +235,7 @@ export default function Auth() {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-3">
+                <form onSubmit={handleSubmit} className="space-y-2">
                   {mode === 'signup' && (
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium">Your name</label>
