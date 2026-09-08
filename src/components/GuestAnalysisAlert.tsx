@@ -79,7 +79,7 @@ export function GuestAnalysisAlert() {
             </Button>
 
             <div className="pt-2 border-t border-border/40 space-y-1.5">
-              <p className="text-[11px] text-primary leading-snug">
+              <p className="text-[11px] text-blue-400 leading-snug">
                 Already have an account? Signing in starts a fresh session, so anything entered in "Guest Analysis Mode" will be cleared.
               </p>
               <Button
