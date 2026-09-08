@@ -180,7 +180,7 @@ const Index = () => {
 
       return stillRelevant;
     });
-  }, [tickers, liveStocks]);
+  }, [tickers, liveStocks, portfolioLoading]);
 
 
   // Track whether we've already notified the user that the feed went live
