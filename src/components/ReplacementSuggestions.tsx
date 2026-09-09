@@ -951,7 +951,3 @@ export function ReplacementSuggestions({
     </div>
   );
 }
-
-    </div>
-  );
-}
