@@ -8,6 +8,7 @@
 
 ## In Progress
 - [x] Halve the borders on the visible Matching Stocks cards and restore selection bubbles for every user
+- [ ] Halve the outer outline around the Matching Stocks list
 - [ ] Credit adjustment request — blocked because project editing tools cannot issue account credits
 
 
