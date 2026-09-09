@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { ArrowLeft, Send } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Header } from '@/components/Header';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
