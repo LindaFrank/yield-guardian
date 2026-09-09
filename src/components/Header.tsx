@@ -113,17 +113,30 @@ export function Header({ onGuestReset }: HeaderProps) {
           )}
 
           {!user && (
-            <Button
-              size="default"
-              className="absolute top-4 right-4 z-[55] gap-2 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 shadow-glow px-[43px] text-[18px] font-semibold h-[67px] min-h-[67px] rounded-lg"
-              onClick={() => {
-                trackEvent('save_portfolio_header_click', { category: 'conversion', userId: null });
-                window.dispatchEvent(new CustomEvent('yg:open-subscription'));
-              }}
-            >
-              <Save className="w-4 h-4" />
-              Save my portfolio
-            </Button>
+            <div className="absolute top-4 right-4 z-[55] flex flex-col items-center gap-4">
+              <Button
+                size="default"
+                className="gap-2 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 shadow-glow px-[43px] text-[18px] font-semibold h-[67px] min-h-[67px] rounded-lg"
+                onClick={() => {
+                  trackEvent('save_portfolio_header_click', { category: 'conversion', userId: null });
+                  window.dispatchEvent(new CustomEvent('yg:open-subscription'));
+                }}
+              >
+                <Save className="w-4 h-4" />
+                Save my portfolio
+              </Button>
+              <Button
+                variant="default"
+                className="w-[88px] h-[88px] min-w-[88px] min-h-[88px] max-w-[88px] max-h-[88px] aspect-square rounded-full p-0 flex items-center justify-center bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 text-[14px] font-semibold"
+                onClick={() => {
+                  trackEvent('feedback_open', { category: 'feedback', userId: null });
+                  window.dispatchEvent(new CustomEvent('yg:open-demo-feedback'));
+                }}
+                aria-label="Give feedback"
+              >
+                Feedback
+              </Button>
+            </div>
           )}
         </div>
       </header>
