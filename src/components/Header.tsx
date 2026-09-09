@@ -137,7 +137,7 @@ export function Header({ onGuestReset }: HeaderProps) {
                   window.dispatchEvent(new CustomEvent('yg:open-subscription'));
                 }}
               >
-                <Save className="w-4 h-4" />
+                <Save className="w-5 h-5" />
                 Save my portfolio
               </Button>
               <Button
