@@ -68,7 +68,7 @@ export function Header({ onGuestReset }: HeaderProps) {
               <div className="flex items-center gap-1 my-2 w-full">
                 <span className="text-muted-foreground text-[20px] leading-none">◂</span>
                 <div className="h-[5px] flex-1 bg-muted-foreground" />
-                <span className="text-muted-foreground text-[16px] leading-none font-mono">//</span>
+                <span className="text-muted-foreground text-[16px] leading-none font-mono font-bold">//</span>
                 <div className="h-[5px] flex-1 bg-muted-foreground" />
                 <span className="text-muted-foreground text-[20px] leading-none">▸</span>
               </div>
@@ -103,7 +103,7 @@ export function Header({ onGuestReset }: HeaderProps) {
           <div className="flex items-center justify-center gap-1 mt-6 -mx-[1px] w-[calc(100%+2px)]">
             <span className="text-muted-foreground text-[20px] leading-none">◂</span>
             <div className="h-[6px] flex-1 bg-muted-foreground" />
-            <span className="text-muted-foreground text-[16px] leading-none font-mono">//</span>
+            <span className="text-muted-foreground text-[16px] leading-none font-mono font-bold">//</span>
             <div className="h-[6px] flex-1 bg-muted-foreground" />
             <span className="text-muted-foreground text-[20px] leading-none">▸</span>
           </div>
