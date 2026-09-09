@@ -32,7 +32,7 @@ export function Header({ onGuestReset }: HeaderProps) {
   const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
-  const showBackButton = location.pathname !== '/' && location.pathname !== '/try';
+  const showBackButton = true;
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
