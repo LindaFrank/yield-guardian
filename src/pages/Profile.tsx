@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'; // v2
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Save, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,7 +13,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function Profile() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
