@@ -625,9 +625,23 @@ export function ReplacementSuggestions({
           return (
             <div
               key={row.stock.ticker}
-              className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border-[4px] border-muted-foreground/50 hover:border-primary/30 transition-colors"
+              className={cn(
+                'flex items-center justify-between p-3 rounded-lg bg-secondary/20 border-[4px] transition-colors',
+                editingTickers.includes(row.stock.ticker)
+                  ? 'border-primary/70 bg-primary/5'
+                  : 'border-muted-foreground/50 hover:border-primary/30',
+              )}
             >
+              {isPaid && (
+                <Checkbox
+                  checked={editingTickers.includes(row.stock.ticker)}
+                  onCheckedChange={() => toggleSelect(row.stock.ticker, row.shares)}
+                  aria-label={`Select ${row.stock.ticker}`}
+                  className="mr-3 shrink-0 h-5 w-5 rounded-full border-[2px] border-muted-foreground/70 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                />
+              )}
               <div className="flex-1 min-w-0">
+
                 <div className="flex items-center gap-2 flex-wrap">
                   <Teaser isPaid={isPaid}>
                     <span className="font-mono font-medium">{row.stock.ticker}</span>
