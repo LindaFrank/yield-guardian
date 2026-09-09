@@ -206,22 +206,6 @@ export default function Auth() {
                <ArrowRight className="w-4 h-4" />
               </Button>
               <GuidedExperiencesMenu />
-              <div className="w-full flex items-center justify-between text-xs px-1">
-                {mode === 'signin' ? (
-                  <span className="font-medium text-foreground">Sign in</span>
-                ) : (
-                  <button type="button" className="text-muted-foreground hover:text-foreground flex items-center gap-1" onClick={() => setMode('signin')}>
-                    <ArrowRight className="w-3 h-3" /> Sign in
-                  </button>
-                )}
-                {mode === 'signin' ? (
-                  <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signup')}>
-                    Don't have an account? Sign up <ArrowRight className="w-3 h-3" />
-                  </button>
-                ) : (
-                  <span className="font-medium text-foreground">Create account</span>
-                )}
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -230,9 +214,20 @@ export default function Auth() {
         <AnimatePresence>
           {showForm && (
             <motion.div className="w-full max-w-sm" initial={{ opacity: 0, y: 30, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', stiffness: 250, damping: 25 }}>
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-1 px-1">
-                <LogIn className="w-4 h-4 text-primary" />
-                {title}
+              <div className="flex items-center justify-between text-sm font-medium text-foreground mb-1 px-1 mt-[6px]">
+                <div className="flex items-center gap-2">
+                  <LogIn className="w-4 h-4 text-primary" />
+                  {title}
+                </div>
+                {mode === 'signin' ? (
+                  <button type="button" className="text-xs text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signup')}>
+                    Don't have an account? Sign up <ArrowRight className="w-3 h-3" />
+                  </button>
+                ) : mode === 'signup' ? (
+                  <button type="button" className="text-xs text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signin')}>
+                    Already have an account? Sign in <ArrowRight className="w-3 h-3" />
+                  </button>
+                ) : null}
               </div>
               <div className="relative gradient-card rounded-xl border border-muted-foreground/50 shadow-elevated backdrop-blur-sm p-4">
                 {mode !== 'forgot' && (
