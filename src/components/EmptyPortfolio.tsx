@@ -288,11 +288,15 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               const numVal = parseFloat(val);
               const isInvalid = submitted && (!numVal || numVal <= 0);
               return (
-                <Card key={stock.ticker} id={`shares-card-${stock.ticker}`} className={cn('p-4 border-2 border-muted-foreground/90', isInvalid && 'border-yield-negative')}>
+                <Card key={stock.ticker} id={`shares-card-${stock.ticker}`} className={cn('p-4 border border-muted-foreground/70', isInvalid && 'border-yield-negative')}>
                   <div className="flex items-center gap-4">
-
-
+                    <Checkbox
+                      checked={selectedTickers.has(stock.ticker)}
+                      onCheckedChange={() => toggleTicker(stock.ticker)}
+                      className="shrink-0"
+                    />
                     <div className="flex-1 min-w-0">
+
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-semibold">{stock.ticker}</span>
                         <span className="text-xs text-muted-foreground">${stock.currentPrice.toFixed(2)}</span>
