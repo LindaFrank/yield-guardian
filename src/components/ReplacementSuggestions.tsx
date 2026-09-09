@@ -250,6 +250,28 @@ export function ReplacementSuggestions({
     });
   };
 
+  const toggleSelect = (ticker: string, prefillShares?: number) => {
+    if (editingTickers.includes(ticker)) handleCancel(ticker);
+    else handlePlusClick(ticker, prefillShares);
+  };
+
+  /** Adds every ticked stock at once. */
+  const handleConfirmSelected = () => {
+    const rows = editingTickers
+      .map((t) => candidates.find((c) => c.stock.ticker === t)?.stock)
+      .filter((s): s is Stock => !!s);
+    const invalid = rows.filter((s) => !(parseFloat(sharesInputs[s.ticker] ?? '') > 0));
+    if (invalid.length > 0) {
+      toast.error(`Enter a valid number of shares for ${invalid.map((s) => s.ticker).join(', ')}`);
+      return;
+    }
+    rows.forEach((s) => onAddStock(s, parseFloat(sharesInputs[s.ticker])));
+    toast.success(`Added ${rows.length} stock${rows.length !== 1 ? 's' : ''} to your portfolio`);
+    setEditingTickers([]);
+    setSharesInputs({});
+  };
+
+
 
   const isDefaultMode = !removedStock;
 
