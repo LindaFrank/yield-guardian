@@ -936,7 +936,7 @@ export function ReplacementSuggestions({
                 })()}
               </div>
 
-              {isPaid && editingTickers.includes(row.stock.ticker) ? (
+              {editingTickers.includes(row.stock.ticker) ? (
                 <div className="flex items-center gap-1.5 ml-2">
                   <Input
                     type="number"
@@ -976,7 +976,7 @@ export function ReplacementSuggestions({
         })}
       </div>
 
-      {isPaid && editingTickers.length > 0 && (
+      {editingTickers.length > 0 && (
         <div className="sticky bottom-0 mt-3 pt-3 border-t-[3px] border-primary/40 bg-card/95 backdrop-blur">
           <Button className="w-full gap-2" onClick={handleConfirmSelected}>
             <Check className="w-4 h-4" />
