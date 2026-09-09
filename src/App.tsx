@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { HelpWizardProvider } from "@/contexts/HelpWizardContext";
 import { useKeepAlive } from "@/hooks/useKeepAlive";
 import { Footer } from "@/components/Footer";
+import { GlobalBackButton } from "@/components/GlobalBackButton";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
@@ -39,6 +40,7 @@ const AppRoutes = () => {
   useKeepAlive();
   return (
     <BrowserRouter>
+      <GlobalBackButton />
       <Routes>
         <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
