@@ -123,8 +123,12 @@ const Index = () => {
   const [quickStartImportOpen, setQuickStartImportOpen] = useState(false);
   const [subscriptionOpen, setSubscriptionOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [actionBarCollapsed, setActionBarCollapsed] = useState(false);
+  const [actionBarScrolled, setActionBarScrolled] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
+
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
