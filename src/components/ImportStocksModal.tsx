@@ -18,7 +18,9 @@ interface ImportStocksModalProps {
   existingShares?: ExistingStockShares[];
   onAddStock: (stock: Stock, shares?: number) => void;
   onUpdateShares?: (ticker: string, shares: number | null) => void;
+  onOpenChange?: (open: boolean) => void;
 }
+
 
 interface DuplicateWithComparison extends ParsedRow {
   currentShares: number | null;
