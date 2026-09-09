@@ -86,6 +86,7 @@ export default function Unsubscribe() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
