@@ -78,21 +78,21 @@ export function Header({ onGuestReset }: HeaderProps) {
               <p className="text-[14px] text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
 
-            <div className="flex items-center justify-end">
+            <div className="flex flex-col items-end gap-2">
               {showBackButton && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => navigate(-1)}
                   title="Go back"
-                  className="text-[#147a8a] hover:text-[#1a8fa3] hover:bg-[#147a8a]/10 gap-1.5 mr-2"
+                  className="text-[#147a8a] hover:text-[#1a8fa3] hover:bg-[#147a8a]/10 gap-1.5"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span className="hidden sm:inline">Back</span>
                 </Button>
               )}
               {user && (
-                <div className="flex items-center gap-3 ml-[100px]">
+                <div className="flex items-center gap-3">
                   {isAdmin && (
                     <Button variant="outline" size="sm" onClick={() => navigate('/admin')} title="Admin console" className="gap-1.5">
                       <ShieldCheck className="w-4 h-4" />
