@@ -633,16 +633,34 @@ const Index = () => {
 
         {/* Action Menu — positioned directly below the lower header separator */}
         <section
-          className={`mb-1 -mt-[24px] relative z-[60] transition-all duration-500 ${
-            replacementDialogOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-fade-in'
-          }`}
-          style={{ animationDelay: '100ms' }}
+          className={`mb-1 -mt-[24px] relative z-30 transition-all duration-500 ${
+            anyDialogOpen ? 'opacity-0 pointer-events-none' : ''
+          } ${actionBarScrolled && !anyDialogOpen ? 'blur-[1px]' : ''}`}
+          style={{
+            animationDelay: '100ms',
+            opacity: anyDialogOpen ? 0 : actionBarScrolled ? 0.45 : 1,
+          }}
         >
-          <div className="rounded-lg border-4 border-primary/30 bg-background px-3 py-3 shadow-glow flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
-              What Do You Want To Do?
-            </span>
-            <div className="flex items-center gap-2 flex-wrap overflow-hidden [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5">
+          <div className="rounded-lg border-4 border-primary/30 bg-background px-3 py-3 shadow-glow">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
+                What Do You Want To Do?
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                onClick={() => setActionBarCollapsed((v) => !v)}
+                aria-label={actionBarCollapsed ? 'Expand action menu' : 'Collapse action menu'}
+              >
+                {actionBarCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+              </Button>
+            </div>
+            <div
+              className={`flex items-center gap-2 flex-wrap overflow-hidden transition-all duration-500 [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5 ${
+                actionBarCollapsed ? 'max-h-0 opacity-0 pointer-events-none pt-0' : 'max-h-[500px] opacity-100 pt-2'
+              }`}
+            >
               <Button
                 variant="outline"
                 className="gap-1.5 border-[3px] border-muted-foreground/50"
@@ -669,6 +687,7 @@ const Index = () => {
                   if (isGuest) setGuestShareValue(ticker, shares);
                   else updateShares.mutate({ ticker, shares });
                 }}
+                onOpenChange={setImportModalOpen}
               />
               <Button
                 variant="secondary"
@@ -716,6 +735,7 @@ const Index = () => {
             </div>
           </div>
         </section>
+
 
         {/* Live Data Status */}
         <div className="mb-4 flex items-center justify-between">
