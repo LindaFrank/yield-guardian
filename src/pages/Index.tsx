@@ -608,100 +608,85 @@ const Index = () => {
       <main className="container mx-auto px-6 py-8">
 
         {/* Action Menu — positioned directly below the lower header separator */}
-        {wizardDone && (
-          <section className="mb-1 -mt-[28px] animate-fade-in" style={{ animationDelay: '100ms' }}>
-
-
-            <div className="rounded-lg border-2 border-primary/30 bg-background px-3 py-3 shadow-glow flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
-                What Do You Want To Do?
-              </span>
+        <section className="mb-1 -mt-[28px] animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <div className="rounded-lg border-2 border-primary/30 bg-background px-3 py-3 shadow-glow flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
+              What Do You Want To Do?
+            </span>
+            <div className="flex items-center gap-2 flex-wrap overflow-hidden [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5">
               <Button
-                variant="ghost"
-                size="sm"
-                className="p-1.5 h-auto shrink-0"
-                onClick={() => setActionBarExpanded((v) => !v)}
-                aria-label={actionBarExpanded ? 'Collapse actions' : 'Expand actions'}
+                variant="outline"
+                className="gap-1.5 border-[3px] border-muted-foreground/50"
+                onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
               >
-                {actionBarExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                <Target className="w-3.5 h-3.5" />
+                Desired Dividend Yield
               </Button>
-              {actionBarExpanded && (
-                <div className="flex items-center gap-2 flex-wrap overflow-hidden [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5">
+              <Button
+                className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
+                onClick={() => {
+                  setSelectedUnderperformer(null);
+                  setReplacementDialogOpen(true);
+                }}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Stocks that meet Yield Target
+              </Button>
+              <ImportStocksModal
+                existingTickers={stocks.map((s) => s.ticker)}
+                existingShares={sharesList.map(s => ({ ticker: s.ticker, shares: s.shares_owned }))}
+                onAddStock={handleAddStock}
+                onUpdateShares={(ticker, shares) => {
+                  if (isGuest) setGuestShareValue(ticker, shares);
+                  else updateShares.mutate({ ticker, shares });
+                }}
+              />
+              <Button
+                variant="secondary"
+                className="gap-1.5 border-[3px] border-muted-foreground/50"
+                onClick={() => setAddStockOpen(true)}
+              >
+                <Search className="w-3.5 h-3.5" />
+                Search Stocks Generally
+              </Button>
+              {stocks.length > 0 && (
+                <>
                   <Button
                     variant="outline"
                     className="gap-1.5 border-[3px] border-muted-foreground/50"
-                    onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                    onClick={() => {
+                      const el = document.getElementById('underperformers-section');
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
                   >
-                    <Target className="w-3.5 h-3.5" />
-                    Desired Dividend Yield
+                    <TrendingDown className="w-3.5 h-3.5" />
+                    Review Underperformers ({underperformers.length})
                   </Button>
                   <Button
-                    className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
+                    variant="outline"
+                    className="gap-1.5 border-[3px] border-muted-foreground/50"
                     onClick={() => {
-                      setSelectedUnderperformer(null);
-                      setReplacementDialogOpen(true);
+                      const el = document.getElementById('replacement-suggestions-section');
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    Stocks that meet Yield Target
+                    Jump to Suggestions
                   </Button>
-                  <ImportStocksModal
-                    existingTickers={stocks.map((s) => s.ticker)}
-                    existingShares={sharesList.map(s => ({ ticker: s.ticker, shares: s.shares_owned }))}
-                    onAddStock={handleAddStock}
-                    onUpdateShares={(ticker, shares) => {
-                      if (isGuest) setGuestShareValue(ticker, shares);
-                      else updateShares.mutate({ ticker, shares });
-                    }}
-                  />
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     className="gap-1.5 border-[3px] border-muted-foreground/50"
-                    onClick={() => setAddStockOpen(true)}
+                    onClick={handleGenerateReport}
+                    disabled={reportGenerating}
                   >
-                    <Search className="w-3.5 h-3.5" />
-                    Search Stocks Generally
+                    {reportGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
+                    {reportGenerating ? 'Creating Report…' : 'Report'}
                   </Button>
-                  {stocks.length > 0 && (
-                    <>
-                      <Button
-                        variant="outline"
-                        className="gap-1.5 border-[3px] border-muted-foreground/50"
-                        onClick={() => {
-                          const el = document.getElementById('underperformers-section');
-                          el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }}
-                      >
-                        <TrendingDown className="w-3.5 h-3.5" />
-                        Review Underperformers ({underperformers.length})
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="gap-1.5 border-[3px] border-muted-foreground/50"
-                        onClick={() => {
-                          const el = document.getElementById('replacement-suggestions-section');
-                          el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }}
-                      >
-                        <Sparkles className="w-3.5 h-3.5" />
-                        Jump to Suggestions
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="gap-1.5 border-[3px] border-muted-foreground/50"
-                        onClick={handleGenerateReport}
-                        disabled={reportGenerating}
-                      >
-                        {reportGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
-                        {reportGenerating ? 'Creating Report…' : 'Report'}
-                      </Button>
-                    </>
-                  )}
-                </div>
+                </>
               )}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
 
         {/* Live Data Status */}
         <div className="mb-4 flex items-center justify-between">
