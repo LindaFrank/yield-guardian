@@ -80,7 +80,7 @@ export function GuestAnalysisAlert({ onReset }: GuestAnalysisAlertProps) {
               Quick Start_Import your own portfolio
             </Button>
             <div className="pt-2 border-t border-border/40">
-              <p className="text-[11px] text-muted-foreground leading-snug mb-2">
+              <p className="text-[11px] text-primary leading-snug mb-2">
                 Want to start fresh? Clear your temporary demo portfolio.
               </p>
               <Button
