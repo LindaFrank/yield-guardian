@@ -564,8 +564,8 @@ export function ReplacementSuggestions({
           <Lock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
           <p className="text-[14px] leading-snug text-foreground/90">
             {user
-              ? 'Upgrade to act on these Alternatives. You’ll unlock ticker names, share counts, and step-by-step instructions you can send to your broker.'
-              : 'Save your portfolio to act on these Alternatives. You’ll unlock ticker names, share counts, and step-by-step instructions you can send to your broker.'}
+              ? 'Upgrade to act on these Alternatives and unlock every strategy we run — including Aggressive and Conservative — so you can see the actual stocks our algorithm returns for your desired yield. You’ll get ticker names, share counts, and step-by-step instructions you can send to your broker. Start putting your dividend income on a stronger footing.'
+              : 'Save your portfolio to act on these Alternatives and unlock every strategy we run — including Aggressive and Conservative — so you can see the actual stocks our algorithm returns for your desired yield. You’ll get ticker names, share counts, and step-by-step instructions you can send to your broker. Start putting your dividend income on a stronger footing.'}
           </p>
         </div>
       )}
