@@ -169,8 +169,9 @@ export function ReplacementSuggestions({
   onIncomeDeltaChange,
 }: ReplacementSuggestionsProps) {
   const { isPaid } = usePaidFeatures();
-  const [editingTicker, setEditingTicker] = useState<string | null>(null);
-  const [sharesInput, setSharesInput] = useState('');
+  const [editingTickers, setEditingTickers] = useState<string[]>([]);
+  const [sharesInputs, setSharesInputs] = useState<Record<string, string>>({});
+
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
 
   // Per-card optimiser controls
