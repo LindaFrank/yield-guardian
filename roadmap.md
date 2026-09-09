@@ -5,4 +5,6 @@
 - [x] Fix signed-in trash-can deletion not removing stock card (ARCC)
 
 ## In Progress
-- [ ] None
+- [x] Move "What do you want to do?" action bar below lower header separator
+- [x] Tighten action bar spacing by 10px
+

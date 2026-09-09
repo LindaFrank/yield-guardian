@@ -610,7 +610,8 @@ const Index = () => {
 
         {/* Action Menu — positioned directly below the lower header separator */}
         {wizardDone && (
-          <section className="mb-8 animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <section className="mb-8 -mt-[10px] animate-fade-in" style={{ animationDelay: '100ms' }}>
+
             <div className="rounded-lg border-2 border-primary/30 bg-background px-3 py-3 shadow-glow flex items-center gap-2 flex-wrap">
               <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
                 What Do You Want To Do?
