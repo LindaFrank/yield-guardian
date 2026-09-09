@@ -900,17 +900,19 @@ export function ReplacementSuggestions({
                 })()}
               </div>
 
-              {isPaid && editingTicker === row.stock.ticker ? (
+              {isPaid && editingTickers.includes(row.stock.ticker) ? (
                 <div className="flex items-center gap-1.5 ml-2">
                   <Input
                     type="number"
                     min="1"
                     placeholder="Shares"
-                    value={sharesInput}
-                    onChange={(e) => setSharesInput(e.target.value)}
+                    value={sharesInputs[row.stock.ticker] ?? ''}
+                    onChange={(e) =>
+                      setSharesInputs((prev) => ({ ...prev, [row.stock.ticker]: e.target.value }))
+                    }
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleConfirm(row.stock);
-                      if (e.key === 'Escape') handleCancel();
+                      if (e.key === 'Escape') handleCancel(row.stock.ticker);
                     }}
                     className="w-20 h-8 text-sm"
                     autoFocus
@@ -926,7 +928,7 @@ export function ReplacementSuggestions({
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={handleCancel}
+                    onClick={() => handleCancel(row.stock.ticker)}
                     className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                   >
                     <X className="w-4 h-4" />
@@ -942,6 +944,7 @@ export function ReplacementSuggestions({
                   <Plus className="w-4 h-4" />
                 </Button>
               ) : null}
+
             </div>
           );
         })}
