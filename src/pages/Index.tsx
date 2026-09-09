@@ -214,7 +214,16 @@ const Index = () => {
     }
   }, [error]);
 
+  // Fade/blur the action bar as the user scrolls so it doesn't dominate the view.
+  useEffect(() => {
+    const handleScroll = () => setActionBarScrolled(window.scrollY > 80);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // After a successful checkout from the guest "Save my portfolio" flow,
+
   // persist the guest portfolio to the newly-subscribed user's account.
   useEffect(() => {
     const checkoutSuccess = searchParams.get('checkout') === 'success';
