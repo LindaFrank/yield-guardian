@@ -79,6 +79,18 @@ export function Header({ onGuestReset }: HeaderProps) {
             </div>
 
             <div className="flex items-center justify-end">
+              {showBackButton && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(-1)}
+                  title="Go back"
+                  className="text-[#147a8a] hover:text-[#1a8fa3] hover:bg-[#147a8a]/10 gap-1.5 mr-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">Back</span>
+                </Button>
+              )}
               {user && (
                 <div className="flex items-center gap-3 ml-[100px]">
                   {isAdmin && (
@@ -89,10 +101,10 @@ export function Header({ onGuestReset }: HeaderProps) {
                   )}
                   <button
                     onClick={() => navigate('/profile')}
-                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors hidden sm:flex"
+                    className="flex items-center gap-2 text-xs text-foreground hover:text-foreground/80 transition-colors hidden sm:flex"
                     title="Edit profile"
                   >
-                    <User className="w-3.5 h-3.5" />
+                    <User className="w-4 h-4" />
                     {profile?.display_name || user.email}
                   </button>
                   <Button variant="outline" size="sm" onClick={handleSignOut} title="Sign out" className="border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary gap-1.5">
