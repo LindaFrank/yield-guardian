@@ -558,6 +558,15 @@ export function ReplacementSuggestions({
         </>
       )}
 
+      {!isPaid && removedStock && (
+        <div className="mb-4 p-3 rounded-lg border-2 border-primary/30 bg-primary/5 flex items-start gap-2.5">
+          <Lock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <p className="text-[14px] leading-snug text-foreground/90">
+            Save your portfolio to act on these Alternatives. You’ll unlock ticker names, share counts, and step-by-step instructions you can send to your broker.
+          </p>
+        </div>
+      )}
+
       <div className="space-y-3">
         {(() => {
           const baseRows = displayRows
