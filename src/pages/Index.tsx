@@ -608,8 +608,8 @@ const Index = () => {
       <main className="container mx-auto px-6 py-8">
 
         {/* Action Menu — positioned directly below the lower header separator */}
-        <section className="mb-1 -mt-[28px] animate-fade-in" style={{ animationDelay: '100ms' }}>
-          <div className="rounded-lg border-2 border-primary/30 bg-background px-3 py-3 shadow-glow flex items-center gap-2 flex-wrap">
+        <section className="mb-1 -mt-[24px] animate-fade-in relative z-[60]" style={{ animationDelay: '100ms' }}>
+          <div className="rounded-lg border-4 border-primary/30 bg-background px-3 py-3 shadow-glow flex items-center gap-2 flex-wrap">
             <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
               What Do You Want To Do?
             </span>
