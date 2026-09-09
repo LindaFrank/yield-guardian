@@ -81,12 +81,12 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
       {stats.map((stat) => {
         const help = STAT_HELP[stat.label];
         const card = (
           <div
-            className="p-4 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:border-muted-foreground/70 hover:scale-[1.03] hover:-translate-y-1 hover:shadow-elevated active:scale-[0.97]"
+            className="p-4 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:border-muted-foreground/70 hover:scale-[1.03] hover:-translate-y-1 hover:shadow-elevated active:scale-[0.97] h-full min-h-[152px] flex flex-col"
           >
             <div className="flex items-center gap-3 mb-3">
               <div className={cn('p-2 rounded-lg bg-secondary/50', stat.color)}>
@@ -108,7 +108,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
             {card}
           </HelpTooltip>
         ) : (
-          <div key={stat.label}>{card}</div>
+          <div key={stat.label} className="h-full">{card}</div>
         );
       })}
     </div>
