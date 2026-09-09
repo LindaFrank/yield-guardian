@@ -487,9 +487,8 @@ const Index = () => {
     }
   };
 
-  const [replacementDialogOpen, setReplacementDialogOpen] = useState(false);
-
   const handleSelectUnderperformer = (stock: Stock) => {
+
     trackEvent('alternatives_reviewed', { category: 'replacement', label: stock.ticker, userId: user?.id ?? null });
     setSelectedUnderperformer(stock);
     setReplacementDialogOpen(true);
