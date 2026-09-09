@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Header } from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 
 type State = 'loading' | 'valid' | 'invalid' | 'done' | 'error';
