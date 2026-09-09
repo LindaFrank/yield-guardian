@@ -1,25 +1,13 @@
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Header } from '@/components/Header';
 
 export default function PrivacyPolicy() {
-  const navigate = useNavigate();
-
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="font-semibold text-lg">Privacy Policy</h1>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-6 py-8 max-w-2xl prose prose-invert prose-sm">
-        <p className="text-muted-foreground text-sm">Last updated: March 17, 2026</p>
+        <h1 className="text-2xl font-semibold mb-2 not-prose">Privacy Policy</h1>
+        <p className="text-muted-foreground text-sm not-prose mb-6">Last updated: March 17, 2026</p>
 
         <h2 className="text-foreground text-lg font-semibold mt-6">1. Information We Collect</h2>
         <p className="text-muted-foreground">
