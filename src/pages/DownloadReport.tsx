@@ -67,5 +67,6 @@ export default function DownloadReport() {
         )}
       </section>
     </main>
+    </div>
   );
 }
