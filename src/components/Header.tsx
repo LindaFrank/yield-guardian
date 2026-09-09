@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, User, ShieldCheck, Save, ArrowLeft, ArrowRight } from 'lucide-react';
+import { TrendingUp, User, ShieldCheck, Save, ArrowLeft, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
