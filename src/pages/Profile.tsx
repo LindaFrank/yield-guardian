@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'; // v2
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Save, User } from 'lucide-react';
+import { Save, User } from 'lucide-react';
+import { Header } from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
