@@ -45,8 +45,10 @@ export default function Unsubscribe() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-2">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-80px)]">
+        <Card className="w-full max-w-md border-2">
         <CardHeader>
           <CardTitle>Email preferences</CardTitle>
           <CardDescription>Yield Guardian</CardDescription>
