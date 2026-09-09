@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, User, ShieldCheck, Save, ArrowLeft } from 'lucide-react';
+import { TrendingUp, User, ShieldCheck, Save, ArrowLeft, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
@@ -107,7 +107,8 @@ export function Header({ onGuestReset }: HeaderProps) {
                     <User className="w-4 h-4" />
                     {profile?.display_name || user.email}
                   </button>
-                  <Button variant="outline" size="sm" onClick={handleSignOut} title="Sign out" className="border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary">
+                  <Button variant="outline" size="sm" onClick={handleSignOut} title="Sign out" className="border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary gap-1.5">
+                    <LogOut className="w-4 h-4" />
                     <span className="hidden sm:inline">Log out</span>
                   </Button>
                 </div>
