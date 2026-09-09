@@ -117,7 +117,6 @@ const Index = () => {
   const [addStockOpen, setAddStockOpen] = useState(false);
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
-  const [actionBarExpanded, setActionBarExpanded] = useState(true);
   const [reportGenerating, setReportGenerating] = useState(false);
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
   const [quickStartOpen, setQuickStartOpen] = useState(false);
