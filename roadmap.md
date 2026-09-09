@@ -7,6 +7,8 @@
 - [x] Tighten action bar spacing by 10px
 
 ## In Progress
-- [ ] None
+- [x] Halve the borders on the visible Matching Stocks cards and restore selection bubbles for every user
+- [x] Halve the outer outline around the Matching Stocks list
+- [ ] Credit adjustment request — blocked because project editing tools cannot issue account credits
 
 

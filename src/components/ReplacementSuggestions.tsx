@@ -301,7 +301,7 @@ export function ReplacementSuggestions({
   const displayRows = result?.rows ?? null;
 
   return (
-    <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50">
+    <div className="p-5 rounded-xl gradient-card shadow-card border-[2px] border-muted-foreground/50">
 
       {removedStock && (
         <>
@@ -628,20 +628,18 @@ export function ReplacementSuggestions({
             <div
               key={row.stock.ticker}
               className={cn(
-                'flex items-center justify-between p-3 rounded-lg bg-secondary/20 border-[4px] transition-colors',
+                'flex items-center justify-between p-3 rounded-lg bg-secondary/20 border-[2px] transition-colors',
                 editingTickers.includes(row.stock.ticker)
                   ? 'border-primary/70 bg-primary/5'
                   : 'border-muted-foreground/50 hover:border-primary/30',
               )}
             >
-              {isPaid && (
-                <Checkbox
-                  checked={editingTickers.includes(row.stock.ticker)}
-                  onCheckedChange={() => toggleSelect(row.stock.ticker, row.shares)}
-                  aria-label={`Select ${row.stock.ticker}`}
-                  className="mr-3 shrink-0 h-5 w-5 rounded-full border-[2px] border-muted-foreground/70 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                />
-              )}
+              <Checkbox
+                checked={editingTickers.includes(row.stock.ticker)}
+                onCheckedChange={() => toggleSelect(row.stock.ticker, row.shares)}
+                aria-label={`Select ${row.stock.ticker}`}
+                className="mr-3 shrink-0 h-5 w-5 rounded-full border-[2px] border-muted-foreground/70 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+              />
               <div className="flex-1 min-w-0">
 
                 <div className="flex items-center gap-2 flex-wrap">
@@ -938,7 +936,7 @@ export function ReplacementSuggestions({
                 })()}
               </div>
 
-              {isPaid && editingTickers.includes(row.stock.ticker) ? (
+              {editingTickers.includes(row.stock.ticker) ? (
                 <div className="flex items-center gap-1.5 ml-2">
                   <Input
                     type="number"
@@ -978,7 +976,7 @@ export function ReplacementSuggestions({
         })}
       </div>
 
-      {isPaid && editingTickers.length > 0 && (
+      {editingTickers.length > 0 && (
         <div className="sticky bottom-0 mt-3 pt-3 border-t-[3px] border-primary/40 bg-card/95 backdrop-blur">
           <Button className="w-full gap-2" onClick={handleConfirmSelected}>
             <Check className="w-4 h-4" />
