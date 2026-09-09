@@ -206,22 +206,6 @@ export default function Auth() {
                <ArrowRight className="w-4 h-4" />
               </Button>
               <GuidedExperiencesMenu />
-              <div className="w-full flex items-center justify-between text-xs px-1">
-                {mode === 'signin' ? (
-                  <span className="font-medium text-foreground">Sign in</span>
-                ) : (
-                  <button type="button" className="text-muted-foreground hover:text-foreground flex items-center gap-1" onClick={() => setMode('signin')}>
-                    <ArrowRight className="w-3 h-3" /> Sign in
-                  </button>
-                )}
-                {mode === 'signin' ? (
-                  <button type="button" className="text-primary hover:underline flex items-center gap-1" onClick={() => setMode('signup')}>
-                    Don't have an account? Sign up <ArrowRight className="w-3 h-3" />
-                  </button>
-                ) : (
-                  <span className="font-medium text-foreground">Create account</span>
-                )}
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
