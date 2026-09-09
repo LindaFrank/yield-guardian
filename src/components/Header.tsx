@@ -115,7 +115,7 @@ export function Header({ onGuestReset }: HeaderProps) {
           {!user && (
             <Button
               size="default"
-              className="absolute top-4 left-4 z-[55] gap-2 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 shadow-glow px-[43px] text-[18px] font-semibold h-[67px] min-h-[67px] rounded-lg"
+              className="absolute top-4 right-4 z-[55] gap-2 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 shadow-glow px-[43px] text-[18px] font-semibold h-[67px] min-h-[67px] rounded-lg"
               onClick={() => {
                 trackEvent('save_portfolio_header_click', { category: 'conversion', userId: null });
                 window.dispatchEvent(new CustomEvent('yg:open-subscription'));
