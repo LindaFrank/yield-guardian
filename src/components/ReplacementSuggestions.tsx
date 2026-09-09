@@ -12,6 +12,8 @@ import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/compone
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -249,6 +251,28 @@ export function ReplacementSuggestions({
       return next;
     });
   };
+
+  const toggleSelect = (ticker: string, prefillShares?: number) => {
+    if (editingTickers.includes(ticker)) handleCancel(ticker);
+    else handlePlusClick(ticker, prefillShares);
+  };
+
+  /** Adds every ticked stock at once. */
+  const handleConfirmSelected = () => {
+    const rows = editingTickers
+      .map((t) => candidates.find((c) => c.stock.ticker === t)?.stock)
+      .filter((s): s is Stock => !!s);
+    const invalid = rows.filter((s) => !(parseFloat(sharesInputs[s.ticker] ?? '') > 0));
+    if (invalid.length > 0) {
+      toast.error(`Enter a valid number of shares for ${invalid.map((s) => s.ticker).join(', ')}`);
+      return;
+    }
+    rows.forEach((s) => onAddStock(s, parseFloat(sharesInputs[s.ticker])));
+    toast.success(`Added ${rows.length} stock${rows.length !== 1 ? 's' : ''} to your portfolio`);
+    setEditingTickers([]);
+    setSharesInputs({});
+  };
+
 
 
   const isDefaultMode = !removedStock;
@@ -603,9 +627,23 @@ export function ReplacementSuggestions({
           return (
             <div
               key={row.stock.ticker}
-              className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border-[4px] border-muted-foreground/50 hover:border-primary/30 transition-colors"
+              className={cn(
+                'flex items-center justify-between p-3 rounded-lg bg-secondary/20 border-[4px] transition-colors',
+                editingTickers.includes(row.stock.ticker)
+                  ? 'border-primary/70 bg-primary/5'
+                  : 'border-muted-foreground/50 hover:border-primary/30',
+              )}
             >
+              {isPaid && (
+                <Checkbox
+                  checked={editingTickers.includes(row.stock.ticker)}
+                  onCheckedChange={() => toggleSelect(row.stock.ticker, row.shares)}
+                  aria-label={`Select ${row.stock.ticker}`}
+                  className="mr-3 shrink-0 h-5 w-5 rounded-full border-[2px] border-muted-foreground/70 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                />
+              )}
               <div className="flex-1 min-w-0">
+
                 <div className="flex items-center gap-2 flex-wrap">
                   <Teaser isPaid={isPaid}>
                     <span className="font-mono font-medium">{row.stock.ticker}</span>
@@ -915,7 +953,6 @@ export function ReplacementSuggestions({
                       if (e.key === 'Escape') handleCancel(row.stock.ticker);
                     }}
                     className="w-20 h-8 text-sm"
-                    autoFocus
                   />
                   <Button
                     size="sm"
@@ -934,21 +971,21 @@ export function ReplacementSuggestions({
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
-              ) : isPaid ? (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handlePlusClick(row.stock.ticker, row.shares)}
-                  className="ml-2 hover:bg-primary/10 hover:text-primary"
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
               ) : null}
 
             </div>
           );
         })}
       </div>
+
+      {isPaid && editingTickers.length > 0 && (
+        <div className="sticky bottom-0 mt-3 pt-3 border-t-[3px] border-primary/40 bg-card/95 backdrop-blur">
+          <Button className="w-full gap-2" onClick={handleConfirmSelected}>
+            <Check className="w-4 h-4" />
+            Add {editingTickers.length} selected stock{editingTickers.length !== 1 ? 's' : ''}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
