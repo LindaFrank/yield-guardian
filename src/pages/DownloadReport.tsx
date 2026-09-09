@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FileDown, FileWarning, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Header } from '@/components/Header';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
 
 const REPORT_STORAGE_KEY = 'yield-guardian-report-download';
