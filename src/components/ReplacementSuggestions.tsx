@@ -7,7 +7,7 @@ import {
   OptimizerMode,
   OptimizerResult,
 } from '@/lib/optimizer';
-import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote, Printer, Mail, Info } from 'lucide-react';
+import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote, Printer, Mail, Info, Lock } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { trackEvent } from '@/lib/analytics';
 import { usePaidFeatures } from '@/hooks/usePaidFeatures';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -169,6 +170,7 @@ export function ReplacementSuggestions({
   onIncomeDeltaChange,
 }: ReplacementSuggestionsProps) {
   const { isPaid } = usePaidFeatures();
+  const { user } = useAuth();
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
   const [sharesInput, setSharesInput] = useState('');
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
@@ -555,6 +557,17 @@ export function ReplacementSuggestions({
             )}
           </div>
         </>
+      )}
+
+      {!isPaid && removedStock && (
+        <div className="mb-4 p-3 rounded-lg border-2 border-primary/30 bg-primary/5 flex items-start gap-2.5">
+          <Lock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <p className="text-[14px] leading-snug text-foreground/90">
+            {user
+              ? 'Upgrade to act on these Alternatives. You’ll unlock ticker names, share counts, and step-by-step instructions you can send to your broker.'
+              : 'Save your portfolio to act on these Alternatives. You’ll unlock ticker names, share counts, and step-by-step instructions you can send to your broker.'}
+          </p>
+        </div>
       )}
 
       <div className="space-y-3">
