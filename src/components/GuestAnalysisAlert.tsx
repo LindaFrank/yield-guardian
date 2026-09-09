@@ -86,7 +86,7 @@ export function GuestAnalysisAlert({ onReset }: GuestAnalysisAlertProps) {
               <Button
                 size="sm"
                 variant="outline"
-                className="w-full justify-start gap-2 border-[3px] border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                className="w-full justify-start gap-2 border-[3px] border-amber-500 text-amber-500 hover:bg-amber-500/10 hover:text-amber-500"
                 onClick={() => {
                   trackEvent('guest_reset_click', { category: 'guest', label: 'reset button', userId: null });
                   onReset?.();
@@ -94,7 +94,7 @@ export function GuestAnalysisAlert({ onReset }: GuestAnalysisAlertProps) {
                 }}
               >
                 <RotateCcw className="w-4 h-4" />
-                Start over
+                Reset
               </Button>
             </div>
           </div>
