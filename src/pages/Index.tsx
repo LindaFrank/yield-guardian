@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Target, FileDown, TrendingDown, Sparkles, Search, Loader2 } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles, Search, Loader2, ChevronUp, ChevronDown } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -123,8 +123,14 @@ const Index = () => {
   const [quickStartImportOpen, setQuickStartImportOpen] = useState(false);
   const [subscriptionOpen, setSubscriptionOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [replacementDialogOpen, setReplacementDialogOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [actionBarCollapsed, setActionBarCollapsed] = useState(false);
+  const [actionBarScrolled, setActionBarScrolled] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
+
+
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
@@ -210,7 +216,16 @@ const Index = () => {
     }
   }, [error]);
 
+  // Fade/blur the action bar as the user scrolls so it doesn't dominate the view.
+  useEffect(() => {
+    const handleScroll = () => setActionBarScrolled(window.scrollY > 80);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // After a successful checkout from the guest "Save my portfolio" flow,
+
   // persist the guest portfolio to the newly-subscribed user's account.
   useEffect(() => {
     const checkoutSuccess = searchParams.get('checkout') === 'success';
@@ -265,7 +280,18 @@ const Index = () => {
     );
   }, [incomeDeltaByTicker, underperformers]);
 
+  const anyDialogOpen =
+    addStockOpen ||
+    replacementDialogOpen ||
+    quickStartOpen ||
+    quickStartImportOpen ||
+    feedbackOpen ||
+    subscriptionOpen ||
+    Boolean(reportBytes) ||
+    importModalOpen;
+
   // Current portfolio dividend income & projected new yield after applying gains
+
   const portfolioStats = useMemo(() => {
     const sharesMap = Object.fromEntries(
       sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
@@ -461,9 +487,8 @@ const Index = () => {
     }
   };
 
-  const [replacementDialogOpen, setReplacementDialogOpen] = useState(false);
-
   const handleSelectUnderperformer = (stock: Stock) => {
+
     trackEvent('alternatives_reviewed', { category: 'replacement', label: stock.ticker, userId: user?.id ?? null });
     setSelectedUnderperformer(stock);
     setReplacementDialogOpen(true);
@@ -609,16 +634,34 @@ const Index = () => {
 
         {/* Action Menu — positioned directly below the lower header separator */}
         <section
-          className={`mb-1 -mt-[24px] relative z-[60] transition-all duration-500 ${
-            replacementDialogOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-fade-in'
-          }`}
-          style={{ animationDelay: '100ms' }}
+          className={`mb-1 -mt-[24px] relative z-30 transition-all duration-500 ${
+            anyDialogOpen ? 'opacity-0 pointer-events-none' : ''
+          } ${actionBarScrolled && !anyDialogOpen ? 'blur-[1px]' : ''}`}
+          style={{
+            animationDelay: '100ms',
+            opacity: anyDialogOpen ? 0 : actionBarScrolled ? 0.45 : 1,
+          }}
         >
-          <div className="rounded-lg border-4 border-primary/30 bg-background px-3 py-3 shadow-glow flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
-              What Do You Want To Do?
-            </span>
-            <div className="flex items-center gap-2 flex-wrap overflow-hidden [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5">
+          <div className="rounded-lg border-4 border-primary/30 bg-background px-3 py-3 shadow-glow">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
+                What Do You Want To Do?
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                onClick={() => setActionBarCollapsed((v) => !v)}
+                aria-label={actionBarCollapsed ? 'Expand action menu' : 'Collapse action menu'}
+              >
+                {actionBarCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+              </Button>
+            </div>
+            <div
+              className={`flex items-center gap-2 flex-wrap overflow-hidden transition-all duration-500 [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5 ${
+                actionBarCollapsed ? 'max-h-0 opacity-0 pointer-events-none pt-0' : 'max-h-[500px] opacity-100 pt-2'
+              }`}
+            >
               <Button
                 variant="outline"
                 className="gap-1.5 border-[3px] border-muted-foreground/50"
@@ -645,6 +688,7 @@ const Index = () => {
                   if (isGuest) setGuestShareValue(ticker, shares);
                   else updateShares.mutate({ ticker, shares });
                 }}
+                onOpenChange={setImportModalOpen}
               />
               <Button
                 variant="secondary"
@@ -692,6 +736,7 @@ const Index = () => {
             </div>
           </div>
         </section>
+
 
         {/* Live Data Status */}
         <div className="mb-4 flex items-center justify-between">

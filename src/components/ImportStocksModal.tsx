@@ -1,4 +1,5 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +19,9 @@ interface ImportStocksModalProps {
   existingShares?: ExistingStockShares[];
   onAddStock: (stock: Stock, shares?: number) => void;
   onUpdateShares?: (ticker: string, shares: number | null) => void;
+  onOpenChange?: (open: boolean) => void;
 }
+
 
 interface DuplicateWithComparison extends ParsedRow {
   currentShares: number | null;
@@ -26,8 +29,13 @@ interface DuplicateWithComparison extends ParsedRow {
   updateAccepted: boolean;
 }
 
-export function ImportStocksModal({ existingTickers, existingShares, onAddStock, onUpdateShares }: ImportStocksModalProps) {
+export function ImportStocksModal({ existingTickers, existingShares, onAddStock, onUpdateShares, onOpenChange }: ImportStocksModalProps) {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
+
   const [phase, setPhase] = useState<'upload' | 'preview'>('upload');
   const [validation, setValidation] = useState<ImportValidation | null>(null);
   const [duplicatesWithComparison, setDuplicatesWithComparison] = useState<DuplicateWithComparison[]>([]);
