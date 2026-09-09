@@ -218,25 +218,38 @@ export function ReplacementSuggestions({
   }, [result, removedStock, onIncomeDeltaChange]);
 
   const handlePlusClick = (ticker: string, prefillShares?: number) => {
-    setEditingTicker(ticker);
-    setSharesInput(prefillShares && prefillShares > 0 ? String(prefillShares) : '');
+    setEditingTickers((prev) => (prev.includes(ticker) ? prev : [...prev, ticker]));
+    setSharesInputs((prev) => ({
+      ...prev,
+      [ticker]: prev[ticker] ?? (prefillShares && prefillShares > 0 ? String(prefillShares) : ''),
+    }));
   };
 
   const handleConfirm = (stock: Stock) => {
-    const shares = parseFloat(sharesInput);
+    const shares = parseFloat(sharesInputs[stock.ticker] ?? '');
     if (!(shares > 0)) {
       toast.error(`Please enter a valid number of shares for ${stock.ticker}`);
       return;
     }
     onAddStock(stock, shares);
-    setEditingTicker(null);
-    setSharesInput('');
+    toast.success(`Added ${shares} shares of ${stock.ticker}`);
+    setEditingTickers((prev) => prev.filter((t) => t !== stock.ticker));
+    setSharesInputs((prev) => {
+      const next = { ...prev };
+      delete next[stock.ticker];
+      return next;
+    });
   };
 
-  const handleCancel = () => {
-    setEditingTicker(null);
-    setSharesInput('');
+  const handleCancel = (ticker: string) => {
+    setEditingTickers((prev) => prev.filter((t) => t !== ticker));
+    setSharesInputs((prev) => {
+      const next = { ...prev };
+      delete next[ticker];
+      return next;
+    });
   };
+
 
   const isDefaultMode = !removedStock;
 
