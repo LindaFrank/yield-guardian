@@ -193,8 +193,9 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                 const numVal = parseFloat(val);
                 const isInvalid = submitted && (!numVal || numVal <= 0);
                 return (
-                  <Card key={result.symbol} className={cn('p-3 border-2 border-muted-foreground/70', isInvalid && 'border-destructive/50')}>
+                  <Card key={result.symbol} className={cn('p-3 border-2 border-muted-foreground/90', isInvalid && 'border-destructive/50')}>
                     <div className="flex items-center gap-3">
+
 
                       <div className="flex-1 min-w-0">
                         <span className="font-mono font-semibold">{result.symbol}</span>
