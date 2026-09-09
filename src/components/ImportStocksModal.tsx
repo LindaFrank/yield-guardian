@@ -29,8 +29,13 @@ interface DuplicateWithComparison extends ParsedRow {
   updateAccepted: boolean;
 }
 
-export function ImportStocksModal({ existingTickers, existingShares, onAddStock, onUpdateShares }: ImportStocksModalProps) {
+export function ImportStocksModal({ existingTickers, existingShares, onAddStock, onUpdateShares, onOpenChange }: ImportStocksModalProps) {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
+
   const [phase, setPhase] = useState<'upload' | 'preview'>('upload');
   const [validation, setValidation] = useState<ImportValidation | null>(null);
   const [duplicatesWithComparison, setDuplicatesWithComparison] = useState<DuplicateWithComparison[]>([]);
