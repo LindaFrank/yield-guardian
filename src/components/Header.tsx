@@ -66,11 +66,11 @@ export function Header({ onGuestReset }: HeaderProps) {
               </div>
               <h1 className="font-semibold text-[31px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
               <div className="flex items-center gap-1 my-2 w-full">
-                <span className="text-muted-foreground text-[16px] leading-none">◂</span>
+                <span className="text-muted-foreground text-[20px] leading-none">◂</span>
                 <div className="h-[5px] flex-1 bg-muted-foreground" />
-                <span className="text-muted-foreground text-[14px] leading-none font-mono">//</span>
+                <span className="text-muted-foreground text-[16px] leading-none font-mono">//</span>
                 <div className="h-[5px] flex-1 bg-muted-foreground" />
-                <span className="text-muted-foreground text-[16px] leading-none">▸</span>
+                <span className="text-muted-foreground text-[20px] leading-none">▸</span>
               </div>
               <p className="text-[14px] text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
@@ -101,11 +101,11 @@ export function Header({ onGuestReset }: HeaderProps) {
             </div>
           </div>
           <div className="flex items-center justify-center gap-1 mt-6 -mx-[1px] w-[calc(100%+2px)]">
-            <span className="text-muted-foreground text-[16px] leading-none">◂</span>
+            <span className="text-muted-foreground text-[20px] leading-none">◂</span>
             <div className="h-[6px] flex-1 bg-muted-foreground" />
-            <span className="text-muted-foreground text-[14px] leading-none font-mono">//</span>
+            <span className="text-muted-foreground text-[16px] leading-none font-mono">//</span>
             <div className="h-[6px] flex-1 bg-muted-foreground" />
-            <span className="text-muted-foreground text-[16px] leading-none">▸</span>
+            <span className="text-muted-foreground text-[20px] leading-none">▸</span>
           </div>
 
           {!user && (
