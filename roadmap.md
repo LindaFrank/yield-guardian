@@ -10,5 +10,4 @@
 - [x] Halve the borders on the visible Matching Stocks cards and restore selection bubbles for every user
 - [x] Halve the outer outline around the Matching Stocks list
 - [ ] Credit adjustment request — blocked because project editing tools cannot issue account credits
-
-
+- [ ] Make "What do you want to do?" action bar collapse again, hide when any dialog/modal opens, and blur/fade on scroll
