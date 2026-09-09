@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Header } from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 
 type State = 'loading' | 'valid' | 'invalid' | 'done' | 'error';
@@ -44,8 +45,10 @@ export default function Unsubscribe() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-2">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-80px)]">
+        <Card className="w-full max-w-md border-2">
         <CardHeader>
           <CardTitle>Email preferences</CardTitle>
           <CardDescription>Yield Guardian</CardDescription>
@@ -83,6 +86,7 @@ export default function Unsubscribe() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

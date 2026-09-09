@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -48,8 +49,10 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-sm gradient-card rounded-xl border border-border/50 shadow-elevated p-6">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="flex items-center justify-center px-4 min-h-[calc(100vh-80px)]">
+        <div className="w-full max-w-sm gradient-card rounded-xl border border-border/50 shadow-elevated p-6">
         <div className="flex items-center gap-2 mb-4">
           <ShieldCheck className="w-5 h-5 text-primary" />
           <h1 className="text-lg font-semibold">Set a new password</h1>
@@ -73,6 +76,7 @@ export default function ResetPassword() {
             </Button>
           </form>
         )}
+      </div>
       </div>
     </div>
   );
