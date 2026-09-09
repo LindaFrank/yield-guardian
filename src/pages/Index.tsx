@@ -893,7 +893,7 @@ const Index = () => {
 
           {/* Alternative Suggestions Dialog */}
           <Dialog open={replacementDialogOpen} onOpenChange={setReplacementDialogOpen}>
-            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" closeLabel="Back to Portfolio">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
@@ -920,8 +920,10 @@ const Index = () => {
                 }
                 onAddStock={(stock, shares) => {
                   handleAddStock(stock, shares);
-                  setReplacementDialogOpen(false);
+                  // Keep the list open so several stocks can be picked in one visit.
+                  if (selectedUnderperformer) setReplacementDialogOpen(false);
                 }}
+
                 onSwap={(candidate, buyShares, removeTicker, sellShares) => {
                   const fromStock = stocks.find((s) => s.ticker === removeTicker);
                   const sold = sellShares ?? 0;

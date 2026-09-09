@@ -169,8 +169,9 @@ export function ReplacementSuggestions({
   onIncomeDeltaChange,
 }: ReplacementSuggestionsProps) {
   const { isPaid } = usePaidFeatures();
-  const [editingTicker, setEditingTicker] = useState<string | null>(null);
-  const [sharesInput, setSharesInput] = useState('');
+  const [editingTickers, setEditingTickers] = useState<string[]>([]);
+  const [sharesInputs, setSharesInputs] = useState<Record<string, string>>({});
+
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
 
   // Per-card optimiser controls
@@ -217,25 +218,38 @@ export function ReplacementSuggestions({
   }, [result, removedStock, onIncomeDeltaChange]);
 
   const handlePlusClick = (ticker: string, prefillShares?: number) => {
-    setEditingTicker(ticker);
-    setSharesInput(prefillShares && prefillShares > 0 ? String(prefillShares) : '');
+    setEditingTickers((prev) => (prev.includes(ticker) ? prev : [...prev, ticker]));
+    setSharesInputs((prev) => ({
+      ...prev,
+      [ticker]: prev[ticker] ?? (prefillShares && prefillShares > 0 ? String(prefillShares) : ''),
+    }));
   };
 
   const handleConfirm = (stock: Stock) => {
-    const shares = parseFloat(sharesInput);
+    const shares = parseFloat(sharesInputs[stock.ticker] ?? '');
     if (!(shares > 0)) {
       toast.error(`Please enter a valid number of shares for ${stock.ticker}`);
       return;
     }
     onAddStock(stock, shares);
-    setEditingTicker(null);
-    setSharesInput('');
+    toast.success(`Added ${shares} shares of ${stock.ticker}`);
+    setEditingTickers((prev) => prev.filter((t) => t !== stock.ticker));
+    setSharesInputs((prev) => {
+      const next = { ...prev };
+      delete next[stock.ticker];
+      return next;
+    });
   };
 
-  const handleCancel = () => {
-    setEditingTicker(null);
-    setSharesInput('');
+  const handleCancel = (ticker: string) => {
+    setEditingTickers((prev) => prev.filter((t) => t !== ticker));
+    setSharesInputs((prev) => {
+      const next = { ...prev };
+      delete next[ticker];
+      return next;
+    });
   };
+
 
   const isDefaultMode = !removedStock;
 
@@ -886,17 +900,19 @@ export function ReplacementSuggestions({
                 })()}
               </div>
 
-              {isPaid && editingTicker === row.stock.ticker ? (
+              {isPaid && editingTickers.includes(row.stock.ticker) ? (
                 <div className="flex items-center gap-1.5 ml-2">
                   <Input
                     type="number"
                     min="1"
                     placeholder="Shares"
-                    value={sharesInput}
-                    onChange={(e) => setSharesInput(e.target.value)}
+                    value={sharesInputs[row.stock.ticker] ?? ''}
+                    onChange={(e) =>
+                      setSharesInputs((prev) => ({ ...prev, [row.stock.ticker]: e.target.value }))
+                    }
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleConfirm(row.stock);
-                      if (e.key === 'Escape') handleCancel();
+                      if (e.key === 'Escape') handleCancel(row.stock.ticker);
                     }}
                     className="w-20 h-8 text-sm"
                     autoFocus
@@ -912,7 +928,7 @@ export function ReplacementSuggestions({
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={handleCancel}
+                    onClick={() => handleCancel(row.stock.ticker)}
                     className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                   >
                     <X className="w-4 h-4" />
@@ -928,6 +944,7 @@ export function ReplacementSuggestions({
                   <Plus className="w-4 h-4" />
                 </Button>
               ) : null}
+
             </div>
           );
         })}
