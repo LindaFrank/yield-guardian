@@ -107,7 +107,8 @@ export function Header({ onGuestReset }: HeaderProps) {
                     <User className="w-4 h-4" />
                     {profile?.display_name || user.email}
                   </button>
-                  <Button variant="outline" size="sm" onClick={handleSignOut} title="Sign out" className="border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary">
+                  <Button variant="outline" size="sm" onClick={handleSignOut} title="Sign out" className="border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary gap-1.5">
+                    <ArrowRight className="w-4 h-4" />
                     <span className="hidden sm:inline">Log out</span>
                   </Button>
                 </div>
