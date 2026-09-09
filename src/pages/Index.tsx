@@ -920,8 +920,10 @@ const Index = () => {
                 }
                 onAddStock={(stock, shares) => {
                   handleAddStock(stock, shares);
-                  setReplacementDialogOpen(false);
+                  // Keep the list open so several stocks can be picked in one visit.
+                  if (selectedUnderperformer) setReplacementDialogOpen(false);
                 }}
+
                 onSwap={(candidate, buyShares, removeTicker, sellShares) => {
                   const fromStock = stocks.find((s) => s.ticker === removeTicker);
                   const sold = sellShares ?? 0;
