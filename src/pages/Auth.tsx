@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
-import { TrendingUp, ArrowRight, Loader2, BarChart3, Shield, Zap, Mail, Apple, LogIn } from 'lucide-react';
+import { TrendingUp, ArrowRight, Loader2, BarChart3, Shield, Zap, Mail, Apple } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -216,7 +216,7 @@ export default function Auth() {
             <motion.div className="w-full max-w-sm" initial={{ opacity: 0, y: 30, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', stiffness: 250, damping: 25 }}>
               <div className="flex items-center justify-between text-sm font-medium text-foreground mb-1 px-1 mt-[6px]">
                 <div className="flex items-center gap-2">
-                  <LogIn className="w-4 h-4 text-primary" />
+                  <ArrowRight className="w-4 h-4 text-primary" />
                   {title}
                 </div>
                 {mode === 'signin' ? (
