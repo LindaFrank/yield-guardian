@@ -86,7 +86,7 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
         const help = STAT_HELP[stat.label];
         const card = (
           <div
-            className="p-4 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:border-muted-foreground/70 hover:scale-[1.03] hover:-translate-y-1 hover:shadow-elevated active:scale-[0.97] h-full min-h-[152px] flex flex-col"
+            className="p-4 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:border-muted-foreground/70 hover:scale-[1.03] hover:-translate-y-1 hover:shadow-elevated active:scale-[0.97] h-[180px] flex flex-col"
           >
             <div className="flex items-center gap-3 mb-3">
               <div className={cn('p-2 rounded-lg bg-secondary/50', stat.color)}>
