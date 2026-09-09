@@ -29,8 +29,8 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { closeLabel?: string }
+>(({ className, children, closeLabel, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -42,13 +42,19 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-full p-1.5 border-2 border-primary/50 bg-primary/10 text-primary opacity-90 ring-offset-background transition-all hover:opacity-100 hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+      <DialogPrimitive.Close
+        className={cn(
+          "absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full border-2 border-primary/50 bg-primary/10 text-primary opacity-90 ring-offset-background transition-all hover:opacity-100 hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none",
+          closeLabel ? "px-3 py-1.5 text-sm font-semibold" : "p-1.5",
+        )}
+      >
         <ArrowLeft className="h-4 w-4" />
-        <span className="sr-only">Go back</span>
+        {closeLabel ? <span>{closeLabel}</span> : <span className="sr-only">Go back</span>}
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
+
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
