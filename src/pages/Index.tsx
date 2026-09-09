@@ -278,7 +278,18 @@ const Index = () => {
     );
   }, [incomeDeltaByTicker, underperformers]);
 
+  const anyDialogOpen =
+    addStockOpen ||
+    replacementDialogOpen ||
+    quickStartOpen ||
+    quickStartImportOpen ||
+    feedbackOpen ||
+    subscriptionOpen ||
+    Boolean(reportBytes) ||
+    importModalOpen;
+
   // Current portfolio dividend income & projected new yield after applying gains
+
   const portfolioStats = useMemo(() => {
     const sharesMap = Object.fromEntries(
       sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
