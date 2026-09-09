@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { TrendingUp, LogOut, User, ShieldCheck, Save } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { TrendingUp, LogOut, User, ShieldCheck, Save, ArrowLeft } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
