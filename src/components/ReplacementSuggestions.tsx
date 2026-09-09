@@ -170,6 +170,7 @@ export function ReplacementSuggestions({
   onIncomeDeltaChange,
 }: ReplacementSuggestionsProps) {
   const { isPaid } = usePaidFeatures();
+  const { user } = useAuth();
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
   const [sharesInput, setSharesInput] = useState('');
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
