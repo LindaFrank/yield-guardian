@@ -101,11 +101,20 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
 
         {onRemove && (
           <button
-            onClick={(e) => {
+            type="button"
+            // Fire on pointer-down so a single press always registers, even if the
+            // card's hover lift shifts the button out from under the cursor before
+            // the click event completes.
+            onPointerDown={(e) => {
               e.stopPropagation();
+              e.preventDefault();
               onRemove(stock.ticker);
             }}
-            className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            className="-m-1 p-3 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors touch-manipulation"
             aria-label="Remove stock"
             title="Remove from portfolio"
           >
