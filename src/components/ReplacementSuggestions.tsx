@@ -301,7 +301,7 @@ export function ReplacementSuggestions({
   const displayRows = result?.rows ?? null;
 
   return (
-    <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50">
+    <div className="p-5 rounded-xl gradient-card shadow-card border-[2px] border-muted-foreground/50">
 
       {removedStock && (
         <>
