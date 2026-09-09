@@ -10,7 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function Contact() {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
