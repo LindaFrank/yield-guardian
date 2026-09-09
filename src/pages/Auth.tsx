@@ -220,7 +220,8 @@ export default function Auth() {
                   {title}
                 </div>
                 {mode === 'signin' ? (
-                  <button type="button" className="text-sm text-primary hover:underline" onClick={() => setMode('signup')}>
+                  <button type="button" className="text-sm text-white hover:underline flex items-center gap-1" onClick={() => setMode('signup')}>
+                    <ArrowRight className="w-4 h-4 text-primary" />
                     Don't have an account? Sign up
                   </button>
                 ) : mode === 'signup' ? (
