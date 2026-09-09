@@ -35,7 +35,11 @@ export default function DownloadReport() {
   const reportBytes = useMemo(() => (report ? base64ToBytes(report.base64) : null), [report]);
 
   return (
-    <main className="min-h-screen bg-background px-6 py-10 text-foreground print:bg-background print:p-0">
+    <div className="min-h-screen bg-background">
+      <div className="print:hidden">
+        <Header />
+      </div>
+      <main className="px-6 py-10 text-foreground print:bg-background print:p-0">
       <section className="mx-auto flex max-w-5xl flex-col text-center">
         {report && reportBytes ? (
           <>
