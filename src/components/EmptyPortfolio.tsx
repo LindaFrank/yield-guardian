@@ -11,6 +11,8 @@ import { marketStocks } from '@/data/mockData';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { checkDividendStability } from '@/lib/portfolioUtils';
+import { cn } from '@/lib/utils';
+
 
 interface EmptyPortfolioProps {
   onSelectStocks: () => void;
