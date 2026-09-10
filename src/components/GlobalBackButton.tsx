@@ -16,9 +16,9 @@ export const GlobalBackButton = forwardRef<HTMLButtonElement>(function GlobalBac
       onClick={() => navigate(-1)}
       aria-label="Go back"
       title="Go back"
-      className="fixed right-0 top-0 z-[100] h-11 gap-2 rounded-bl-lg rounded-tr-none rounded-tl-none rounded-br-none border-2 border-primary bg-primary px-4 font-semibold text-primary-foreground shadow-lg hover:bg-primary/90"
+      className="fixed right-0 top-0 z-[100] h-8 gap-1.5 rounded-bl-md rounded-tr-none rounded-tl-none rounded-br-none border-2 border-primary bg-primary px-2.5 text-sm font-semibold text-primary-foreground shadow-lg hover:bg-primary/90"
     >
-      <ArrowLeft className="h-5 w-5" />
+      <ArrowLeft className="h-4 w-4" />
       Back
     </Button>
   );
