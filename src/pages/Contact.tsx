@@ -62,14 +62,12 @@ export default function Contact() {
     }
 
     // Fire-and-forget confirmation email to the sender
-    supabase.functions.invoke('send-transactional-email', {
-      body: {
-        templateName: 'contact-confirmation',
-        recipientEmail: trimmedEmail,
-        idempotencyKey: `contact-confirm-${inserted?.id ?? trimmedEmail}`,
-        templateData: { name: trimmedName, message: trimmedMessage },
-      },
-    }).catch(() => {});
+    if (inserted?.id) {
+      supabase.functions.invoke('send-contact-confirmation', {
+        body: { submissionId: inserted.id },
+      }).catch(() => {});
+    }
+
 
     toast({ title: 'Message sent!', description: 'Thanks for reaching out. We\'ll get back to you soon.' });
 
