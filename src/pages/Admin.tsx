@@ -12,7 +12,7 @@ import { AdminAnalytics } from '@/components/AdminAnalytics';
 import { DemoFeedbackList } from '@/components/DemoFeedbackList';
 import { ClickAnalytics } from '@/components/ClickAnalytics';
 
-import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck, Ticket, Copy, Ban, Plus, CreditCard } from 'lucide-react';
+import { ArrowLeft, Loader2, UserPlus, KeyRound, ShieldCheck, Ticket, Copy, Ban, Plus, CreditCard, Inbox } from 'lucide-react';
 
 type AdminUser = { id: string; email?: string; created_at: string; last_sign_in_at: string | null; roles: string[] };
 type InviteCode = { id: string; code: string; max_uses: number; uses: number; expires_at: string | null; revoked: boolean; created_at: string };
@@ -176,9 +176,14 @@ export default function Admin() {
         <Button variant="outline" onClick={() => navigate('/')} className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to dashboard
         </Button>
-        <div className="flex items-center gap-2 mb-6">
-          <ShieldCheck className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-semibold">Admin Console</h1>
+        <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-6 h-6 text-primary" />
+            <h1 className="text-2xl font-semibold">Admin Console</h1>
+          </div>
+          <Button onClick={() => navigate('/admin/inbox')}>
+            <Inbox className="w-4 h-4 mr-2" /> Open inbox
+          </Button>
         </div>
         <AdminAnalytics />
 
