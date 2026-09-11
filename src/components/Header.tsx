@@ -79,7 +79,7 @@ export function Header({ onGuestReset }: HeaderProps) {
             </div>
 
             <div className={`flex flex-col items-end gap-2 ${!user ? '-mt-[170px]' : '-mt-[15px]'}`}>
-              {showBackButton && (
+              {showBackButton && !!user && (
                 <Button
                   variant="ghost"
                   size="sm"
