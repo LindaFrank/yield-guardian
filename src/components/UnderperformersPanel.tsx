@@ -3,12 +3,12 @@ import { StockAnalysis, Stock, ReplacementCandidate } from '@/types/portfolio';
 import { formatPercentage } from '@/lib/portfolioUtils';
 import { UnderperformersList } from './UnderperformersList';
 import { ReplacementSuggestions } from './ReplacementSuggestions';
-import { TrendingDown, MousePointerClick, AlertTriangle } from 'lucide-react';
+import { TrendingDown, MousePointerClick, AlertTriangle, X } from 'lucide-react';
 
 interface UnderperformersPanelProps {
   underperformers: StockAnalysis[];
   selectedStock: Stock | null;
-  onSelectStock: (stock: Stock) => void;
+  onSelectStock: (stock: Stock | null) => void;
   targetYield: number;
   candidates: ReplacementCandidate[];
   sharesYHeld: number;
@@ -61,7 +61,7 @@ export function UnderperformersPanel({
       <div className="flex items-center gap-2 mb-4 text-yield-negative">
         <TrendingDown className="w-5 h-5" />
         <h2 className="text-base font-bold uppercase tracking-wider">
-          Underperformers &amp; Suggested Replacements
+          Underperformers &amp; Suggested Alternatives
         </h2>
         <span className="ml-auto text-sm font-mono">{underperformers.length}</span>
       </div>
@@ -94,7 +94,7 @@ export function UnderperformersPanel({
       ) : (
         <>
           <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
-            Click a ticker on the left to see curated replacement suggestions on the right.
+            Click a ticker on the left to see curated alternative suggestions on the right.
           </p>
 
           <div className="grid lg:grid-cols-2 gap-4">
@@ -106,22 +106,32 @@ export function UnderperformersPanel({
             />
 
             {selectedStock ? (
-              <ReplacementSuggestions
-                removedStock={selectedStock}
-                candidates={candidates}
-                sharesYHeld={sharesYHeld}
-                targetYield={targetYield}
-                portfolioValue={portfolioValue}
-                portfolioIncome={portfolioIncome}
-                onIncomeDeltaChange={onIncomeDeltaChange}
-                onAddStock={onAddStock}
-                onSwap={onSwap}
-              />
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => onSelectStock(null)}
+                  aria-label="Close alternative suggestions"
+                  className="absolute top-3 right-3 z-10 w-6 h-6 flex items-center justify-center rounded-md border-[2px] border-muted-foreground/50 bg-secondary/80 backdrop-blur text-muted-foreground hover:text-foreground hover:border-muted-foreground/80 hover:bg-secondary transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+                <ReplacementSuggestions
+                  removedStock={selectedStock}
+                  candidates={candidates}
+                  sharesYHeld={sharesYHeld}
+                  targetYield={targetYield}
+                  portfolioValue={portfolioValue}
+                  portfolioIncome={portfolioIncome}
+                  onIncomeDeltaChange={onIncomeDeltaChange}
+                  onAddStock={onAddStock}
+                  onSwap={onSwap}
+                />
+              </div>
             ) : (
               <div className="p-8 rounded-xl border-[4px] border-dashed border-muted-foreground/40 flex flex-col items-center justify-center text-center text-muted-foreground min-h-[200px]">
                 <MousePointerClick className="w-8 h-8 mb-3 opacity-60" />
                 <p className="text-sm font-medium">
-                  Select an underperforming stock to see replacement suggestions
+                  Select an underperforming stock to see alternative suggestions
                 </p>
               </div>
             )}

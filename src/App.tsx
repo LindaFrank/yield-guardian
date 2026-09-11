@@ -9,10 +9,15 @@ import { useKeepAlive } from "@/hooks/useKeepAlive";
 import { Footer } from "@/components/Footer";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
+import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
+import Unsubscribe from "./pages/Unsubscribe";
+import DownloadReport from "./pages/DownloadReport";
 import NotFound from "./pages/NotFound";
+
 
 const queryClient = new QueryClient();
 
@@ -36,10 +41,17 @@ const AppRoutes = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/try" element={<Index />} />
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/unsubscribe" element={<Unsubscribe />} />
+        <Route path="/download-report" element={<DownloadReport />} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

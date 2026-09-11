@@ -1,4 +1,5 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +19,9 @@ interface ImportStocksModalProps {
   existingShares?: ExistingStockShares[];
   onAddStock: (stock: Stock, shares?: number) => void;
   onUpdateShares?: (ticker: string, shares: number | null) => void;
+  onOpenChange?: (open: boolean) => void;
 }
+
 
 interface DuplicateWithComparison extends ParsedRow {
   currentShares: number | null;
@@ -26,15 +29,22 @@ interface DuplicateWithComparison extends ParsedRow {
   updateAccepted: boolean;
 }
 
-export function ImportStocksModal({ existingTickers, existingShares, onAddStock, onUpdateShares }: ImportStocksModalProps) {
+export function ImportStocksModal({ existingTickers, existingShares, onAddStock, onUpdateShares, onOpenChange }: ImportStocksModalProps) {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
+
   const [phase, setPhase] = useState<'upload' | 'preview'>('upload');
   const [validation, setValidation] = useState<ImportValidation | null>(null);
   const [duplicatesWithComparison, setDuplicatesWithComparison] = useState<DuplicateWithComparison[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [fileName, setFileName] = useState('');
+  const [activeTab, setActiveTab] = useState('new');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const handleFile = useCallback(async (file: File) => {
     setIsLoading(true);
@@ -43,6 +53,8 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
       const parsed = await parseFile(file);
       const result = validateImport(parsed, existingTickers);
       setValidation(result);
+      setActiveTab(result.newStocks.length > 0 ? 'new' : result.duplicates.length > 0 ? 'duplicates' : 'new');
+
 
       // Build duplicate comparison data
       const dupsWithComparison = result.duplicates.map((row): DuplicateWithComparison => {
@@ -57,9 +69,15 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
       setPhase('preview');
     } catch (err) {
       console.error('Parse error:', err);
-      setValidation({ newStocks: [], duplicates: [], errors: [{ raw: file.name, reason: 'Failed to parse file' }] });
+      const reason = err instanceof Error && err.message
+        ? err.message
+        : 'Failed to read this file. Please try a CSV, TXT, PDF, or a clear photo/scan of your statement.';
+      setValidation({ newStocks: [], duplicates: [], errors: [{ raw: file.name, reason }] });
       setDuplicatesWithComparison([]);
+      setActiveTab('errors');
       setPhase('preview');
+
+
     } finally {
       setIsLoading(false);
     }
@@ -150,16 +168,18 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
             {isLoading ? (
               <>
                 <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                <p className="text-sm text-muted-foreground">Parsing file…</p>
+                <p className="text-sm text-muted-foreground">Reading file…</p>
+                <p className="text-xs text-muted-foreground/60">Scans and photos can take up to a minute</p>
               </>
             ) : (
               <>
                 <FileUp className="w-10 h-10 text-muted-foreground/50" />
                 <p className="text-sm text-muted-foreground text-center">
-                  Drop a CSV, TXT, or PDF file here<br />
+                  Drop a CSV, TXT, PDF, or photo/scan (JPEG, PNG) here<br />
                   <span className="text-xs">or click to browse</span>
                 </p>
-                <p className="text-xs text-muted-foreground/60">
+                <p className="text-xs text-muted-foreground/60 text-center">
+                  Scanned statements and photos are read automatically<br />
                   PII (names, SSNs, etc.) is automatically filtered out
                 </p>
               </>
@@ -167,19 +187,21 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
             <input
               ref={fileInputRef}
               type="file"
-              accept=".csv,.txt,.pdf"
+              accept=".csv,.txt,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,image/*"
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFile(file);
               }}
             />
+
           </div>
         )}
 
         {phase === 'preview' && validation && (
           <>
-            <Tabs defaultValue="new" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+
               <TabsList className="w-full">
                 <TabsTrigger value="new" className="flex-1 gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -201,8 +223,17 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
               <TabsContent value="new">
                 <div className="border-[4px] border-yield-positive/40 rounded-lg p-3 max-h-60 overflow-y-auto">
                   {totalNew === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">No new stocks found</p>
+                    <div className="py-4 space-y-1.5 text-center">
+                      <p className="text-sm text-muted-foreground">No new stocks found</p>
+                      {totalDupes === 0 && totalErrors === 0 && (
+                        <p className="text-xs text-muted-foreground/70">
+                          We couldn't recognize any ticker symbols in this file. Make sure it's a text-based
+                          statement (CSV, TXT, or a PDF you can select text in) that lists ticker symbols and share counts.
+                        </p>
+                      )}
+                    </div>
                   ) : (
+
                     <div className="space-y-2">
                       {validation.newStocks.map((row, i) => (
                         <StockRow key={`${row.ticker}-${i}`} row={row} variant="new" />

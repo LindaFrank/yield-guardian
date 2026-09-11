@@ -9,7 +9,7 @@ interface ReportData {
   getReplacements: (stock: Stock) => ReplacementCandidate[];
 }
 
-export async function generatePortfolioReport(data: ReportData): Promise<void> {
+export async function generatePortfolioReport(data: ReportData): Promise<Uint8Array> {
   const { jsPDF } = await import('jspdf');
   const { default: autoTable } = await import('jspdf-autotable');
 
@@ -18,7 +18,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
   let y = 20;
 
   // Note: vetting (2 yrs stable + 120-day active payment) only applies to suggested
-  // replacements, not to the user's actual holdings. Users decide what to keep or sell.
+  // alternatives, not to the user's actual holdings. Users decide what to keep or sell.
 
   // Title
   doc.setFontSize(20);
@@ -73,7 +73,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
 
     doc.setFontSize(13);
     doc.setTextColor(184, 80, 66);
-    doc.text('Underperforming Stocks & Replacement Suggestions', 14, y);
+    doc.text('Underperforming Stocks & Alternative Suggestions', 14, y);
     y += 6;
 
     for (const analysis of data.underperformers) {
@@ -102,7 +102,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
       );
       y += 18;
 
-      // Replacement candidates sorted by price closest to underperformer
+      // Alternative candidates sorted by price closest to underperformer
       const replacements = data.getReplacements(analysis.stock);
       const underPrice = analysis.stock.currentPrice;
       const underDivPerShare = analysis.stock.annualDividend;
@@ -112,7 +112,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
       if (sortedReplacements.length > 0) {
         autoTable(doc, {
           startY: y,
-          head: [['Ticker', 'Name', 'Price/Share', '% Yield', 'Yield/Share\n(Dollars)', 'Cost of Replacement\nStock (YieldxN=Ann.Div)', 'Num Repl.\nShares', 'Value Underperf.\nRetained', 'Num Underperf.\nShares Retained', 'Projected Annual\nDividend Yield ($)']],
+          head: [['Ticker', 'Name', 'Price/Share', '% Yield', 'Yield/Share\n(Dollars)', 'Cost of Alternative\nStock (YieldxN=Ann.Div)', 'Num Alt.\nShares', 'Value Underperf.\nRetained', 'Num Underperf.\nShares Retained', 'Projected Annual\nDividend Yield ($)']],
           body: sortedReplacements.map((r) => {
             const replDivPerShare = r.stock.annualDividend;
             const numReplShares = replDivPerShare > 0 ? Math.ceil(underTotalAnnualDiv / replDivPerShare) : 0;
@@ -142,7 +142,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
       } else {
         doc.setFontSize(8);
         doc.setTextColor(120, 120, 120);
-        doc.text('No replacement candidates found.', 18, y + 4);
+        doc.text('No alternative candidates found.', 18, y + 4);
         y += 12;
       }
     }
@@ -194,5 +194,7 @@ export async function generatePortfolioReport(data: ReportData): Promise<void> {
     doc.text('Dividend Tracker — Portfolio Report', 14, doc.internal.pageSize.getHeight() - 8);
   }
 
-  doc.save('portfolio-report.pdf');
+  // Return the bytes rather than a data/blob URL. Embedded Safari previews
+  // commonly block those URLs before the PDF viewer can read them.
+  return new Uint8Array(doc.output('arraybuffer'));
 }

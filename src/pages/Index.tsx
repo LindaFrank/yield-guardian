@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Target, FileDown, TrendingDown, Sparkles, ChevronRight, ChevronLeft, Search } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { Target, FileDown, TrendingDown, Sparkles, Search, Loader2, ChevronUp, ChevronDown } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
@@ -26,29 +27,82 @@ import { AddStockModal } from '@/components/AddStockModal';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
+import { HelpIconToggle } from '@/components/HelpIconToggle';
+import { PdfReportPreview } from '@/components/PdfReportPreview';
+import { RedScrollContainer } from '@/components/RedScrollContainer';
+import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide_Create_ver_2.pdf.asset.json';
+import qsg1 from '@/assets/quick-start-create-v2-1.jpg.asset.json';
+import qsg2 from '@/assets/quick-start-create-v2-2.jpg.asset.json';
+import qsg3 from '@/assets/quick-start-create-v2-3.jpg.asset.json';
+import qsg4 from '@/assets/quick-start-create-v2-4.jpg.asset.json';
+import qsg5 from '@/assets/quick-start-create-v2-5.jpg.asset.json';
+import qsg6 from '@/assets/quick-start-create-v2-6.jpg.asset.json';
+import qsg7 from '@/assets/quick-start-create-v2-7.jpg.asset.json';
+import qsg8 from '@/assets/quick-start-create-v2-8.jpg.asset.json';
+
+import quickStartImportPdf from '@/assets/YG_Quick_Start_Existing_Portfolio.pdf.asset.json';
+import qsi1 from '@/assets/quick-start-import-1.jpg.asset.json';
+import qsi2 from '@/assets/quick-start-import-2.jpg.asset.json';
+import qsi3 from '@/assets/quick-start-import-3.jpg.asset.json';
+import qsi4 from '@/assets/quick-start-import-4.jpg.asset.json';
+import qsi5 from '@/assets/quick-start-import-5.jpg.asset.json';
+import qsi6 from '@/assets/quick-start-import-6.jpg.asset.json';
+import qsi7 from '@/assets/quick-start-import-7.jpg.asset.json';
+import qsi8 from '@/assets/quick-start-import-8.jpg.asset.json';
+import qsi9 from '@/assets/quick-start-import-9.jpg.asset.json';
+import qsi10 from '@/assets/quick-start-import-10.jpg.asset.json';
+import qsi11 from '@/assets/quick-start-import-11.jpg.asset.json';
+import qsi12 from '@/assets/quick-start-import-12.jpg.asset.json';
+
+const quickStartPages = [qsg1, qsg2, qsg3, qsg4, qsg5, qsg6, qsg7, qsg8];
+const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, qsi9, qsi10, qsi11, qsi12];
 import { useStockQuotes } from '@/hooks/useStockData';
-import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares } from '@/hooks/usePortfolio';
+import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged, trackEvent } from '@/lib/analytics';
+import { SubscriptionModal, loadPendingGuestPortfolio, clearPendingGuestPortfolio } from '@/components/SubscriptionModal';
+import { DemoFeedbackModal } from '@/components/DemoFeedbackModal';
+
+import { supabase } from '@/integrations/supabase/client';
 
 
-const DEFAULT_TICKERS = ['JNJ', 'KO', 'ABBV', 'T', 'VZ', 'XOM'];
 const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
 
 const Index = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
   const addTicker = useAddTicker();
   const removeTicker = useRemoveTicker();
   const updateShares = useUpdateShares();
   const { data: stocksWithShares } = useUserStocksWithShares();
 
-  // Use saved tickers if logged in and loaded, otherwise defaults
+
+  // Guest mode: no account — portfolio lives in local state for this session only
+  const isGuest = !user;
+  const [guestTickers, setGuestTickers] = useState<string[]>([]);
+  const [guestShares, setGuestShares] = useState<Record<string, number | null>>({});
+
+  const setGuestShareValue = useCallback((ticker: string, shares: number | null) => {
+    setGuestShares((prev) => ({ ...prev, [ticker]: shares }));
+  }, []);
+
+  // Use saved tickers if logged in and loaded, otherwise the guest session list
   const tickers = useMemo(() => {
-    if (!user) return DEFAULT_TICKERS;
+    if (isGuest) return guestTickers;
     if (tickersLoading) return [];
     return savedTickers && savedTickers.length > 0 ? savedTickers : [];
-  }, [user, tickersLoading, savedTickers]);
+  }, [isGuest, guestTickers, tickersLoading, savedTickers]);
+
+  const sharesList = useMemo<UserStockEntry[]>(() => {
+    if (isGuest) {
+      return guestTickers.map((ticker) => ({ ticker, shares_owned: guestShares[ticker] ?? null }));
+    }
+    return stocksWithShares ?? [];
+  }, [isGuest, guestTickers, guestShares, stocksWithShares]);
 
   // Candidate tickers = market stocks NOT already in the portfolio
   const candidateTickers = useMemo(
@@ -56,19 +110,34 @@ const Index = () => {
     [tickers]
   );
 
+
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
   const [addStockOpen, setAddStockOpen] = useState(false);
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
-  const [actionBarExpanded, setActionBarExpanded] = useState(false);
+  const [reportGenerating, setReportGenerating] = useState(false);
+  const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
+  const [quickStartOpen, setQuickStartOpen] = useState(false);
+  const [quickStartImportOpen, setQuickStartImportOpen] = useState(false);
+  const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [replacementDialogOpen, setReplacementDialogOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [actionBarCollapsed, setActionBarCollapsed] = useState(false);
+  const [actionBarScrolled, setActionBarScrolled] = useState(false);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+
   // Σ IncomeDelta_Y across underperformers (keyed by ticker, last-known per stock)
   const [incomeDeltaByTicker, setIncomeDeltaByTicker] = useState<Record<string, number>>({});
 
   // Wizard is done if user has saved tickers OR has already dismissed it this session
   const [wizardDismissed, setWizardDismissed] = useState(false);
-  const wizardDone = wizardDismissed || (!tickersLoading && tickers.length > 0);
+  const portfolioLoading = isGuest ? false : tickersLoading;
+  const wizardDone = wizardDismissed || (!portfolioLoading && tickers.length > 0);
   const showStockFinder = !wizardDone || showFindStocksFlow;
   const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
@@ -76,11 +145,15 @@ const Index = () => {
   // Fetch live data for portfolio tickers
   const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
 
-  // Fetch live quotes for candidate replacement stocks
+  // Fetch live quotes for candidate alternative stocks
   const { data: liveCandidates } = useStockQuotes(candidateTickers);
 
   // Keep local portfolio state in sync when user/account tickers change
   useEffect(() => {
+    // While the saved portfolio is still loading, keep whatever is on screen —
+    // clearing here would make an existing portfolio flash away on reload.
+    if (portfolioLoading) return;
+
     // Critical for new accounts: never keep stale stocks from a previous session/user
     if (tickers.length === 0) {
       setStocks([]);
@@ -88,17 +161,32 @@ const Index = () => {
       return;
     }
 
-    if (liveStocks && liveStocks.length > 0) {
-      const merged = liveStocks.map((live) => {
-        const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
-        return {
-          ...live,
-          sector: live.sector || mock?.sector || 'Unknown',
-        };
-      });
-      setStocks(merged);
-    }
-  }, [tickers, liveStocks]);
+
+    setStocks((prev) => {
+      // Always drop any ticker that is no longer in the portfolio list, even
+      // while the fresh live quote is still loading. This prevents a removed
+      // card from lingering until the next quote response arrives.
+      const stillRelevant = prev.filter((s) => tickers.includes(s.ticker));
+
+      if (liveStocks && liveStocks.length > 0) {
+        const merged = liveStocks
+          // Never show a holding that is no longer in the portfolio list (e.g. a
+          // just-removed ticker still present in a cached quote response).
+          .filter((live) => tickers.includes(live.ticker))
+          .map((live) => {
+            const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
+            return {
+              ...live,
+              sector: live.sector || mock?.sector || 'Unknown',
+            };
+          });
+        return merged;
+      }
+
+      return stillRelevant;
+    });
+  }, [tickers, liveStocks, portfolioLoading]);
+
 
   // Track whether we've already notified the user that the feed went live
   const feedNotifiedRef = useRef(false);
@@ -128,6 +216,51 @@ const Index = () => {
     }
   }, [error]);
 
+  // Fade/blur the action bar as the user scrolls so it doesn't dominate the view.
+  useEffect(() => {
+    const handleScroll = () => setActionBarScrolled(window.scrollY > 80);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // After a successful checkout from the guest "Save my portfolio" flow,
+
+  // persist the guest portfolio to the newly-subscribed user's account.
+  useEffect(() => {
+    const checkoutSuccess = searchParams.get('checkout') === 'success';
+    if (!checkoutSuccess || !user) return;
+
+    const pending = loadPendingGuestPortfolio();
+    if (!pending || pending.tickers.length === 0) {
+      clearPendingGuestPortfolio();
+      searchParams.delete('checkout');
+      searchParams.delete('session_id');
+      setSearchParams(searchParams, { replace: true });
+      return;
+    }
+
+    let saved = 0;
+    const save = async () => {
+      for (const ticker of pending.tickers) {
+        const shares = pending.shares[ticker] ?? null;
+        const { error } = await supabase
+          .from('user_stocks')
+          .insert({ user_id: user.id, ticker, shares_owned: shares });
+        if (!error) saved++;
+      }
+      clearPendingGuestPortfolio();
+      searchParams.delete('checkout');
+      searchParams.delete('session_id');
+      setSearchParams(searchParams, { replace: true });
+      toast({
+        title: 'Portfolio saved',
+        description: `${saved} of ${pending.tickers.length} holdings saved to your account. Welcome to Yield Guardian!`,
+      });
+    };
+    save();
+  }, [searchParams, setSearchParams, user, toast]);
+
   const stockAnalyses = useMemo(
     () => stocks.map((stock) => analyzeStock(stock, targetYield)),
     [stocks, targetYield]
@@ -147,10 +280,21 @@ const Index = () => {
     );
   }, [incomeDeltaByTicker, underperformers]);
 
+  const anyDialogOpen =
+    addStockOpen ||
+    replacementDialogOpen ||
+    quickStartOpen ||
+    quickStartImportOpen ||
+    feedbackOpen ||
+    subscriptionOpen ||
+    Boolean(reportBytes) ||
+    importModalOpen;
+
   // Current portfolio dividend income & projected new yield after applying gains
+
   const portfolioStats = useMemo(() => {
     const sharesMap = Object.fromEntries(
-      (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+      sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
     );
     let value = 0;
     let income = 0;
@@ -164,7 +308,24 @@ const Index = () => {
     return { value, income, newIncome, newYield };
   }, [stocks, stocksWithShares, totalIncomeGain]);
 
-  // Build a live market stocks pool for replacement suggestions
+  // Daily portfolio snapshot for admin analytics (avg improvement over time)
+  useEffect(() => {
+    if (!user || stocks.length === 0 || portfolioStats.value <= 0) return;
+    if (!markDailySnapshotLogged(user.id)) return;
+    const currentYield = portfolioStats.value > 0 ? (portfolioStats.income / portfolioStats.value) * 100 : 0;
+    logPortfolioSnapshot({
+      userId: user.id,
+      portfolioValue: portfolioStats.value,
+      annualIncome: portfolioStats.income,
+      weightedYield: currentYield,
+      numPositions: stocks.length,
+      numUnderperformers: underperformers.length,
+      reason: 'daily',
+    });
+  }, [user, stocks.length, portfolioStats.value, portfolioStats.income, underperformers.length]);
+
+
+  // Build a live market stocks pool for alternative suggestions
   const liveMarketStocks = useMemo(() => {
     if (!liveCandidates || liveCandidates.length === 0) return [];
     return liveCandidates.map((live) => {
@@ -240,18 +401,71 @@ const Index = () => {
     // Any previously-previewed income deltas referenced the prior portfolio
     // composition; invalidate them so "New portfolio yield" stays accurate.
     setIncomeDeltaByTicker({});
-    if (user) {
-      removeTicker.mutate(ticker);
+    if (isGuest) {
+      setGuestTickers((prev) => prev.filter((t) => t !== ticker));
+      setGuestShares((prev) => {
+        const next = { ...prev };
+        delete next[ticker];
+        return next;
+      });
+      return;
     }
+
+    // Optimistically update React Query cache so the ticker list drops the
+    // removed stock before the next render. This prevents the live-feed sync
+    // effect from briefly restoring the deleted card while the mutation's
+    // optimistic update is still pending.
+    if (user) {
+      const tickersKey = ['user-stocks', user.id];
+      const sharesKey = ['user-stocks-shares', user.id];
+      queryClient.setQueryData<string[]>(tickersKey, (prev) => prev?.filter((t) => t !== ticker) ?? []);
+      queryClient.setQueryData<{ ticker: string; shares_owned: number }[]>(sharesKey, (prev) =>
+        prev?.filter((s) => s.ticker !== ticker) ?? []
+      );
+    }
+
+    removeTicker.mutate(ticker, {
+      onError: () => {
+        toast({
+          title: `Couldn't remove ${ticker}`,
+          description: 'We could not save that change. Please check your connection and try again.',
+          variant: 'destructive',
+        });
+      },
+    });
+
+  };
+
+  const handleResetGuestPortfolio = () => {
+    setGuestTickers([]);
+    setGuestShares({});
+    setStocks([]);
+    setSelectedUnderperformer(null);
+    setIncomeDeltaByTicker({});
+    setWizardDismissed(false);
+    setShowFindStocksFlow(false);
+    setFindStocksStep(0);
+    setReportBytes(null);
+    setReplacementDialogOpen(false);
+    trackEvent('guest_portfolio_reset', {
+      category: 'guest',
+      label: 'start over',
+      userId: null,
+    });
+    toast({
+      title: 'Demo reset',
+      description: 'Your temporary portfolio has been cleared. Start fresh whenever you like.',
+    });
   };
 
   const handleSellShares = (ticker: string, sellShares: number) => {
-    const currentShares = stocksWithShares?.find((s) => s.ticker === ticker)?.shares_owned ?? 0;
+    const currentShares = sharesList.find((s) => s.ticker === ticker)?.shares_owned ?? 0;
     const remainingShares = Math.max(0, currentShares - Math.floor(sellShares));
 
     setIncomeDeltaByTicker({});
     if (remainingShares > 0) {
-      if (user) updateShares.mutate({ ticker, shares: remainingShares });
+      if (isGuest) setGuestShareValue(ticker, remainingShares);
+      else updateShares.mutate({ ticker, shares: remainingShares });
       return;
     }
 
@@ -264,48 +478,293 @@ const Index = () => {
       // Invalidate stale projected gains — they were computed against the
       // previous portfolio value/income.
       setIncomeDeltaByTicker({});
-      if (user) {
+      if (isGuest) {
+        setGuestTickers((prev) => (prev.includes(stock.ticker) ? prev : [...prev, stock.ticker]));
+        if (shares !== undefined) setGuestShareValue(stock.ticker, shares);
+      } else {
         addTicker.mutate({ ticker: stock.ticker, shares });
       }
     }
   };
 
-  const [replacementDialogOpen, setReplacementDialogOpen] = useState(false);
-
   const handleSelectUnderperformer = (stock: Stock) => {
+
+    trackEvent('alternatives_reviewed', { category: 'replacement', label: stock.ticker, userId: user?.id ?? null });
     setSelectedUnderperformer(stock);
     setReplacementDialogOpen(true);
+  };
+
+  useEffect(() => {
+    const openCreate = () => setQuickStartOpen(true);
+    const openImport = () => setQuickStartImportOpen(true);
+    const openSub = () => setSubscriptionOpen(true);
+    const openFeedback = () => setFeedbackOpen(true);
+    window.addEventListener('yg:open-quick-start-create', openCreate);
+    window.addEventListener('yg:open-quick-start-import', openImport);
+    window.addEventListener('yg:open-subscription', openSub);
+    window.addEventListener('yg:open-demo-feedback', openFeedback);
+    return () => {
+      window.removeEventListener('yg:open-quick-start-create', openCreate);
+      window.removeEventListener('yg:open-quick-start-import', openImport);
+      window.removeEventListener('yg:open-subscription', openSub);
+      window.removeEventListener('yg:open-demo-feedback', openFeedback);
+    };
+  }, []);
+
+  const handleGenerateReport = async () => {
+    setReportGenerating(true);
+    try {
+      const pdfBytes = await generatePortfolioReport({
+        stocks,
+        sharesMap: Object.fromEntries(
+          sharesList.map((s) => [s.ticker, s.shares_owned])
+        ),
+        targetYield,
+        underperformers,
+        getReplacements: (stock) =>
+          suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map((s) => s.ticker)),
+      });
+      setReportBytes(pdfBytes);
+      trackEvent('report_generated', { category: 'report', label: `${underperformers.length} underperformers`, userId: user?.id ?? null });
+    } catch (err) {
+      console.error('Report generation failed:', err);
+      toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
+    } finally {
+      setReportGenerating(false);
+    }
+  };
+
+  const handleDownloadReport = () => {
+    if (!reportBytes) return;
+    trackEvent('report_printed', { category: 'report', userId: user?.id ?? null });
+    const filename = `yield-guardian-portfolio-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let offset = 0; offset < reportBytes.length; offset += chunkSize) {
+      binary += String.fromCharCode(...reportBytes.subarray(offset, offset + chunkSize));
+    }
+    window.localStorage.setItem(
+      'yield-guardian-report-download',
+      JSON.stringify({ filename, base64: window.btoa(binary) }),
+    );
+    window.open(`${window.location.origin}/download-report`, '_blank', 'noopener,noreferrer');
   };
 
   return (
     <div className="min-h-screen bg-background">
       
-      <Header />
+      <Header onGuestReset={handleResetGuestPortfolio} />
+
+
+      <Dialog open={quickStartOpen} onOpenChange={(o) => setQuickStartOpen(o)}>
+        <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
+          <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0 flex-row items-center justify-between gap-3">
+            <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start Guide</DialogTitle>
+            <a
+              href={quickStartPdf.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0 mr-8"
+            >
+              Download PDF
+            </a>
+          </DialogHeader>
+          <RedScrollContainer
+            tabIndex={0}
+            className="flex-1 min-h-0 bg-muted/20"
+            innerClassName="px-4 py-4"
+          >
+            <div className="mx-auto max-w-[900px] space-y-4">
+              {quickStartPages.map((page, i) => (
+                <img
+                  key={page.url}
+                  src={page.url}
+                  alt={`Yield Guardian Quick Start Guide, page ${i + 1}`}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  width={850}
+                  height={1100}
+                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-white object-contain"
+                />
+              ))}
+            </div>
+          </RedScrollContainer>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={quickStartImportOpen} onOpenChange={(o) => setQuickStartImportOpen(o)}>
+        <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
+          <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0 flex-row items-center justify-between gap-3">
+            <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start — Import Your Own Portfolio</DialogTitle>
+            <a
+              href={quickStartImportPdf.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0 mr-8"
+            >
+              Download PDF
+            </a>
+          </DialogHeader>
+          <RedScrollContainer
+            tabIndex={0}
+            className="flex-1 min-h-0 bg-muted/20"
+            innerClassName="px-4 py-4"
+          >
+            <div className="mx-auto max-w-[900px] space-y-4">
+              {quickStartImportPages.map((page, i) => (
+                <img
+                  key={page.url}
+                  src={page.url}
+                  alt={`Yield Guardian import your own portfolio guide, page ${i + 1}`}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  width={850}
+                  height={1100}
+                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-white object-contain"
+                />
+              ))}
+            </div>
+          </RedScrollContainer>
+        </DialogContent>
+      </Dialog>
+
+      <DemoFeedbackModal open={feedbackOpen} onOpenChange={setFeedbackOpen} />
+
+
       
       <main className="container mx-auto px-6 py-8">
-        {/* Live Data Status */}
-        <HelpTooltip text="This is used to display instructions or messages." side="bottom">
-          <div className="mb-4">
-            {(isLoading || tickersLoading) && (
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-                Fetching live market data…
-              </div>
-            )}
-            {!isLoading && !tickersLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                Live data · Refreshes every 5 min
-              </div>
-            )}
-            {!isLoading && !tickersLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
-                Waiting for live feed…
-              </div>
-            )}
+
+        {/* Action Menu — positioned directly below the lower header separator */}
+        <section
+          className={`mb-1 -mt-[24px] relative z-30 transition-all duration-500 ${
+            anyDialogOpen ? 'opacity-0 pointer-events-none' : ''
+          } ${actionBarScrolled && !anyDialogOpen ? 'blur-[1px]' : ''}`}
+          style={{
+            animationDelay: '100ms',
+            opacity: anyDialogOpen ? 0 : actionBarScrolled ? 0.45 : 1,
+          }}
+        >
+          <div className="rounded-lg border-4 border-primary/30 bg-background px-3 py-3 shadow-glow">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
+                What Do You Want To Do?
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                onClick={() => setActionBarCollapsed((v) => !v)}
+                aria-label={actionBarCollapsed ? 'Expand action menu' : 'Collapse action menu'}
+              >
+                {actionBarCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+              </Button>
+            </div>
+            <div
+              className={`flex items-center gap-2 flex-wrap overflow-hidden transition-all duration-500 [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5 ${
+                actionBarCollapsed ? 'max-h-0 opacity-0 pointer-events-none pt-0' : 'max-h-[500px] opacity-100 pt-2'
+              }`}
+            >
+              <Button
+                variant="outline"
+                className="gap-1.5 border-[3px] border-muted-foreground/50"
+                onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+              >
+                <Target className="w-3.5 h-3.5" />
+                Desired Dividend Yield
+              </Button>
+              <Button
+                className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
+                onClick={() => {
+                  setSelectedUnderperformer(null);
+                  setReplacementDialogOpen(true);
+                }}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Stocks that meet Yield Target
+              </Button>
+              <ImportStocksModal
+                existingTickers={stocks.map((s) => s.ticker)}
+                existingShares={sharesList.map(s => ({ ticker: s.ticker, shares: s.shares_owned }))}
+                onAddStock={handleAddStock}
+                onUpdateShares={(ticker, shares) => {
+                  if (isGuest) setGuestShareValue(ticker, shares);
+                  else updateShares.mutate({ ticker, shares });
+                }}
+                onOpenChange={setImportModalOpen}
+              />
+              <Button
+                variant="secondary"
+                className="gap-1.5 border-[3px] border-muted-foreground/50"
+                onClick={() => setAddStockOpen(true)}
+              >
+                <Search className="w-3.5 h-3.5" />
+                Search Stocks Generally
+              </Button>
+              {stocks.length > 0 && (
+                <>
+                  <Button
+                    variant="outline"
+                    className="gap-1.5 border-[3px] border-muted-foreground/50"
+                    onClick={() => {
+                      const el = document.getElementById('underperformers-section');
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                  >
+                    <TrendingDown className="w-3.5 h-3.5" />
+                    Review Underperformers ({underperformers.length})
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="gap-1.5 border-[3px] border-muted-foreground/50"
+                    onClick={() => {
+                      const el = document.getElementById('replacement-suggestions-section');
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Jump to Suggestions
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="gap-1.5 border-[3px] border-muted-foreground/50"
+                    onClick={handleGenerateReport}
+                    disabled={reportGenerating}
+                  >
+                    {reportGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
+                    {reportGenerating ? 'Creating Report…' : 'Report'}
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
-        </HelpTooltip>
+        </section>
+
+
+        {/* Live Data Status */}
+        <div className="mb-4 flex items-center justify-between">
+          <HelpTooltip text="Market data is refreshed automatically every few minutes." side="bottom">
+            <div>
+              {(isLoading || portfolioLoading) && (
+
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                  Fetching live market data…
+                </div>
+              )}
+              {!isLoading && !portfolioLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                  Live data · Refreshes every 5 min
+                </div>
+              )}
+              {!isLoading && !portfolioLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
+                <div className="text-base text-primary flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  Waiting for live feed…
+                </div>
+              )}
+            </div>
+          </HelpTooltip>
+          <HelpIconToggle />
+        </div>
 
         {/* New user: show onboarding wizard prominently first */}
         {showStockFinder && (
@@ -336,129 +795,20 @@ const Index = () => {
           <PortfolioStats
             stocks={stocks}
             sharesMap={Object.fromEntries(
-              (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
+              sharesList.map(s => [s.ticker, s.shares_owned])
             )}
             targetYield={targetYield}
             underperformerCount={underperformers.length}
           />
         </section>
 
-        {/* Sticky Action Bar */}
-        {wizardDone && (
-          <div className="sticky top-[100px] z-40 mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-background px-3 py-2 shadow-glow animate-fade-in">
-            {!actionBarExpanded && (
-              <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
-                What Do You Want To Do?
-              </span>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-1.5 h-auto shrink-0"
-              onClick={() => setActionBarExpanded((v) => !v)}
-              aria-label={actionBarExpanded ? 'Collapse actions' : 'Expand actions'}
-            >
-              {actionBarExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </Button>
-            {actionBarExpanded && (
-              <div className="flex items-center gap-2 flex-wrap overflow-hidden [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5">
-                <Button
-                  variant="outline"
-                  className="gap-1.5 border-[3px] border-muted-foreground/50"
-                  onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                >
-                  <Target className="w-3.5 h-3.5" />
-                  Desired Dividend Yield
-                </Button>
-                <Button
-                  className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
-                  onClick={() => {
-                    setSelectedUnderperformer(null);
-                    setReplacementDialogOpen(true);
-                  }}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Stocks that meet Yield Target
-                </Button>
-                <ImportStocksModal
-                  existingTickers={stocks.map((s) => s.ticker)}
-                  existingShares={stocksWithShares?.map(s => ({ ticker: s.ticker, shares: s.shares_owned })) ?? []}
-                  onAddStock={handleAddStock}
-                  onUpdateShares={(ticker, shares) => {
-                    if (user) {
-                      updateShares.mutate({ ticker, shares });
-                    }
-                  }}
-                />
-                <Button
-                  variant="secondary"
-                  className="gap-1.5 border-[3px] border-muted-foreground/50"
-                  onClick={() => setAddStockOpen(true)}
-                >
-                  <Search className="w-3.5 h-3.5" />
-                  Search Stocks Generally
-                </Button>
-                {stocks.length > 0 && (
-                  <>
-                    <Button
-                      variant="outline"
-                      className="gap-1.5 border-[3px] border-muted-foreground/50"
-                      onClick={() => {
-                        const el = document.getElementById('underperformers-section');
-                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }}
-                    >
-                      <TrendingDown className="w-3.5 h-3.5" />
-                      Review Underperformers ({underperformers.length})
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="gap-1.5 border-[3px] border-muted-foreground/50"
-                      onClick={() => {
-                        const el = document.getElementById('replacement-suggestions-section');
-                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }}
-                    >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      Jump to Suggestions
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="gap-1.5 border-[3px] border-muted-foreground/50"
-                      onClick={async () => {
-                        try {
-                          await generatePortfolioReport({
-                            stocks,
-                            sharesMap: Object.fromEntries(
-                              (stocksWithShares ?? []).map(s => [s.ticker, s.shares_owned])
-                            ),
-                            targetYield,
-                            underperformers,
-                            getReplacements: (stock) =>
-                              suggestReplacements(stock, liveMarketStocks, targetYield, stocks.map(s => s.ticker)),
-                          });
-                        } catch (err) {
-                          console.error('Report generation failed:', err);
-                          toast({ title: 'Report Error', description: String(err), variant: 'destructive' });
-                        }
-                      }}
-                    >
-                      <FileDown className="w-3.5 h-3.5" />
-                      Report
-                    </Button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Row 1: Income YTD + Yield slider */}
+
         <div className="space-y-4">
           <IncomeYTD
             stocks={stocks}
             sharesMap={Object.fromEntries(
-              (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+              sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
             )}
           />
           <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
@@ -468,7 +818,7 @@ const Index = () => {
           </HelpTooltip>
         </div>
 
-        {/* Combined Underperformers + Replacements panel (above Income Impact) */}
+        {/* Combined Underperformers + Alternatives panel (above Income Impact) */}
         {!showStockFinder && underperformers.length > 0 && (
           <section id="replacement-suggestions-section" className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
             <UnderperformersPanel
@@ -479,7 +829,7 @@ const Index = () => {
               candidates={replacements}
               sharesYHeld={
                 selectedUnderperformer
-                  ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                  ? sharesList.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
                   : 0
               }
               portfolioValue={portfolioStats.value}
@@ -491,8 +841,16 @@ const Index = () => {
               }
               onAddStock={(stock, shares) => handleAddStock(stock, shares)}
               onSwap={(candidate, buyShares, removeTicker, sellShares) => {
+                const fromStock = stocks.find((s) => s.ticker === removeTicker);
+                const sold = sellShares ?? 0;
+                const incomeDelta = (buyShares * candidate.annualDividend) - (sold * (fromStock?.annualDividend ?? 0));
+                const yieldDelta = (candidate.currentYield ?? 0) - (fromStock?.currentYield ?? 0);
+                if (user) logReplacementEvent({
+                  userId: user.id, fromTicker: removeTicker, toTicker: candidate.ticker,
+                  sharesSold: sold, sharesBought: buyShares, incomeDelta, yieldDelta,
+                });
                 handleAddStock(candidate, buyShares);
-                handleSellShares(removeTicker, sellShares ?? 0);
+                handleSellShares(removeTicker, sold);
               }}
             />
           </section>
@@ -504,7 +862,7 @@ const Index = () => {
             <IncomeImpact
               underperformers={underperformers}
               sharesMap={Object.fromEntries(
-                (stocksWithShares ?? []).map((s) => [s.ticker, s.shares_owned ?? 0]),
+                sharesList.map((s) => [s.ticker, s.shares_owned ?? 0]),
               )}
               marketPool={liveMarketStocks.length > 0 ? liveMarketStocks : mockMarketStocks}
               portfolioTickers={stocks.map((s) => s.ticker)}
@@ -548,11 +906,14 @@ const Index = () => {
                     >
                       <StockCard
                         analysis={analysis}
-                        sharesOwned={stocksWithShares?.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
+                        sharesOwned={sharesList.find(s => s.ticker === analysis.stock.ticker)?.shares_owned}
                         onRemove={handleRemoveStock}
                         onSelect={analysis.isUnderperforming ? handleSelectUnderperformer : undefined}
                         onUpdateShares={(ticker, shares) => {
-                          if (user) {
+                          if (isGuest) {
+                            setGuestShareValue(ticker, shares);
+                            toast({ title: 'Shares updated', description: `${ticker} set to ${shares ?? 0} shares.` });
+                          } else {
                             updateShares.mutate(
                               { ticker, shares },
                               {
@@ -575,14 +936,14 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Replacement Suggestions Dialog */}
+          {/* Alternative Suggestions Dialog */}
           <Dialog open={replacementDialogOpen} onOpenChange={setReplacementDialogOpen}>
-            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" closeLabel="Back to Portfolio">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
                   {selectedUnderperformer
-                    ? `Replacements for ${selectedUnderperformer.ticker}`
+                    ? `Alternatives for ${selectedUnderperformer.ticker}`
                     : 'Matching Stocks'}
                 </DialogTitle>
               </DialogHeader>
@@ -591,7 +952,7 @@ const Index = () => {
                 candidates={replacements}
                 sharesYHeld={
                   selectedUnderperformer
-                    ? stocksWithShares?.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                    ? sharesList.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
                     : 0
                 }
                 targetYield={targetYield}
@@ -604,14 +965,45 @@ const Index = () => {
                 }
                 onAddStock={(stock, shares) => {
                   handleAddStock(stock, shares);
-                  setReplacementDialogOpen(false);
+                  // Keep the list open so several stocks can be picked in one visit.
                 }}
+
+
                 onSwap={(candidate, buyShares, removeTicker, sellShares) => {
+                  const fromStock = stocks.find((s) => s.ticker === removeTicker);
+                  const sold = sellShares ?? 0;
+                  const incomeDelta = (buyShares * candidate.annualDividend) - (sold * (fromStock?.annualDividend ?? 0));
+                  const yieldDelta = (candidate.currentYield ?? 0) - (fromStock?.currentYield ?? 0);
+                  if (user) logReplacementEvent({
+                    userId: user.id, fromTicker: removeTicker, toTicker: candidate.ticker,
+                    sharesSold: sold, sharesBought: buyShares, incomeDelta, yieldDelta,
+                  });
                   handleAddStock(candidate, buyShares);
-                  handleSellShares(removeTicker, sellShares ?? 0);
+                  handleSellShares(removeTicker, sold);
                   setReplacementDialogOpen(false);
                 }}
               />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={Boolean(reportBytes)} onOpenChange={(open) => !open && setReportBytes(null)}>
+            <DialogContent className="max-w-5xl h-[88vh] flex flex-col overflow-hidden">
+              <DialogHeader>
+                <DialogTitle>Portfolio Report</DialogTitle>
+                <DialogDescription>Review the report below, then save the PDF to your device.</DialogDescription>
+              </DialogHeader>
+              {reportBytes && (
+                <>
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={handleDownloadReport}>
+                      <FileDown className="w-4 h-4" />
+                      Download PDF
+                    </Button>
+                    <p className="self-center text-xs text-muted-foreground">Opens a download page outside the embedded preview.</p>
+                  </div>
+                  <PdfReportPreview bytes={reportBytes} />
+                </>
+              )}
             </DialogContent>
           </Dialog>
 
@@ -622,6 +1014,13 @@ const Index = () => {
             onOpenChange={setAddStockOpen}
             suggestedStocks={liveMarketStocks}
             targetYield={targetYield}
+          />
+
+          <SubscriptionModal
+            open={subscriptionOpen}
+            onOpenChange={setSubscriptionOpen}
+            guestTickers={tickers}
+            guestShares={guestShares}
           />
         </div>
       </main>

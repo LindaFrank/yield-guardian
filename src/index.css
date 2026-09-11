@@ -41,8 +41,15 @@
     /* Custom semantic colors */
     --yield-positive: 165 82% 51%;
     --yield-warning: 38 92% 50%;
-    --yield-negative: 0 80% 45%;
+    --yield-negative: 0 95% 52%;
     --yield-neutral: 215 20% 55%;
+    --feedback: 214 90% 54%;
+    --feedback-foreground: 0 0% 100%;
+    --promo: 300 100% 50%;
+    --promo-foreground: 0 0% 100%;
+    --promo-violet: 300 100% 50%;
+
+
 
     /* Approach accents */
     --approach-aggressive: 270 75% 65%;
@@ -51,6 +58,7 @@
     /* Gradients */
     --gradient-card: linear-gradient(135deg, hsl(222 47% 10%) 0%, hsl(222 47% 8%) 100%);
     --gradient-primary: linear-gradient(135deg, hsl(165 82% 51%) 0%, hsl(158 64% 52%) 100%);
+    --gradient-promo: linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(0, 255, 255, 0.3) 100%), linear-gradient(135deg, rgb(139, 0, 0) 0%, rgb(240, 0, 255) 100%);
     --gradient-glow: radial-gradient(ellipse at center, hsl(165 82% 51% / 0.15) 0%, transparent 70%);
 
     /* Shadows */
@@ -87,6 +95,11 @@
     --accent-foreground: 210 40% 96%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
+    --feedback: 214 90% 54%;
+    --feedback-foreground: 0 0% 100%;
+    --promo: 300 100% 50%;
+    --promo-foreground: 0 0% 100%;
+
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 165 82% 51%;
@@ -188,3 +201,4 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground));
 }
+

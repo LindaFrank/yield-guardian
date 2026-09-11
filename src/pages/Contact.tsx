@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { ArrowLeft, Send } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Header } from '@/components/Header';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -10,7 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function Contact() {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -46,11 +45,15 @@ export default function Contact() {
     }
 
     setSending(true);
-    const { error } = await supabase.from('contact_messages').insert({
-      name: trimmedName,
-      email: trimmedEmail,
-      message: trimmedMessage,
-    });
+    const { data: inserted, error } = await supabase
+      .from('contact_messages')
+      .insert({
+        name: trimmedName,
+        email: trimmedEmail,
+        message: trimmedMessage,
+      })
+      .select('id')
+      .maybeSingle();
     setSending(false);
 
     if (error) {
@@ -58,7 +61,18 @@ export default function Contact() {
       return;
     }
 
+    // Fire-and-forget confirmation email to the sender
+    supabase.functions.invoke('send-transactional-email', {
+      body: {
+        templateName: 'contact-confirmation',
+        recipientEmail: trimmedEmail,
+        idempotencyKey: `contact-confirm-${inserted?.id ?? trimmedEmail}`,
+        templateData: { name: trimmedName, message: trimmedMessage },
+      },
+    }).catch(() => {});
+
     toast({ title: 'Message sent!', description: 'Thanks for reaching out. We\'ll get back to you soon.' });
+
     setName('');
     setEmail('');
     setMessage('');
@@ -66,18 +80,10 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="font-semibold text-lg">Contact Us</h1>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-6 py-8 max-w-lg">
+        <h1 className="text-2xl font-semibold mb-6">Contact Us</h1>
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Send Us a Message</CardTitle>

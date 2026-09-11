@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { TrendingUp, LogOut, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { TrendingUp, User, ShieldCheck, Save, ArrowLeft, LogOut } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
 import { Button } from '@/components/ui/button';
-import { HelpIconToggle } from '@/components/HelpIconToggle';
+import { trackEvent } from '@/lib/analytics';
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -16,11 +19,20 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
+import { GuestAnalysisAlert } from '@/components/GuestAnalysisAlert';
 
-export function Header() {
+interface HeaderProps {
+  onGuestReset?: () => void;
+}
+
+export function Header({ onGuestReset }: HeaderProps) {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
+  const showBackButton = true;
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -47,34 +59,52 @@ export function Header() {
   return (
     <>
       <header className="bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <TrendingUp className="w-6 h-6 text-primary" />
+        <div className="container mx-auto px-6 py-5 relative">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+            <div aria-hidden="true" />
+
+            <div className="flex flex-col items-center">
+              <div className="p-2 rounded-lg bg-primary/10 mb-1">
+                <TrendingUp className="w-8 h-8 text-primary" />
               </div>
-              <div>
-                <h1 className="font-semibold text-lg">Yield Guardian</h1>
-                <div className="flex items-center gap-1 my-0.5">
-                  <span className="text-muted-foreground/90 text-[10px] leading-none">◂</span>
-                  <div className="h-[2px] w-10 bg-muted-foreground/60" />
-                  <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
-                  <div className="h-[2px] w-10 bg-muted-foreground/60" />
-                  <span className="text-muted-foreground/90 text-[10px] leading-none">▸</span>
-                </div>
-                <p className="text-xs text-muted-foreground">Portfolio Yield Analysis</p>
+              <h1 className="font-semibold text-[31px]"><span className="text-foreground">Yield</span> <span className="text-primary">Guardian</span></h1>
+              <div className="flex items-center gap-1 my-2 w-full">
+                <span className="text-muted-foreground text-[20px] leading-none">◂</span>
+                <div className="h-[5px] flex-1 bg-muted-foreground" />
+                <span className="text-muted-foreground text-[16px] leading-none font-mono font-bold">//</span>
+                <div className="h-[5px] flex-1 bg-muted-foreground" />
+                <span className="text-muted-foreground text-[20px] leading-none">▸</span>
               </div>
+              <p className="text-[14px] text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
-            <div className="flex items-center">
-              <HelpIconToggle />
+
+            <div className={`flex flex-col items-end gap-2 ${!user ? '-mt-[170px]' : '-mt-[15px]'}`}>
+              {showBackButton && !!user && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(-1)}
+                  title="Go back"
+                  className="mt-1 min-w-[92px] text-[#0f6f35] hover:text-[#147a3a] hover:bg-[#0f6f35]/10 gap-1.5"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">Back</span>
+                </Button>
+              )}
               {user && (
-                <div className="flex items-center gap-3 ml-[100px]">
+                <div className="flex items-center gap-3">
+                  {isAdmin && (
+                    <Button variant="outline" size="sm" onClick={() => navigate('/admin')} title="Admin console" className="gap-1.5">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span className="hidden sm:inline">Admin</span>
+                    </Button>
+                  )}
                   <button
                     onClick={() => navigate('/profile')}
-                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors hidden sm:flex"
+                    className="flex items-center gap-2 text-xs text-foreground hover:text-foreground/80 transition-colors hidden sm:flex"
                     title="Edit profile"
                   >
-                    <User className="w-3.5 h-3.5" />
+                    <User className="w-4 h-4" />
                     {profile?.display_name || user.email}
                   </button>
                   <Button variant="outline" size="sm" onClick={handleSignOut} title="Sign out" className="border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary gap-1.5">
@@ -85,13 +115,54 @@ export function Header() {
               )}
             </div>
           </div>
-          <div className="flex items-center justify-center gap-1 mt-3">
-            <span className="text-muted-foreground/80 text-[10px] leading-none">◂</span>
-            <div className="h-[2px] w-[44%] bg-muted-foreground/60" />
-            <span className="text-muted-foreground/70 text-[10px] leading-none font-mono">//</span>
-            <div className="h-[2px] w-[44%] bg-muted-foreground/60" />
-            <span className="text-muted-foreground/80 text-[10px] leading-none">▸</span>
+          <div className="flex items-center justify-center gap-1 mt-6 -mx-[1px] w-[calc(100%+2px)]">
+            <span className="text-muted-foreground text-[24px] leading-none">◂</span>
+            <div className="h-[6px] flex-1 bg-muted-foreground" />
+            <span className="text-muted-foreground text-[16px] leading-none font-mono font-bold">//</span>
+            <div className="h-[6px] flex-1 bg-muted-foreground" />
+            <span className="text-muted-foreground text-[24px] leading-none">▸</span>
           </div>
+
+          {!user && (
+            <GuestAnalysisAlert onReset={onGuestReset} />
+          )}
+
+          {!user && (
+            <div className="absolute top-1 right-4 z-[55] flex flex-col items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/auth')}
+                title="Go back"
+                className="bg-[#0a0a0a] border-gray-500 text-[#147a8a] hover:bg-[#141414] hover:border-gray-400 hover:text-[#1a8fa3] gap-1.5 font-semibold"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Back</span>
+              </Button>
+              <Button
+                size="default"
+                className="gap-1.5 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 shadow-glow px-[33px] text-[18px] font-semibold h-[57px] min-h-[57px] rounded-lg"
+                onClick={() => {
+                  trackEvent('save_portfolio_header_click', { category: 'conversion', userId: null });
+                  window.dispatchEvent(new CustomEvent('yg:open-subscription'));
+                }}
+              >
+                <Save className="w-4 h-4" />
+                Save my portfolio
+              </Button>
+              <Button
+                variant="default"
+                className="w-[88px] h-[88px] min-w-[88px] min-h-[88px] max-w-[88px] max-h-[88px] aspect-square rounded-full p-0 flex items-center justify-center bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 text-[14px] font-semibold"
+                onClick={() => {
+                  trackEvent('feedback_open', { category: 'feedback', userId: null });
+                  window.dispatchEvent(new CustomEvent('yg:open-demo-feedback'));
+                }}
+                aria-label="Give feedback"
+              >
+                Feedback
+              </Button>
+            </div>
+          )}
         </div>
       </header>
 

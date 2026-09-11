@@ -193,10 +193,22 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                 const numVal = parseFloat(val);
                 const isInvalid = submitted && (!numVal || numVal <= 0);
                 return (
-                  <Card key={result.symbol} className={`p-3 border-border/50 ${isInvalid ? 'border-destructive/50' : ''}`}>
+                  <Card key={result.symbol} className={cn('p-3 border-[0.5px] border-muted-foreground/70', isInvalid && 'border-destructive/50')}>
                     <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked
+                        onCheckedChange={() => {
+                          setSelected((prev) => {
+                            const next = new Map(prev);
+                            next.delete(result.symbol);
+                            return next;
+                          });
+                        }}
+                        className="shrink-0"
+                      />
                       <div className="flex-1 min-w-0">
                         <span className="font-mono font-semibold">{result.symbol}</span>
+
                         <p className="text-xs text-muted-foreground line-clamp-1">{result.name}</p>
                       </div>
                       <Input

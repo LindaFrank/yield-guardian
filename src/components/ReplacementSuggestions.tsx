@@ -7,17 +7,139 @@ import {
   OptimizerMode,
   OptimizerResult,
 } from '@/lib/optimizer';
-import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote, Printer, Mail } from 'lucide-react';
+import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote, Printer, Mail, Info } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { trackEvent } from '@/lib/analytics';
+import { usePaidFeatures } from '@/hooks/usePaidFeatures';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+
+
+/** Blurs children when the visitor isn't a paid subscriber or admin. */
+function Teaser({ isPaid, children }: { isPaid: boolean; children: React.ReactNode }) {
+  if (isPaid) return <>{children}</>;
+  return (
+    <span
+      className="inline-block blur-[4px] select-none opacity-70"
+      title="Subscribe to reveal names and share counts"
+    >
+      {children}
+    </span>
+  );
+}
+
+/** Explains what "rest-of-year dividend" means and how the two cards compare. */
+function RestOfYearExplainer({
+  keepTicker,
+  switchLabel,
+  keepIncome,
+  switchIncome,
+  fracRemaining,
+  isPaid,
+}: {
+  keepTicker: string;
+  switchLabel: string;
+  keepIncome: number;
+  switchIncome: number;
+  fracRemaining: number;
+  isPaid: boolean;
+}) {
+  const delta = switchIncome - keepIncome;
+  const pctRemaining = Math.round(fracRemaining * 100);
+  const monthsLeft = Math.max(0, Math.round(fracRemaining * 12));
+  const label = isPaid ? switchLabel : 'the alternative';
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          aria-label="Explain rest-of-year dividend"
+          className="inline-flex items-center gap-1 text-[14px] font-semibold uppercase tracking-wide text-foreground/90 hover:text-foreground underline decoration-dotted underline-offset-2 mt-2"
+        >
+          <Info className="w-3.5 h-3.5" />
+          What does this mean?
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Your dividends for the rest of this year</DialogTitle>
+          <DialogDescription className="text-[17px] font-medium text-primary">
+            A plain-English look at what changes between now and December 31.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 text-[16px] leading-relaxed text-foreground/95">
+          <p>
+            “Rest-of-year div” is the dividend cash you can still expect to collect between today and
+            the end of this year — about {pctRemaining}% of the year
+            {monthsLeft > 0 ? ` (roughly ${monthsLeft} month${monthsLeft === 1 ? '' : 's'})` : ''} is left,
+            so we count only that share of a full year's payments.
+          </p>
+          <div className="rounded-md border-[2px] border-yield-negative/50 bg-yield-negative/5 p-3">
+            <div className="text-[14px] uppercase tracking-wide font-bold text-yield-negative mb-1">
+              Keep {keepTicker}
+            </div>
+            <p className="text-foreground/95">
+              Those shares stay put and pay you{' '}
+              <span className="font-mono font-bold">{formatCurrency(keepIncome)}</span> more this year.
+            </p>
+          </div>
+          <div
+            className={cn(
+              'rounded-md border-[2px] p-3',
+              delta >= 0
+                ? 'border-yield-positive/50 bg-yield-positive/5'
+                : 'border-yield-negative/50 bg-yield-negative/5',
+            )}
+          >
+            <div
+              className={cn(
+                'text-[14px] uppercase tracking-wide font-bold mb-1',
+                delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
+              )}
+            >
+              Switch to {label}
+            </div>
+            <p className="text-foreground/95">
+              You sell the {keepTicker} shares and put the same money into {label}, which pays you{' '}
+              <span className="font-mono font-bold">{formatCurrency(switchIncome)}</span> before year end.
+            </p>
+          </div>
+          <p>
+            The number in parentheses is the difference:{' '}
+            <span
+              className={cn(
+                'font-mono font-bold',
+                delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
+              )}
+            >
+              {delta >= 0 ? '+' : ''}
+              {formatCurrency(delta)}
+            </span>{' '}
+            {delta >= 0
+              ? 'in extra dividend cash you would collect this year by making the switch now.'
+              : 'less dividend cash this year — the switch raises your yield rate, but pays fewer dollars before December 31.'}
+          </p>
+          <p>
+            Switching earlier in the year captures more of this difference. Figures use each company's
+            current declared dividend rate and each stock's own payment calendar can shift the exact
+            timing; issuers can cut or suspend payments at any time.
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 interface ReplacementSuggestionsProps {
   removedStock: Stock | null;
@@ -48,8 +170,10 @@ export function ReplacementSuggestions({
   portfolioIncome,
   onIncomeDeltaChange,
 }: ReplacementSuggestionsProps) {
-  const [editingTicker, setEditingTicker] = useState<string | null>(null);
-  const [sharesInput, setSharesInput] = useState('');
+  const { isPaid } = usePaidFeatures();
+  const [editingTickers, setEditingTickers] = useState<string[]>([]);
+  const [sharesInputs, setSharesInputs] = useState<Record<string, string>>({});
+
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
 
   // Per-card optimiser controls
@@ -96,25 +220,60 @@ export function ReplacementSuggestions({
   }, [result, removedStock, onIncomeDeltaChange]);
 
   const handlePlusClick = (ticker: string, prefillShares?: number) => {
-    setEditingTicker(ticker);
-    setSharesInput(prefillShares && prefillShares > 0 ? String(prefillShares) : '');
+    setEditingTickers((prev) => (prev.includes(ticker) ? prev : [...prev, ticker]));
+    setSharesInputs((prev) => ({
+      ...prev,
+      [ticker]: prev[ticker] ?? (prefillShares && prefillShares > 0 ? String(prefillShares) : ''),
+    }));
   };
 
   const handleConfirm = (stock: Stock) => {
-    const shares = parseFloat(sharesInput);
+    const shares = parseFloat(sharesInputs[stock.ticker] ?? '');
     if (!(shares > 0)) {
       toast.error(`Please enter a valid number of shares for ${stock.ticker}`);
       return;
     }
     onAddStock(stock, shares);
-    setEditingTicker(null);
-    setSharesInput('');
+    toast.success(`Added ${shares} shares of ${stock.ticker}`);
+    setEditingTickers((prev) => prev.filter((t) => t !== stock.ticker));
+    setSharesInputs((prev) => {
+      const next = { ...prev };
+      delete next[stock.ticker];
+      return next;
+    });
   };
 
-  const handleCancel = () => {
-    setEditingTicker(null);
-    setSharesInput('');
+  const handleCancel = (ticker: string) => {
+    setEditingTickers((prev) => prev.filter((t) => t !== ticker));
+    setSharesInputs((prev) => {
+      const next = { ...prev };
+      delete next[ticker];
+      return next;
+    });
   };
+
+  const toggleSelect = (ticker: string, prefillShares?: number) => {
+    if (editingTickers.includes(ticker)) handleCancel(ticker);
+    else handlePlusClick(ticker, prefillShares);
+  };
+
+  /** Adds every ticked stock at once. */
+  const handleConfirmSelected = () => {
+    const rows = editingTickers
+      .map((t) => candidates.find((c) => c.stock.ticker === t)?.stock)
+      .filter((s): s is Stock => !!s);
+    const invalid = rows.filter((s) => !(parseFloat(sharesInputs[s.ticker] ?? '') > 0));
+    if (invalid.length > 0) {
+      toast.error(`Enter a valid number of shares for ${invalid.map((s) => s.ticker).join(', ')}`);
+      return;
+    }
+    rows.forEach((s) => onAddStock(s, parseFloat(sharesInputs[s.ticker])));
+    toast.success(`Added ${rows.length} stock${rows.length !== 1 ? 's' : ''} to your portfolio`);
+    setEditingTickers([]);
+    setSharesInputs({});
+  };
+
+
 
   const isDefaultMode = !removedStock;
 
@@ -124,13 +283,13 @@ export function ReplacementSuggestions({
         <div className="flex items-center justify-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-primary" />
           <span className="font-medium">
-            {isDefaultMode ? 'Matching Stocks' : 'Replacement Suggestions'}
+            {isDefaultMode ? 'Matching Stocks' : 'Alternative Suggestions'}
           </span>
         </div>
         <p className="text-muted-foreground">
           {isDefaultMode
             ? 'No matching stocks currently exceed your target yield'
-            : 'No replacement stocks meet your current yield target'}
+            : 'No alternative stocks meet your current yield target'}
         </p>
       </div>
     );
@@ -142,11 +301,11 @@ export function ReplacementSuggestions({
   const displayRows = result?.rows ?? null;
 
   return (
-    <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50">
+    <div className="p-5 rounded-xl gradient-card shadow-card border-[2px] border-muted-foreground/50">
 
       {removedStock && (
         <>
-          <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50">
+          <div className="inline-flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50 w-[35.46rem] max-w-full">
             <span className="font-mono text-sm text-muted-foreground">{removedStock.ticker}</span>
             <ArrowRight className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">Showing alternatives</span>
@@ -156,13 +315,13 @@ export function ReplacementSuggestions({
           <div className="mb-4 p-3 rounded-lg border-4 border-primary/30 bg-primary/5 space-y-3">
             <div className="flex items-center gap-2">
               <Wand2 className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold">Replacement Strategy</span>
+              <span className="text-sm font-semibold">Alternative Strategy</span>
             </div>
 
             {/* Mode toggle */}
             <div className="flex gap-1 p-1 rounded-md bg-secondary/40">
               <button
-                onClick={() => setMode('aggressive')}
+                onClick={() => { trackEvent('strategy_mode_select', { category: 'strategy', label: 'aggressive' }); setMode('aggressive'); }}
                 className={cn(
                   'flex-1 text-xs font-medium py-1.5 px-2 rounded transition-colors border-4 border-muted-foreground/60',
                   mode === 'aggressive' ? 'bg-primary text-primary-foreground' : 'text-white hover:text-foreground',
@@ -171,7 +330,7 @@ export function ReplacementSuggestions({
                 Aggressive
               </button>
               <button
-                onClick={() => setMode('conservative')}
+                onClick={() => { trackEvent('strategy_mode_select', { category: 'strategy', label: 'conservative' }); setMode('conservative'); }}
                 className={cn(
                   'flex-1 text-xs font-medium py-1.5 px-2 rounded transition-colors border-4 border-muted-foreground/60',
                   mode === 'conservative' ? 'bg-primary text-primary-foreground' : 'text-white hover:text-foreground',
@@ -272,11 +431,16 @@ export function ReplacementSuggestions({
                   const keepIncome = result.sharesYSold * removedStock.annualDividend * fracRemaining;
                   const switchIncome = effectiveNewIncome * fracRemaining;
 
-                  const switchLabel = isOverride
-                    ? `${overrideShares} ${compareStock!.ticker}`
-                    : optimizerPicks.length === 1
-                      ? `${optimizerPicks[0].shares} ${optimizerPicks[0].stock.ticker}`
-                      : optimizerPicks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+                          const switchLabel = isOverride
+                            ? `${overrideShares} ${compareStock!.ticker}`
+                            : optimizerPicks.length === 1
+                              ? `${optimizerPicks[0].shares} ${optimizerPicks[0].stock.ticker}`
+                              : optimizerPicks.map((r) => `${r.shares} ${r.stock.ticker}`).join(' + ');
+                          const switchLabelNode = isPaid ? (
+                            <>{switchLabel}</>
+                          ) : (
+                            <Teaser isPaid={false}>{switchLabel}</Teaser>
+                          );
 
                   const delta = switchIncome - keepIncome;
                   const allTickers = result.rows.map((r) => r.stock.ticker);
@@ -287,7 +451,7 @@ export function ReplacementSuggestions({
                       <div className="text-[11px] uppercase tracking-wide text-muted-foreground text-center">
                         Rest-of-year dividend comparison
                       </div>
-                      {allTickers.length > 1 && (
+                      {isPaid && allTickers.length > 1 && (
                         <div className="flex items-center gap-2">
                           <label className="text-[11px] uppercase tracking-wide text-muted-foreground">
                             Compare against
@@ -320,7 +484,7 @@ export function ReplacementSuggestions({
                           <div className="font-mono font-bold text-lg mt-1 text-yield-negative">
                             {formatCurrency(keepIncome)}
                           </div>
-                          <div className="text-[11px] text-foreground/80 font-medium">rest-of-year div</div>
+                          <div className="text-[13px] text-foreground/80 font-medium">rest-of-year div</div>
                         </div>
                         <div className={cn(
                           'p-3 rounded-md border-[3px] shadow-card',
@@ -330,7 +494,7 @@ export function ReplacementSuggestions({
                             'text-[13px] uppercase tracking-wide font-bold leading-tight',
                             delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
                           )}>
-                            IF YOU SWITCH TO<br/>{switchLabel}
+                            IF YOU SWITCH TO<br/>{switchLabelNode}
                           </div>
                           <div className={cn(
                             'font-mono font-bold text-lg mt-1',
@@ -338,9 +502,17 @@ export function ReplacementSuggestions({
                           )}>
                             {formatCurrency(switchIncome)}
                           </div>
-                          <div className="text-[11px] text-foreground/80 font-medium">
+                          <div className="text-[13px] text-foreground/80 font-medium">
                             rest-of-year div (<span className={cn('font-bold text-[13px]', delta >= 0 ? 'text-yield-positive' : 'text-yield-negative')}>{delta >= 0 ? '+' : ''}{formatCurrency(delta)}</span>)
                           </div>
+                          <RestOfYearExplainer
+                            keepTicker={removedStock.ticker}
+                            switchLabel={switchLabel}
+                            keepIncome={keepIncome}
+                            switchIncome={switchIncome}
+                            fracRemaining={fracRemaining}
+                            isPaid={isPaid}
+                          />
 
                         </div>
                       </div>
@@ -355,7 +527,7 @@ export function ReplacementSuggestions({
                 {allocationPicks.length > 0 && (
                   <div className="flex justify-between gap-3">
                     <span className="text-muted-foreground shrink-0">Allocation breakdown</span>
-                    <span className="font-mono text-right">
+                    <span className={cn('font-mono text-right', !isPaid && 'blur-[4px] select-none opacity-70')}>
                       {allocationPicks.map((r) => `Buy ${r.shares} ${r.stock.ticker}`).join(' + ')}
                     </span>
                   </div>
@@ -441,7 +613,7 @@ export function ReplacementSuggestions({
 
           return baseRows;
         })().map((row, idx) => {
-          // Find matching ReplacementCandidate metadata for display badges
+          // Find matching candidate metadata for display badges
           const meta = candidates.find((c) => c.stock.ticker === row.stock.ticker);
           const yieldVal = meta?.yield ?? (row.stock.annualDividend / row.stock.currentPrice) * 100;
           const stabilityScore = meta?.stabilityScore ?? 2;
@@ -455,11 +627,25 @@ export function ReplacementSuggestions({
           return (
             <div
               key={row.stock.ticker}
-              className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border-[4px] border-muted-foreground/50 hover:border-primary/30 transition-colors"
+              className={cn(
+                'flex items-center justify-between p-3 rounded-lg bg-secondary/20 border-[2px] transition-colors',
+                editingTickers.includes(row.stock.ticker)
+                  ? 'border-primary/70 bg-primary/5'
+                  : 'border-muted-foreground/50 hover:border-primary/30',
+              )}
             >
+              <Checkbox
+                checked={editingTickers.includes(row.stock.ticker)}
+                onCheckedChange={() => toggleSelect(row.stock.ticker, row.shares)}
+                aria-label={`Select ${row.stock.ticker}`}
+                className="mr-3 shrink-0 h-5 w-5 rounded-full border-[2px] border-muted-foreground/70 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+              />
               <div className="flex-1 min-w-0">
+
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono font-medium">{row.stock.ticker}</span>
+                  <Teaser isPaid={isPaid}>
+                    <span className="font-mono font-medium">{row.stock.ticker}</span>
+                  </Teaser>
                   <span className={cn(
                     'font-mono text-sm',
                     yieldVal >= 5 ? 'text-yield-positive' : yieldVal >= 3.5 ? 'text-yield-warning' : 'text-yield-negative'
@@ -549,6 +735,7 @@ export function ReplacementSuggestions({
                             w.focus();
                             setTimeout(() => w.print(), 250);
                           };
+                          if (!isPaid) return null;
                           return (
                             <Popover>
                               <PopoverTrigger asChild>
@@ -642,7 +829,7 @@ export function ReplacementSuggestions({
                             </Popover>
                           );
                         })()}
-                        {removedStock && onSwap && (
+                        {isPaid && removedStock && onSwap && (
                           <Button
                             size="sm"
                             onClick={() => {
@@ -659,12 +846,12 @@ export function ReplacementSuggestions({
                   })()}
                 </div>
                 <p className="text-[15px] text-muted-foreground truncate mt-0.5">
-                  {row.stock.name}
+                  <Teaser isPaid={isPaid}>{row.stock.name}</Teaser>
                 </p>
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
                 {displayRows && (() => {
                   // In conservative mode, project the same trade into THIS card's ticker
-                  // so every replacement shows the same income breakdown as the solver pick.
+                  // so every alternative shows the same income breakdown as the solver pick.
                   let projShares = row.shares;
                   let projCost = row.cost;
                   let projIncome = row.income;
@@ -705,7 +892,11 @@ export function ReplacementSuggestions({
 
                   return (
                     <div className="text-[15px] text-muted-foreground mt-1 space-y-0.5">
-                      <p>Buying {projShares.toLocaleString()} shares at {formatCurrency(row.stock.currentPrice)} each</p>
+                      <p>
+                        Buying{' '}
+                        <Teaser isPaid={isPaid}>{projShares.toLocaleString()}</Teaser>{' '}
+                        shares at {formatCurrency(row.stock.currentPrice)} each
+                      </p>
                       <p>Total invested: <span className="font-mono">{formatCurrency(projCost)}</span></p>
                       <div className="pt-1 mt-1 border-t border-border/40 space-y-0.5">
                         <p className="flex justify-between gap-3">
@@ -719,7 +910,13 @@ export function ReplacementSuggestions({
                           </p>
                         )}
                         <p className="flex justify-between gap-3">
-                          <span>New {projShares.toLocaleString()} {row.stock.ticker} (rest of year)</span>
+                          <span>
+                            New{' '}
+                            <Teaser isPaid={isPaid}>
+                              {projShares.toLocaleString()} {row.stock.ticker}
+                            </Teaser>{' '}
+                            (rest of year)
+                          </span>
                           <span className="font-mono">{formatCurrency(newRest)}</span>
                         </p>
                         <p className="flex justify-between gap-3 font-medium text-foreground">
@@ -739,20 +936,21 @@ export function ReplacementSuggestions({
                 })()}
               </div>
 
-              {editingTicker === row.stock.ticker ? (
+              {editingTickers.includes(row.stock.ticker) ? (
                 <div className="flex items-center gap-1.5 ml-2">
                   <Input
                     type="number"
                     min="1"
                     placeholder="Shares"
-                    value={sharesInput}
-                    onChange={(e) => setSharesInput(e.target.value)}
+                    value={sharesInputs[row.stock.ticker] ?? ''}
+                    onChange={(e) =>
+                      setSharesInputs((prev) => ({ ...prev, [row.stock.ticker]: e.target.value }))
+                    }
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleConfirm(row.stock);
-                      if (e.key === 'Escape') handleCancel();
+                      if (e.key === 'Escape') handleCancel(row.stock.ticker);
                     }}
                     className="w-20 h-8 text-sm"
-                    autoFocus
                   />
                   <Button
                     size="sm"
@@ -765,26 +963,27 @@ export function ReplacementSuggestions({
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={handleCancel}
+                    onClick={() => handleCancel(row.stock.ticker)}
                     className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handlePlusClick(row.stock.ticker, row.shares)}
-                  className="ml-2 hover:bg-primary/10 hover:text-primary"
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              )}
+              ) : null}
+
             </div>
           );
         })}
       </div>
+
+      {editingTickers.length > 0 && (
+        <div className="sticky bottom-0 mt-3 pt-3 border-t-[3px] border-primary/40 bg-card/95 backdrop-blur">
+          <Button className="w-full gap-2" onClick={handleConfirmSelected}>
+            <Check className="w-4 h-4" />
+            Add {editingTickers.length} selected stock{editingTickers.length !== 1 ? 's' : ''}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
