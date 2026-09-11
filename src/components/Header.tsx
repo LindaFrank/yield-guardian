@@ -128,7 +128,7 @@ export function Header({ onGuestReset }: HeaderProps) {
           )}
 
           {!user && (
-            <div className="absolute top-[37px] right-4 z-[55] flex flex-col items-center gap-4">
+            <div className="absolute top-[37px] right-4 z-[55] flex flex-col items-center gap-2">
               <Button
                 size="default"
                 className="gap-1.5 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 shadow-glow px-[33px] text-[18px] font-semibold h-[57px] min-h-[57px] rounded-lg"
@@ -142,7 +142,7 @@ export function Header({ onGuestReset }: HeaderProps) {
               </Button>
               <Button
                 variant="default"
-                className="w-[88px] h-[88px] min-w-[88px] min-h-[88px] max-w-[88px] max-h-[88px] aspect-square rounded-full p-0 flex items-center justify-center bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 text-[14px] font-semibold mt-[5px]"
+                className="w-[88px] h-[88px] min-w-[88px] min-h-[88px] max-w-[88px] max-h-[88px] aspect-square rounded-full p-0 flex items-center justify-center bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 text-[14px] font-semibold"
                 onClick={() => {
                   trackEvent('feedback_open', { category: 'feedback', userId: null });
                   window.dispatchEvent(new CustomEvent('yg:open-demo-feedback'));
