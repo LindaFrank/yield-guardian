@@ -78,7 +78,7 @@ export function Header({ onGuestReset }: HeaderProps) {
               <p className="text-[14px] text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
 
-            <div className="flex flex-col items-end gap-2 -mt-[15px]">
+            <div className={`flex flex-col items-end gap-2 ${!user ? '-mt-[170px]' : '-mt-[15px]'}`}>
               {showBackButton && (
                 <Button
                   variant="ghost"
@@ -128,7 +128,7 @@ export function Header({ onGuestReset }: HeaderProps) {
           )}
 
           {!user && (
-            <div className="absolute top-[1px] right-4 z-[55] flex flex-col items-center gap-4">
+            <div className="absolute top-[32px] right-4 z-[55] flex flex-col items-center gap-4">
               <Button
                 size="default"
                 className="gap-2 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 shadow-glow px-[43px] text-[18px] font-semibold h-[67px] min-h-[67px] rounded-lg"
