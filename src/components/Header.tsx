@@ -128,7 +128,7 @@ export function Header({ onGuestReset }: HeaderProps) {
           )}
 
           {!user && (
-            <div className="absolute top-[53px] right-4 z-[55] flex flex-col items-center gap-2">
+            <div className="absolute top-[78px] right-4 z-[55] flex flex-col items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
