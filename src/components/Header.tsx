@@ -142,7 +142,7 @@ export function Header({ onGuestReset }: HeaderProps) {
               </Button>
               <Button
                 variant="default"
-                className="w-[88px] h-[88px] min-w-[88px] min-h-[88px] max-w-[88px] max-h-[88px] aspect-square rounded-full p-0 flex items-center justify-center bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 text-[14px] font-semibold"
+                className="w-[88px] h-[88px] min-w-[88px] min-h-[88px] max-w-[88px] max-h-[88px] aspect-square rounded-full p-0 flex items-center justify-center bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 text-[14px] font-semibold mt-[5px]"
                 onClick={() => {
                   trackEvent('feedback_open', { category: 'feedback', userId: null });
                   window.dispatchEvent(new CustomEvent('yg:open-demo-feedback'));
