@@ -130,6 +130,16 @@ export function Header({ onGuestReset }: HeaderProps) {
           {!user && (
             <div className="absolute top-[53px] right-4 z-[55] flex flex-col items-center gap-2">
               <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(-1)}
+                title="Go back"
+                className="bg-[#0a0a0a] border-[#0f6f35] text-[#0f6f35] hover:bg-[#141414] hover:border-[#147a3a] hover:text-[#147a3a] gap-1.5 font-semibold"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Back</span>
+              </Button>
+              <Button
                 size="default"
                 className="gap-1.5 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-[5px] border-amber-600 shadow-glow px-[33px] text-[18px] font-semibold h-[57px] min-h-[57px] rounded-lg"
                 onClick={() => {
