@@ -78,7 +78,7 @@ export function Header({ onGuestReset }: HeaderProps) {
               <p className="text-[14px] text-muted-foreground">Portfolio Yield Analysis</p>
             </div>
 
-            <div className="flex flex-col items-end gap-2 -mt-[15px]">
+            <div className={`flex flex-col items-end gap-2 ${!user ? '-mt-[92px]' : '-mt-[15px]'}`}>
               {showBackButton && (
                 <Button
                   variant="ghost"
