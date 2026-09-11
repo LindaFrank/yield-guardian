@@ -56,6 +56,22 @@ export function Header({ onGuestReset }: HeaderProps) {
     await signOut();
   };
 
+  const handleBack = async () => {
+    if (user && location.pathname === '/') {
+      await signOut();
+      navigate('/auth', { replace: true });
+      return;
+    }
+
+    const historyIndex = window.history.state?.idx;
+    if (typeof historyIndex === 'number' && historyIndex > 0) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(user ? '/' : '/auth');
+  };
+
   return (
     <>
       <header className="bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -83,7 +99,7 @@ export function Header({ onGuestReset }: HeaderProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => navigate(-1)}
+                  onClick={handleBack}
                   title="Go back"
                   className="mt-1 min-w-[97px] text-[#0f6f35] hover:text-[#147a3a] hover:bg-[#0f6f35]/10 gap-1.5"
                 >
