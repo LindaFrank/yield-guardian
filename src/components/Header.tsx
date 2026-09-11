@@ -134,7 +134,7 @@ export function Header({ onGuestReset }: HeaderProps) {
                 size="sm"
                 onClick={() => navigate(-1)}
                 title="Go back"
-                className="bg-[#0a0a0a] border-[#0f6f35] text-[#0f6f35] hover:bg-[#141414] hover:border-[#147a3a] hover:text-[#147a3a] gap-1.5 font-semibold"
+                className="bg-[#0a0a0a] border-gray-500 text-[#147a8a] hover:bg-[#141414] hover:border-gray-400 hover:text-[#1a8fa3] gap-1.5 font-semibold"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="hidden sm:inline">Back</span>
