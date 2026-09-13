@@ -71,7 +71,7 @@ function RestOfYearExplainer({
           What does this mean?
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Your dividends for the rest of this year</DialogTitle>
           <DialogDescription className="text-[17px] font-medium text-primary">
