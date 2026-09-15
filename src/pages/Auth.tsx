@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
 import { GuidedExperiencesMenu } from '@/components/GuidedExperiencesMenu';
+import { TermsAgreementCheckbox } from '@/components/TermsAgreementCheckbox';
 import { trackEvent } from '@/lib/analytics';
 
 
@@ -34,6 +35,7 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const { required: inviteRequired } = useInviteCodeRequired();
   const [autoLogging, setAutoLogging] = useState(!!adminKey);
@@ -68,6 +70,7 @@ export default function Auth() {
         if (error) toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
       } else if (mode === 'signup') {
         if (password.length < 8) { toast({ title: 'Password too short', description: 'Use at least 8 characters.', variant: 'destructive' }); setLoading(false); return; }
+        if (!termsAccepted) { toast({ title: 'Terms & Conditions', description: 'Please check the box to agree to the Terms & Conditions before creating your account.', variant: 'destructive' }); setLoading(false); return; }
         if (inviteRequired) {
           if (!inviteCode.trim()) {
             toast({ title: 'Invite code required', description: 'Enter the invite code you were sent.', variant: 'destructive' });
@@ -277,6 +280,9 @@ export default function Auth() {
                       <Input type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value.toUpperCase())} placeholder="YG-XXXX-XXXX" required autoCapitalize="characters" />
                       <p className="text-[11px] text-muted-foreground">Enter the invite code you were sent.</p>
                     </div>
+                  )}
+                  {mode === 'signup' && (
+                    <TermsAgreementCheckbox checked={termsAccepted} onCheckedChange={setTermsAccepted} id="auth-terms" />
                   )}
                   <Button type="submit" className="w-full group" disabled={loading}>
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
