@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { SCENES } from "../narration";
 import { Backdrop } from "../components/Backdrop";
 import { Captions } from "../components/Caption";
 import { Button, Kicker, Panel, Row, Title } from "../components/Ui";
@@ -85,20 +86,7 @@ export const S9Guest: React.FC = () => {
           </span>
         </div>
       </Panel>
-      <Captions
-        lines={[
-          {
-            from: 12,
-            duration: 140,
-            text: "In Guest Analysis Mode, stock names, tickers and share counts stay hidden.",
-          },
-          {
-            from: 152,
-            duration: 148,
-            text: "Choosing Save my portfolio starts account creation, and unlocks the alternatives and the new yield.",
-          },
-        ]}
-      />
+      <Captions lines={SCENES.s9.lines} />
     </AbsoluteFill>
   );
 };

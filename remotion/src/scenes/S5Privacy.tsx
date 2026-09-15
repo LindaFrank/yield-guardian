@@ -6,6 +6,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
+import { SCENES } from "../narration";
 import { Backdrop } from "../components/Backdrop";
 import { Captions } from "../components/Caption";
 import { Kicker, Panel, Title } from "../components/Ui";
@@ -105,15 +106,7 @@ export const S5Privacy: React.FC = () => {
           );
         })}
       </Panel>
-      <Captions
-        lines={[
-          {
-            from: 16,
-            duration: 224,
-            text: "Personal identifying information is ignored — only the data needed for dividends and yield is used.",
-          },
-        ]}
-      />
+      <Captions lines={SCENES.s5.lines} />
     </AbsoluteFill>
   );
 };

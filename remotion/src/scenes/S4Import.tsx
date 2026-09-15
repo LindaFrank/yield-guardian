@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { SCENES } from "../narration";
 import { Backdrop } from "../components/Backdrop";
 import { Captions } from "../components/Caption";
 import { Button, Kicker, Panel, Row, Title } from "../components/Ui";
@@ -60,20 +61,7 @@ export const S4Import: React.FC = () => {
             : "23 of 23 holdings read · portfolio value calculated"}
         </div>
       </Panel>
-      <Captions
-        lines={[
-          {
-            from: 20,
-            duration: 120,
-            text: "Yield Guardian can analyze her portfolio — she simply imports it as a guest.",
-          },
-          {
-            from: 140,
-            duration: 130,
-            text: "It reads the tickers and share counts, then calculates her current portfolio value.",
-          },
-        ]}
-      />
+      <Captions lines={SCENES.s4.lines} />
     </AbsoluteFill>
   );
 };

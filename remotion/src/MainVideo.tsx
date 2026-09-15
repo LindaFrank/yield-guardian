@@ -17,9 +17,10 @@ import { S7Compare } from "./scenes/S7Compare";
 import { S8Explainer } from "./scenes/S8Explainer";
 import { S9Guest } from "./scenes/S9Guest";
 import { S10Cta } from "./scenes/S10Cta";
+import { SCENES, TRANSITION } from "./narration";
 import { C } from "./theme";
 
-const T = 20;
+const T = TRANSITION;
 
 const wipeT = (
   <TransitionSeries.Transition
@@ -38,43 +39,43 @@ const fadeT = (
 export const MainVideo: React.FC = () => (
   <AbsoluteFill style={{ backgroundColor: C.bg }}>
     <TransitionSeries>
-      <TransitionSeries.Sequence durationInFrames={270}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s1.duration}>
         <S1Susan />
       </TransitionSeries.Sequence>
       {fadeT}
-      <TransitionSeries.Sequence durationInFrames={240}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s2.duration}>
         <S2Goal />
       </TransitionSeries.Sequence>
       {wipeT}
-      <TransitionSeries.Sequence durationInFrames={210}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s3.duration}>
         <S3Holdings />
       </TransitionSeries.Sequence>
       {fadeT}
-      <TransitionSeries.Sequence durationInFrames={270}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s4.duration}>
         <S4Import />
       </TransitionSeries.Sequence>
       {wipeT}
-      <TransitionSeries.Sequence durationInFrames={240}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s5.duration}>
         <S5Privacy />
       </TransitionSeries.Sequence>
       {fadeT}
-      <TransitionSeries.Sequence durationInFrames={270}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s6.duration}>
         <S6Underperformers />
       </TransitionSeries.Sequence>
       {wipeT}
-      <TransitionSeries.Sequence durationInFrames={330}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s7.duration}>
         <S7Compare />
       </TransitionSeries.Sequence>
       {fadeT}
-      <TransitionSeries.Sequence durationInFrames={240}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s8.duration}>
         <S8Explainer />
       </TransitionSeries.Sequence>
       {wipeT}
-      <TransitionSeries.Sequence durationInFrames={300}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s9.duration}>
         <S9Guest />
       </TransitionSeries.Sequence>
       {fadeT}
-      <TransitionSeries.Sequence durationInFrames={240}>
+      <TransitionSeries.Sequence durationInFrames={SCENES.s10.duration}>
         <S10Cta />
       </TransitionSeries.Sequence>
     </TransitionSeries>

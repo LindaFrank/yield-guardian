@@ -6,6 +6,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
+import { SCENES } from "../narration";
 import { Backdrop } from "../components/Backdrop";
 import { Captions } from "../components/Caption";
 import { Kicker, Panel, Title } from "../components/Ui";
@@ -89,15 +90,7 @@ export const S8Explainer: React.FC = () => {
           );
         })}
       </Panel>
-      <Captions
-        lines={[
-          {
-            from: 14,
-            duration: 226,
-            text: "And an explainer shows exactly how those end-of-year dividend numbers are calculated.",
-          },
-        ]}
-      />
+      <Captions lines={SCENES.s8.lines} />
     </AbsoluteFill>
   );
 };
