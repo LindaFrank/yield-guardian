@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { StripeEmbeddedCheckout } from './StripeEmbeddedCheckout';
 import { PaymentTestModeBanner } from './PaymentTestModeBanner';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
+import { TermsAgreementCheckbox } from '@/components/TermsAgreementCheckbox';
 import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell } from 'lucide-react';
 
 interface SubscriptionModalProps {
@@ -61,6 +62,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
   const { toast } = useToast();
@@ -73,6 +75,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
     setEmail('');
     setPassword('');
     setInviteCode('');
+    setTermsAccepted(false);
     setLoading(false);
     setUserId(undefined);
   };
@@ -92,6 +95,11 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
       if (authMode === 'signup') {
         if (password.length < 8) {
           toast({ title: 'Password too short', description: 'Use at least 8 characters.', variant: 'destructive' });
+          setLoading(false);
+          return;
+        }
+        if (!termsAccepted) {
+          toast({ title: 'Terms & Conditions', description: 'Please check the box to agree to the Terms & Conditions before creating your account.', variant: 'destructive' });
           setLoading(false);
           return;
         }
@@ -233,6 +241,9 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                   <Label htmlFor="sub-invite">Invite code</Label>
                   <Input id="sub-invite" type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} required={authMode === 'signup'} maxLength={100} placeholder="Enter your invite code" />
                 </div>
+              )}
+              {authMode === 'signup' && (
+                <TermsAgreementCheckbox checked={termsAccepted} onCheckedChange={setTermsAccepted} id="sub-terms" />
               )}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (authMode === 'signup' ? 'Create account & continue' : 'Sign in & continue')}
