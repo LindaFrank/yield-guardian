@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { SCENES } from "../narration";
 import { Backdrop } from "../components/Backdrop";
 import { Captions } from "../components/Caption";
 import { Button, Kicker, Panel, Stat, Title } from "../components/Ui";
@@ -78,20 +79,7 @@ export const S6Underperformers: React.FC = () => {
           <Button label="Review Underperformers" delay={110} />
         </div>
       </Panel>
-      <Captions
-        lines={[
-          {
-            from: 14,
-            duration: 130,
-            text: "The sample portfolio holds familiar stocks — with one, ABBV, that does not meet the 5.0% goal.",
-          },
-          {
-            from: 144,
-            duration: 126,
-            text: "Yield Guardian flags underperforming stocks against the desired annual yield.",
-          },
-        ]}
-      />
+      <Captions lines={SCENES.s6.lines} />
     </AbsoluteFill>
   );
 };

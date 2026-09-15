@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { SCENES } from "../narration";
 import { Backdrop } from "../components/Backdrop";
 import { Captions } from "../components/Caption";
 import { Kicker, Panel, Title } from "../components/Ui";
@@ -129,20 +130,7 @@ export const S7Compare: React.FC = () => {
       >
         Rest of year dividends: +$2,115.28
       </div>
-      <Captions
-        lines={[
-          {
-            from: 10,
-            duration: 140,
-            text: "Click Review Underperformers and a comparison appears, side by side.",
-          },
-          {
-            from: 150,
-            duration: 180,
-            text: "Keep the stock, and you see the dividends expected through year end — or see what an alternative would earn.",
-          },
-        ]}
-      />
+      <Captions lines={SCENES.s7.lines} />
     </AbsoluteFill>
   );
 };

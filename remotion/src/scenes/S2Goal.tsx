@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { SCENES } from "../narration";
 import { Backdrop } from "../components/Backdrop";
 import { Captions } from "../components/Caption";
 import { Kicker, Panel, Stat } from "../components/Ui";
@@ -86,20 +87,7 @@ export const S2Goal: React.FC = () => {
           />
         </div>
       </Panel>
-      <Captions
-        lines={[
-          {
-            from: 12,
-            duration: 116,
-            text: "After reviewing her income and expenses, she decided a 5.0% annual yield will support her.",
-          },
-          {
-            from: 128,
-            duration: 112,
-            text: "Her portfolio holds 23 stocks — and working out which ones actually help is hard to calculate.",
-          },
-        ]}
-      />
+      <Captions lines={SCENES.s2.lines} />
     </AbsoluteFill>
   );
 };

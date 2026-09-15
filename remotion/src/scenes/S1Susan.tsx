@@ -6,6 +6,7 @@ import {
   staticFile,
   useCurrentFrame,
 } from "remotion";
+import { SCENES } from "../narration";
 import { Backdrop } from "../components/Backdrop";
 import { Captions } from "../components/Caption";
 import { Kicker, Title } from "../components/Ui";
@@ -57,20 +58,7 @@ export const S1Susan: React.FC = () => {
           }}
         />
       </div>
-      <Captions
-        lines={[
-          {
-            from: 30,
-            duration: 120,
-            text: "I'd like you to meet Susan. Over the years, she has built a substantial stock portfolio.",
-          },
-          {
-            from: 150,
-            duration: 120,
-            text: "She wants those investments to provide her income through retirement.",
-          },
-        ]}
-      />
+      <Captions lines={SCENES.s1.lines} />
     </AbsoluteFill>
   );
 };

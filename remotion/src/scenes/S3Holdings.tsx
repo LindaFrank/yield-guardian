@@ -6,6 +6,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
+import { SCENES } from "../narration";
 import { Backdrop } from "../components/Backdrop";
 import { Captions } from "../components/Caption";
 import { Kicker, Title } from "../components/Ui";
@@ -78,15 +79,7 @@ export const S3Holdings: React.FC = () => {
           );
         })}
       </div>
-      <Captions
-        lines={[
-          {
-            from: 40,
-            duration: 170,
-            text: "Finding the stocks that move her toward her goal — and spotting the ones that don't — takes real work.",
-          },
-        ]}
-      />
+      <Captions lines={SCENES.s3.lines} />
     </AbsoluteFill>
   );
 };
