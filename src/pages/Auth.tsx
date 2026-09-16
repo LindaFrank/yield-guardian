@@ -36,6 +36,7 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const { required: inviteRequired } = useInviteCodeRequired();
   const [autoLogging, setAutoLogging] = useState(!!adminKey);

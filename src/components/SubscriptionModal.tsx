@@ -63,6 +63,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
   const { toast } = useToast();
