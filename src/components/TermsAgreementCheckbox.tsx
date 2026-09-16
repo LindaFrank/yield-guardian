@@ -40,6 +40,8 @@ export const TermsAgreementCheckbox = forwardRef<HTMLDivElement, TermsAgreementC
           </label>
           <a
             href={TERMS_DOCUMENT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-primary hover:underline"
           >
             Terms &amp; Conditions
@@ -64,6 +66,8 @@ export const TermsAgreementCheckbox = forwardRef<HTMLDivElement, TermsAgreementC
           </label>
           <a
             href={PRIVACY_DOCUMENT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-primary hover:underline"
           >
             Privacy Policy
