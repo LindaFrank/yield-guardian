@@ -29,23 +29,38 @@ export default function Auth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const adminKey = searchParams.get('key');
-  const [mode, setMode] = useState<Mode>('signin');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const readStored = (key: string) => {
+    try { return sessionStorage.getItem(key) ?? ''; } catch { return ''; }
+  };
+  const writeStored = (key: string, value: string) => {
+    try { sessionStorage.setItem(key, value); } catch { /* ignore */ }
+  };
+
+  const [mode, setMode] = useState<Mode>(() => (readStored('yg:auth-mode') as Mode) || 'signin');
+  const [name, setName] = useState(() => readStored('yg:auth-name'));
+  const [email, setEmail] = useState(() => readStored('yg:auth-email'));
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
   const { required: inviteRequired } = useInviteCodeRequired();
   const [autoLogging, setAutoLogging] = useState(!!adminKey);
-  const [showForm, setShowForm] = useState(false);
+  // Once the intro has played in this browser session, show the form immediately
+  // so returning from another tab/window doesn't replay it.
+  const [showForm, setShowForm] = useState(() => readStored('yg:auth-intro-done') === '1');
   const { toast } = useToast();
 
+  useEffect(() => { writeStored('yg:auth-mode', mode); }, [mode]);
+  useEffect(() => { writeStored('yg:auth-name', name); }, [name]);
+  useEffect(() => { writeStored('yg:auth-email', email); }, [email]);
+
   useEffect(() => {
-    if (!adminKey) {
-      const timer = setTimeout(() => setShowForm(true), 2800);
-      return () => clearTimeout(timer);
-    }
-  }, [adminKey]);
+    if (adminKey || showForm) return;
+    const timer = setTimeout(() => {
+      setShowForm(true);
+      writeStored('yg:auth-intro-done', '1');
+    }, 2800);
+    return () => clearTimeout(timer);
+  }, [adminKey, showForm]);
 
   useEffect(() => {
     if (!adminKey) return;
