@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
 import DownloadReport from "./pages/DownloadReport";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 
@@ -49,6 +50,7 @@ const AppRoutes = () => {
         <Route path="/admin/inbox" element={<ProtectedRoute><AdminInbox /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/download-report" element={<DownloadReport />} />
 

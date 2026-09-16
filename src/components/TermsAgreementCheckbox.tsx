@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const TERMS_DOCUMENT_URL = '/Yield_Guardian_Terms_Privacy_Disclosures.pdf';
+const TERMS_DOCUMENT_URL = '/terms';
 
 interface TermsAgreementCheckboxProps {
   checked: boolean;
