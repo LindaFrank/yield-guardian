@@ -22,17 +22,20 @@ export const TermsAgreementCheckbox = forwardRef<HTMLDivElement, TermsAgreementC
         className="mt-0.5"
         aria-required="true"
       />
-      <label htmlFor={id} className="text-xs text-muted-foreground leading-snug cursor-pointer select-none">
-        I have read and agree to the Yield Guardian{' '}
+      <div className="text-xs text-muted-foreground leading-snug select-none">
+        <label htmlFor={id} className="cursor-pointer">
+          I have read and agree to the Yield Guardian{' '}
+        </label>
         <a
           href={TERMS_DOCUMENT_URL}
           className="text-primary hover:underline"
-          onClick={(event) => event.stopPropagation()}
         >
           Terms &amp; Conditions
-        </a>{' '}
-        and acknowledge the Privacy Policy.
-      </label>
+        </a>
+        <label htmlFor={id} className="cursor-pointer">
+          {' '}and acknowledge the Privacy Policy.
+        </label>
+      </div>
     </div>
   );
 });
