@@ -23,6 +23,7 @@ import { trackEvent } from '@/lib/analytics';
 import { usePaidFeatures } from '@/hooks/usePaidFeatures';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { DisclosureNotice } from '@/components/DisclosureNotice';
 
 
 /** Blurs children when the visitor isn't a paid subscriber or admin. */
@@ -344,6 +345,9 @@ export function ReplacementSuggestions({
                   ? 'You want maximum income now.'
                   : 'You want the smallest trade that hits your yield target.'}
             </p>
+            <DisclosureNotice className="border-t border-border/50 pt-3">
+              Illustrative analysis only. Alternatives are presented for comparison and are not recommendations to buy, sell, or hold a security. Prices, dividends, yields, and actual results may change.
+            </DisclosureNotice>
 
             {/* Shares-to-sell slider (Aggressive only) */}
             {mode === 'aggressive' && sharesYHeld > 0 && (
@@ -802,6 +806,9 @@ export function ReplacementSuggestions({
                                   <p className="text-[11px] italic opacity-80 pt-1 border-t border-yellow-500/40">
                                     Once your brokerage trades settle, click "Next" to update your portfolio here.
                                   </p>
+                                  <p className="text-[11px] leading-relaxed opacity-90 pt-2 border-t border-yellow-500/40">
+                                    Educational steps only. Yield Guardian may explain how an illustrated portfolio change could be made, but does not recommend, place, transmit, or execute trades. You decide whether to proceed and execute transactions independently through your brokerage.
+                                  </p>
                                   <div className="flex gap-2 pt-2 border-t border-yellow-500/40">
                                     <Button
                                       type="button"
@@ -975,6 +982,12 @@ export function ReplacementSuggestions({
           );
         })}
       </div>
+
+      {removedStock && isPaid && onSwap && (
+        <DisclosureNotice className="mt-3 border-t border-border/50 pt-3">
+          Yield Guardian records transactions you report for portfolio tracking, history, calculations, and reporting. Recording a transaction in Yield Guardian does not execute or transmit a trade.
+        </DisclosureNotice>
+      )}
 
       {editingTickers.length > 0 && (
         <div className="sticky bottom-0 mt-3 pt-3 border-t-[3px] border-primary/40 bg-card/95 backdrop-blur">

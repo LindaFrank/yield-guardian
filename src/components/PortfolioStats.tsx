@@ -3,6 +3,7 @@ import { formatCurrency, formatPercentage, calculateDividendYield } from '@/lib/
 import { Wallet, TrendingUp, AlertCircle, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HelpTooltip } from '@/components/HelpTooltip';
+import { DisclosureNotice } from '@/components/DisclosureNotice';
 
 interface PortfolioStatsProps {
   stocks: Stock[];
@@ -81,8 +82,9 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
-      {stats.map((stat) => {
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
+        {stats.map((stat) => {
         const help = STAT_HELP[stat.label];
         const card = (
           <div
@@ -110,7 +112,11 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
         ) : (
           <div key={stat.label} className="h-full">{card}</div>
         );
-      })}
+        })}
+      </div>
+      <DisclosureNotice>
+        Dividends are not guaranteed. Estimates are based on company-reported financial information and published dividend statements available at the time of analysis. Actual results may differ.
+      </DisclosureNotice>
     </div>
   );
 }
