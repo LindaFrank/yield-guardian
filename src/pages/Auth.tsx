@@ -71,7 +71,7 @@ export default function Auth() {
         if (error) toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
       } else if (mode === 'signup') {
         if (password.length < 8) { toast({ title: 'Password too short', description: 'Use at least 8 characters.', variant: 'destructive' }); setLoading(false); return; }
-        if (!termsAccepted) { toast({ title: 'Terms & Conditions', description: 'Please check the box to agree to the Terms & Conditions before creating your account.', variant: 'destructive' }); setLoading(false); return; }
+        if (!termsAccepted || !privacyAccepted) { toast({ title: 'Agreement required', description: 'Please check both boxes to agree to the Terms & Conditions and acknowledge the Privacy Policy before creating your account.', variant: 'destructive' }); setLoading(false); return; }
         if (inviteRequired) {
           if (!inviteCode.trim()) {
             toast({ title: 'Invite code required', description: 'Enter the invite code you were sent.', variant: 'destructive' });
