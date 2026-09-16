@@ -179,6 +179,9 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               <span>1% Conservative</span>
               <span>10% Aggressive</span>
             </div>
+            <p className="mt-4 border-t border-border/50 pt-3 text-left text-[11px] leading-relaxed text-muted-foreground">
+              Your Desired Yield is a target, not a guarantee. Market conditions, available securities, dividend changes, and portfolio constraints may prevent the selected yield from being achieved.
+            </p>
           </Card>
           <div className="flex flex-wrap gap-3 justify-center">
             {onAddStock && (

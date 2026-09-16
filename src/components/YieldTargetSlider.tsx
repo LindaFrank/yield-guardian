@@ -1,5 +1,6 @@
 import { Slider } from '@/components/ui/slider';
 import { Target } from 'lucide-react';
+import { DisclosureNotice } from '@/components/DisclosureNotice';
 
 interface YieldTargetSliderProps {
   value: number;
@@ -34,6 +35,9 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
         <span>1%</span>
         <span>10%</span>
       </div>
+      <DisclosureNotice className="mt-3 border-t border-border/50 pt-3">
+        Your Desired Yield is a target, not a guarantee. Market conditions, available securities, dividend changes, and portfolio constraints may prevent the selected yield from being achieved.
+      </DisclosureNotice>
     </div>
   );
 }
