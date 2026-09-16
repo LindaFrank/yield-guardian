@@ -283,7 +283,14 @@ export default function Auth() {
                     </div>
                   )}
                   {mode === 'signup' && (
-                    <TermsAgreementCheckbox checked={termsAccepted} onCheckedChange={setTermsAccepted} id="auth-terms" />
+                    <TermsAgreementCheckbox
+                      termsChecked={termsAccepted}
+                      privacyChecked={privacyAccepted}
+                      onTermsChange={setTermsAccepted}
+                      onPrivacyChange={setPrivacyAccepted}
+                      termsId="auth-terms"
+                      privacyId="auth-privacy"
+                    />
                   )}
                   <Button type="submit" className="w-full group" disabled={loading}>
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
