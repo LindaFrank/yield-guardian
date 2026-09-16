@@ -1,5 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox';
-import termsDoc from '@/assets/terms-privacy-disclosures.pdf.asset.json';
+
+const TERMS_DOCUMENT_URL = '/Yield_Guardian_Terms_Privacy_Disclosures.pdf';
 
 interface TermsAgreementCheckboxProps {
   checked: boolean;
@@ -20,15 +21,11 @@ export function TermsAgreementCheckbox({ checked, onCheckedChange, id = 'terms-a
       <label htmlFor={id} className="text-xs text-muted-foreground leading-snug cursor-pointer select-none">
         I have read and agree to the Yield Guardian{' '}
         <a
-          href={termsDoc.url}
+          href={TERMS_DOCUMENT_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary hover:underline"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            window.open(termsDoc.url, '_blank', 'noopener,noreferrer');
-          }}
+          onClick={(event) => event.stopPropagation()}
         >
           Terms &amp; Conditions
         </a>{' '}
