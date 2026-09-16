@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 const TERMS_DOCUMENT_URL = '/Yield_Guardian_Terms_Privacy_Disclosures.pdf';
@@ -8,9 +9,12 @@ interface TermsAgreementCheckboxProps {
   id?: string;
 }
 
-export function TermsAgreementCheckbox({ checked, onCheckedChange, id = 'terms-agreement' }: TermsAgreementCheckboxProps) {
+export const TermsAgreementCheckbox = forwardRef<HTMLDivElement, TermsAgreementCheckboxProps>(function TermsAgreementCheckbox(
+  { checked, onCheckedChange, id = 'terms-agreement' },
+  ref,
+) {
   return (
-    <div className="flex items-start gap-2.5 pt-1">
+    <div ref={ref} className="flex items-start gap-2.5 pt-1">
       <Checkbox
         id={id}
         checked={checked}
@@ -22,8 +26,6 @@ export function TermsAgreementCheckbox({ checked, onCheckedChange, id = 'terms-a
         I have read and agree to the Yield Guardian{' '}
         <a
           href={TERMS_DOCUMENT_URL}
-          target="_blank"
-          rel="noopener noreferrer"
           className="text-primary hover:underline"
           onClick={(event) => event.stopPropagation()}
         >
@@ -33,4 +35,4 @@ export function TermsAgreementCheckbox({ checked, onCheckedChange, id = 'terms-a
       </label>
     </div>
   );
-}
+});
