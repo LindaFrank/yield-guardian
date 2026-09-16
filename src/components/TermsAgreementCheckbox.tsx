@@ -24,7 +24,11 @@ export function TermsAgreementCheckbox({ checked, onCheckedChange, id = 'terms-a
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary hover:underline"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open(termsDoc.url, '_blank', 'noopener,noreferrer');
+          }}
         >
           Terms &amp; Conditions
         </a>{' '}
