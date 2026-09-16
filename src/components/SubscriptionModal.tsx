@@ -77,6 +77,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
     setPassword('');
     setInviteCode('');
     setTermsAccepted(false);
+    setPrivacyAccepted(false);
     setLoading(false);
     setUserId(undefined);
   };
@@ -99,8 +100,8 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
           setLoading(false);
           return;
         }
-        if (!termsAccepted) {
-          toast({ title: 'Terms & Conditions', description: 'Please check the box to agree to the Terms & Conditions before creating your account.', variant: 'destructive' });
+        if (!termsAccepted || !privacyAccepted) {
+          toast({ title: 'Agreement required', description: 'Please check both boxes to agree to the Terms & Conditions and acknowledge the Privacy Policy before creating your account.', variant: 'destructive' });
           setLoading(false);
           return;
         }
@@ -244,7 +245,14 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                 </div>
               )}
               {authMode === 'signup' && (
-                <TermsAgreementCheckbox checked={termsAccepted} onCheckedChange={setTermsAccepted} id="sub-terms" />
+                <TermsAgreementCheckbox
+                  termsChecked={termsAccepted}
+                  privacyChecked={privacyAccepted}
+                  onTermsChange={setTermsAccepted}
+                  onPrivacyChange={setPrivacyAccepted}
+                  termsId="sub-terms"
+                  privacyId="sub-privacy"
+                />
               )}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (authMode === 'signup' ? 'Create account & continue' : 'Sign in & continue')}
