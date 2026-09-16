@@ -54,7 +54,7 @@ export default function PrivacyPolicy() {
         <p className="text-muted-foreground">
           If you have any questions about this privacy policy or feedback about the app, please{' '}
           <a href="/contact" className="text-primary hover:underline">contact us</a> or email us at{' '}
-          <a href="mailto:lindafrank@aol.com" className="text-primary hover:underline">lindafrank@aol.com</a>.
+          <a href="mailto:linda@guardianyield.com" className="text-primary hover:underline">linda@guardianyield.com</a>.
         </p>
       </main>
     </div>
