@@ -33,7 +33,16 @@ export const TermsAgreementCheckbox = forwardRef<HTMLDivElement, TermsAgreementC
           Terms &amp; Conditions
         </a>
         <label htmlFor={id} className="cursor-pointer">
-          {' '}and acknowledge the Privacy Policy.
+          {' '}and acknowledge the{' '}
+        </label>
+        <a
+          href="/privacy"
+          className="text-primary hover:underline"
+        >
+          Privacy Policy
+        </a>
+        <label htmlFor={id} className="cursor-pointer">
+          .
         </label>
       </div>
     </div>
