@@ -9,6 +9,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { StripeEmbeddedCheckout } from './StripeEmbeddedCheckout';
 import { PaymentTestModeBanner } from './PaymentTestModeBanner';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/contexts/AuthContext';
 import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell } from 'lucide-react';
 
 interface SubscriptionModalProps {
@@ -63,8 +65,11 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
   const { toast } = useToast();
   const { required: inviteRequired } = useInviteCodeRequired();
+  const { user: currentUser } = useAuth();
 
   const reset = () => {
     setStep('pricing');
@@ -75,6 +80,8 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
     setInviteCode('');
     setLoading(false);
     setUserId(undefined);
+    setAgreeTerms(false);
+    setAgreePrivacy(false);
   };
 
   const handleClose = (open: boolean) => {
@@ -196,7 +203,37 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                 ))}
               </ul>
             </div>
-            <Button className="w-full shadow-glow" size="lg" onClick={() => setStep('auth')}>
+            <div className="space-y-3 rounded-lg border border-border/60 p-4">
+              <div className="flex items-start gap-3">
+                <Checkbox id="sub-terms" checked={agreeTerms} onCheckedChange={(v) => setAgreeTerms(v === true)} className="mt-0.5" />
+                <Label htmlFor="sub-terms" className="text-sm font-normal leading-snug">
+                  I agree to the{' '}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline">Terms &amp; Conditions</a>.
+                </Label>
+              </div>
+              <div className="flex items-start gap-3">
+                <Checkbox id="sub-privacy" checked={agreePrivacy} onCheckedChange={(v) => setAgreePrivacy(v === true)} className="mt-0.5" />
+                <Label htmlFor="sub-privacy" className="text-sm font-normal leading-snug">
+                  I acknowledge the{' '}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">Privacy Policy</a>.
+                </Label>
+              </div>
+            </div>
+            <Button
+              className="w-full shadow-glow"
+              size="lg"
+              disabled={!agreeTerms || !agreePrivacy}
+              onClick={() => {
+                if (currentUser) {
+                  setUserId(currentUser.id);
+                  setEmail(currentUser.email ?? '');
+                  savePendingGuestPortfolio(guestTickers, guestShares);
+                  setStep('checkout');
+                } else {
+                  setStep('auth');
+                }
+              }}
+            >
               Start monitoring — $29.95/month
             </Button>
             <p className="text-center text-xs text-muted-foreground">
