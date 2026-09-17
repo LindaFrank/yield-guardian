@@ -328,7 +328,7 @@ export function ReplacementSuggestions({
                   mode === 'aggressive' ? 'bg-primary text-primary-foreground' : 'text-white hover:text-foreground',
                 )}
               >
-                Aggressive
+                Higher-Income Alternative
               </button>
               <button
                 onClick={() => { trackEvent('strategy_mode_select', { category: 'strategy', label: 'conservative' }); setMode('conservative'); }}
@@ -337,7 +337,7 @@ export function ReplacementSuggestions({
                   mode === 'conservative' ? 'bg-primary text-primary-foreground' : 'text-white hover:text-foreground',
                 )}
               >
-                Conservative
+                Conservative Alternative
               </button>
             </div>
             <p className="text-[15px] text-foreground leading-snug">
