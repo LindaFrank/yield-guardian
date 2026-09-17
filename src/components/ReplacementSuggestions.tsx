@@ -338,6 +338,19 @@ export function ReplacementSuggestions({
               <Wand2 className="w-4 h-4 text-primary" />
               <span className="text-sm font-semibold">Explore Alternative Strategies</span>
             </div>
+            {!isPaid && (
+              <button
+                type="button"
+                onClick={() => openSubscription('alternatives_preview_notice')}
+                className="group flex w-full items-start gap-2 rounded-md border border-dashed border-primary/40 bg-primary/5 p-2 text-left transition-colors hover:bg-primary/10"
+              >
+                <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-primary" />
+                <span className="text-[13px] leading-snug text-foreground/90">
+                  <span className="font-semibold">Preview mode</span>{' '}
+                  — Subscribe to reveal the stock names and share counts used in each modeled alternative.
+                </span>
+              </button>
+            )}
 
             {/* Mode toggle */}
             <div className="flex gap-1 p-1 rounded-md bg-secondary/40">
