@@ -7,7 +7,7 @@ import {
   OptimizerMode,
   OptimizerResult,
 } from '@/lib/optimizer';
-import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote, Printer, Mail, Info } from 'lucide-react';
+import { ArrowRight, Plus, Sparkles, ShieldCheck, AlertTriangle, Check, X, TrendingUp, Wand2, ArrowRightCircle, StickyNote, Printer, Mail, Info, Lock } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,11 @@ function Teaser({ isPaid, children }: { isPaid: boolean; children: React.ReactNo
       {children}
     </span>
   );
+}
+
+function openSubscription(source: string) {
+  trackEvent('subscribe_click', { category: 'conversion', label: source });
+  window.dispatchEvent(new CustomEvent('yg:open-subscription'));
 }
 
 /** Explains what "rest-of-year dividend" means and how the two cards compare. */
@@ -333,6 +338,19 @@ export function ReplacementSuggestions({
               <Wand2 className="w-4 h-4 text-primary" />
               <span className="text-sm font-semibold">Explore Alternative Strategies</span>
             </div>
+            {!isPaid && (
+              <button
+                type="button"
+                onClick={() => openSubscription('alternatives_preview_notice')}
+                className="group flex w-full items-start gap-2 rounded-md border border-dashed border-primary/40 bg-primary/5 p-2 text-left transition-colors hover:bg-primary/10"
+              >
+                <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-primary" />
+                <span className="text-[13px] leading-snug text-foreground/90">
+                  <span className="font-semibold">Preview mode</span>{' '}
+                  — Subscribe to reveal the stock names and share counts used in each modeled alternative.
+                </span>
+              </button>
+            )}
 
             {/* Mode toggle */}
             <div className="flex gap-1 p-1 rounded-md bg-secondary/40">
@@ -624,6 +642,22 @@ export function ReplacementSuggestions({
 
       {removedStock && (
         <div className="mb-3 space-y-2">
+          {!isPaid && (
+            <div className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-3 space-y-2">
+              <p className="text-[13px] leading-relaxed text-foreground/90">
+                Subscribe to unlock the complete alternative comparison, including stock names and modeled share counts.
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => openSubscription('alternatives_unlock_cta')}
+                className="gap-1.5 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-2 border-amber-600 font-semibold"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                Unlock Complete Analysis — $29.95/mo
+              </Button>
+            </div>
+          )}
           <h3 className="text-sm font-semibold text-foreground">Select an Alternative to Model</h3>
           <p className="text-[13px] leading-relaxed text-muted-foreground">
             The securities below currently meet the criteria used for this analysis. Select one to see how using it as an alternative would change the modeled portfolio yield and estimated annual dividend income.
@@ -682,9 +716,23 @@ export function ReplacementSuggestions({
               <div className="flex-1 min-w-0">
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Teaser isPaid={isPaid}>
+                  {isPaid ? (
                     <span className="font-mono font-medium">{row.stock.ticker}</span>
-                  </Teaser>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => openSubscription('alternatives_card_lock')}
+                      className="group inline-flex items-center gap-1.5 text-[13px] font-medium text-foreground/80 hover:text-primary transition-colors"
+                    >
+                      <Lock className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary" />
+                      <span className="underline decoration-dotted underline-offset-2">
+                        Stock name and share count hidden
+                      </span>
+                      <span className="text-muted-foreground">
+                        — Available with a subscription.
+                      </span>
+                    </button>
+                  )}
                   <span className="text-[11px] text-muted-foreground">Current yield used in this analysis</span>
                   <span className={cn(
                     'font-mono text-sm',
@@ -888,9 +936,11 @@ export function ReplacementSuggestions({
                     );
                   })()}
                 </div>
-                <p className="text-[15px] text-muted-foreground truncate mt-0.5">
-                  <Teaser isPaid={isPaid}>{row.stock.name}</Teaser>
-                </p>
+                {isPaid && (
+                  <p className="text-[15px] text-muted-foreground truncate mt-0.5">
+                    {row.stock.name}
+                  </p>
+                )}
                 {matchReason && <p className="text-[15px] text-primary/80 mt-1">{matchReason}</p>}
                 {displayRows && (() => {
                   // In conservative mode, project the same trade into THIS card's ticker

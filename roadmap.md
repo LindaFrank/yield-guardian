@@ -10,5 +10,8 @@
 - [x] Make "What do you want to do?" action bar collapse again, hide when any dialog/modal opens, and blur/fade on scroll
 - [x] Keep Portfolio Stats boxes (Portfolio Value, Expected Annual Dividends, Your Portfolio Income Rate, Underperformers) the same fixed size and matching the Underperformers box
 
+## Done
+- [x] Add subscription prompts in alternatives panel: preview notice, blurred-card overlay, unlock reminder, and CTA button — implemented and verified
+
 ## In Progress
 - [ ] Credit adjustment request — blocked because project editing tools cannot issue account credits
