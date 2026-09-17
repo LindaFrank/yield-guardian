@@ -88,7 +88,7 @@ function RestOfYearExplainer({
           </p>
           <div className="rounded-md border-[2px] border-yield-negative/50 bg-yield-negative/5 p-3">
             <div className="text-[14px] uppercase tracking-wide font-bold text-yield-negative mb-1">
-              Keep {keepTicker}
+              Keep My Portfolio Unchanged: {keepTicker}
             </div>
             <p className="text-foreground/95">
               Those shares stay put and pay you{' '}
@@ -361,13 +361,13 @@ export function ReplacementSuggestions({
             <p className="text-[15px] text-foreground leading-snug">
                 {mode === 'aggressive'
                   ? 'Models a strategy that prioritizes higher current dividend income using the values available at the time of analysis.'
-                  : 'You want the smallest trade that hits your yield target.'}
+                  : 'Models the smallest portfolio change that reaches your selected yield target.'}
             </p>
             {/* Shares-to-sell slider (Aggressive only) */}
             {mode === 'aggressive' && sharesYHeld > 0 && (
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs">Shares of {removedStock.ticker} to sell</Label>
+                  <Label className="text-xs">Shares of {removedStock.ticker} included in the model</Label>
                   <span className="text-xs font-mono text-primary">{sharesYSold} / {sliderMax}</span>
                 </div>
                 <Slider
@@ -488,7 +488,7 @@ export function ReplacementSuggestions({
                             }}
                             className="text-xs font-mono bg-secondary/40 border-2 border-muted-foreground/40 rounded px-1.5 py-1 text-foreground hover:border-primary/50 focus:outline-none focus:border-primary"
                           >
-                            <option value="__optimizer__">Smart pick</option>
+                            <option value="__optimizer__">Modeled allocation</option>
                             {allTickers.map((t) => {
                               const isHeld = candidates.find((c) => c.stock.ticker === t)?.alreadyHeld;
                               return (
@@ -725,7 +725,7 @@ export function ReplacementSuggestions({
                             1,
                             Math.floor(result?.sharesYSold ?? sharesYHeld),
                           );
-                          const subject = `Brokerage swap: sell ${removedStock.ticker}, buy ${row.stock.ticker}`;
+                          const subject = `Illustrated portfolio change: ${removedStock.ticker} and ${row.stock.ticker}`;
                           const bodyText =
                             `Execute in your brokerage:\n\n` +
                             `1. Liquidate ${sellShares} shares of ${removedStock.ticker} (${removedStock.name}).\n` +
@@ -936,7 +936,7 @@ export function ReplacementSuggestions({
                   return (
                     <div className="text-[15px] text-muted-foreground mt-1 space-y-0.5">
                       <p>
-                        Buying{' '}
+                        Modeled allocation: {' '}
                         <Teaser isPaid={isPaid}>{projShares.toLocaleString()}</Teaser>{' '}
                         shares at {formatCurrency(row.stock.currentPrice)} each
                       </p>
