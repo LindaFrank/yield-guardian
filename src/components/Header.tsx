@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
+import { usePaidFeatures } from '@/hooks/usePaidFeatures';
 import { Button } from '@/components/ui/button';
 import { trackEvent } from '@/lib/analytics';
 
@@ -28,6 +29,7 @@ interface HeaderProps {
 export function Header({ onGuestReset }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { isPaid, isLoading: paidLoading } = usePaidFeatures();
   const navigate = useNavigate();
   const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -89,6 +91,20 @@ export function Header({ onGuestReset }: HeaderProps) {
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span className="hidden sm:inline">Back</span>
+                </Button>
+              )}
+              {user && !isPaid && !paidLoading && (
+                <Button
+                  size="sm"
+                  className="gap-1.5 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-2 border-amber-600 font-semibold"
+                  onClick={() => {
+                    trackEvent('subscribe_header_click', { category: 'conversion', userId: user.id });
+                    window.dispatchEvent(new CustomEvent('yg:open-subscription'));
+                  }}
+                  title="Subscribe to unlock alternatives"
+                >
+                  <Save className="w-4 h-4" />
+                  Subscribe — $29.95/mo
                 </Button>
               )}
               {user && (
