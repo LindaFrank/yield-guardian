@@ -700,9 +700,23 @@ export function ReplacementSuggestions({
               <div className="flex-1 min-w-0">
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Teaser isPaid={isPaid}>
+                  {isPaid ? (
                     <span className="font-mono font-medium">{row.stock.ticker}</span>
-                  </Teaser>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => openSubscription('alternatives_card_lock')}
+                      className="group inline-flex items-center gap-1.5 text-[13px] font-medium text-foreground/80 hover:text-primary transition-colors"
+                    >
+                      <Lock className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary" />
+                      <span className="underline decoration-dotted underline-offset-2">
+                        Stock name and share count hidden
+                      </span>
+                      <span className="text-muted-foreground">
+                        — Available with a subscription.
+                      </span>
+                    </button>
+                  )}
                   <span className="text-[11px] text-muted-foreground">Current yield used in this analysis</span>
                   <span className={cn(
                     'font-mono text-sm',
