@@ -341,6 +341,9 @@ export function ReplacementSuggestions({
               </button>
             </div>
             <p className="text-[15px] text-foreground leading-snug">
+              Compare potential portfolio strategies using the current security prices and dividend information available at the time of this analysis.
+            </p>
+            <p className="text-[15px] text-foreground leading-snug">
                 {mode === 'aggressive'
                   ? 'Models a strategy that prioritizes higher current dividend income using the values available at the time of analysis.'
                   : 'You want the smallest trade that hits your yield target.'}
