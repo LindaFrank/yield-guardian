@@ -109,10 +109,10 @@ function RestOfYearExplainer({
                 delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
               )}
             >
-              Switch to {label}
+              Alternative Used in This Model: {label}
             </div>
             <p className="text-foreground/95">
-              You sell the {keepTicker} shares and put the same money into {label}, which pays you{' '}
+              The model reallocates the value of the {keepTicker} shares to {label}, which produces{' '}
               <span className="font-mono font-bold">{formatCurrency(switchIncome)}</span> before year end.
             </p>
           </div>
@@ -128,11 +128,11 @@ function RestOfYearExplainer({
               {formatCurrency(delta)}
             </span>{' '}
             {delta >= 0
-              ? 'in extra dividend cash you would collect this year by making the switch now.'
-              : 'less dividend cash this year — the switch raises your yield rate, but pays fewer dollars before December 31.'}
+              ? 'in additional modeled dividend income before year end using this alternative.'
+              : 'less modeled dividend income before year end — the alternative raises the yield rate but produces fewer dollars before December 31.'}
           </p>
           <p>
-            Switching earlier in the year captures more of this difference. Figures use each company's
+            Modeling the change earlier in the year captures more of this difference. Figures use each company's
             current declared dividend rate and each stock's own payment calendar can shift the exact
             timing; issuers can cut or suspend payments at any time.
           </p>
@@ -306,10 +306,25 @@ export function ReplacementSuggestions({
 
       {removedStock && (
         <>
-          <div className="inline-flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50 w-full">
-            <span className="font-mono text-sm text-muted-foreground">{removedStock.ticker}</span>
-            <ArrowRight className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Showing alternatives</span>
+          <div className="mb-4 p-3 rounded-lg bg-secondary/30 border border-border/50 w-full space-y-2">
+            <p className="text-[11px] font-semibold uppercase text-muted-foreground">
+              Holding Flagged for Review
+            </p>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-mono text-sm text-foreground">{removedStock.ticker}</p>
+                <p className="text-[13px] text-muted-foreground truncate">{removedStock.name}</p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-[11px] text-muted-foreground">Current yield used in this analysis</p>
+                <p className="font-mono text-sm text-yield-negative">
+                  {formatPercentage((removedStock.annualDividend / removedStock.currentPrice) * 100)}
+                </p>
+              </div>
+            </div>
+            <p className="text-[13px] leading-relaxed text-muted-foreground">
+              This holding is being reviewed because its current dividend yield contributes less toward your selected portfolio-income goal than some other holdings or alternatives in this analysis.
+            </p>
           </div>
 
           {/* Optimiser controls */}
@@ -348,10 +363,6 @@ export function ReplacementSuggestions({
                   ? 'Models a strategy that prioritizes higher current dividend income using the values available at the time of analysis.'
                   : 'You want the smallest trade that hits your yield target.'}
             </p>
-            <DisclosureNotice className="border-t border-border/50 pt-3">
-              Illustrative analysis only. Alternatives are presented for comparison and are not recommendations to buy, sell, or hold a security. Prices, dividends, yields, and actual results may change.
-            </DisclosureNotice>
-
             {/* Shares-to-sell slider (Aggressive only) */}
             {mode === 'aggressive' && sharesYHeld > 0 && (
               <div className="space-y-1.5">
@@ -421,8 +432,14 @@ export function ReplacementSuggestions({
 
               return (
               <div className="pt-2 border-t border-border/50 space-y-1 text-[15px]">
+                <div className="space-y-1 pb-2">
+                  <h3 className="text-sm font-semibold text-foreground">Modeled Strategy Comparison</h3>
+                  <p className="text-[13px] leading-relaxed text-muted-foreground">
+                    Using the current values shown in this analysis, this alternative strategy models the following potential changes compared with keeping the portfolio unchanged.
+                  </p>
+                </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Sell {result.sharesYSold} shares {removedStock.ticker}</span>
+                  <span className="text-muted-foreground">Modeled reduction: {result.sharesYSold} shares {removedStock.ticker}</span>
                   <span className="font-mono">{formatCurrency(result.investmentY)}</span>
                 </div>
 
@@ -486,7 +503,7 @@ export function ReplacementSuggestions({
                       <div className="grid grid-cols-2 gap-2">
                         <div className="p-3 rounded-md border-[3px] border-yield-negative/70 bg-yield-negative/10 shadow-card">
                           <div className="text-[13px] uppercase tracking-wide text-yield-negative font-bold leading-tight">
-                            IF YOU KEEP<br/>{removedStock.ticker}
+                            KEEP MY PORTFOLIO UNCHANGED<br/>{removedStock.ticker}
                           </div>
                           <div className="font-mono font-bold text-lg mt-1 text-yield-negative">
                             {formatCurrency(keepIncome)}
@@ -501,7 +518,7 @@ export function ReplacementSuggestions({
                             'text-[13px] uppercase tracking-wide font-bold leading-tight',
                             delta >= 0 ? 'text-yield-positive' : 'text-yield-negative',
                           )}>
-                            IF YOU SWITCH TO<br/>{switchLabelNode}
+                            ALTERNATIVE USED IN THIS MODEL<br/>{switchLabelNode}
                           </div>
                           <div className={cn(
                             'font-mono font-bold text-lg mt-1',
@@ -520,6 +537,9 @@ export function ReplacementSuggestions({
                             fracRemaining={fracRemaining}
                             isPaid={isPaid}
                           />
+                          <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+                            This security is being used to calculate the alternative strategy using the price and dividend information available at the time of the analysis.
+                          </p>
 
                         </div>
                       </div>
@@ -528,14 +548,14 @@ export function ReplacementSuggestions({
                   );
                 })()}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Reallocate</span>
+                  <span className="text-muted-foreground">Modeled alternative allocation</span>
                   <span className="font-mono">{formatCurrency(effectiveTotalCost)}{effectiveLeftover > 0.01 && ` (+${formatCurrency(effectiveLeftover)} cash)`}</span>
                 </div>
                 {allocationPicks.length > 0 && (
                   <div className="flex justify-between gap-3">
                     <span className="text-muted-foreground shrink-0">Allocation breakdown</span>
                     <span className={cn('font-mono text-right', !isPaid && 'blur-[4px] select-none opacity-70')}>
-                      {allocationPicks.map((r) => `Buy ${r.shares} ${r.stock.ticker}`).join(' + ')}
+                      {allocationPicks.map((r) => `${r.shares} shares ${r.stock.ticker}`).join(' + ')}
                     </span>
                   </div>
                 )}
@@ -602,6 +622,18 @@ export function ReplacementSuggestions({
         </>
       )}
 
+      {removedStock && (
+        <div className="mb-3 space-y-2">
+          <h3 className="text-sm font-semibold text-foreground">Select an Alternative to Model</h3>
+          <p className="text-[13px] leading-relaxed text-muted-foreground">
+            The securities below currently meet the criteria used for this analysis. Select one to see how using it as an alternative would change the modeled portfolio yield and estimated annual dividend income.
+          </p>
+          <DisclosureNotice>
+            Selecting a security creates an educational comparison. It is not a recommendation to buy, sell, or hold that security and does not initiate a transaction.
+          </DisclosureNotice>
+        </div>
+      )}
+
       <div className="space-y-3">
         {(() => {
           const baseRows = displayRows
@@ -653,6 +685,7 @@ export function ReplacementSuggestions({
                   <Teaser isPaid={isPaid}>
                     <span className="font-mono font-medium">{row.stock.ticker}</span>
                   </Teaser>
+                  <span className="text-[11px] text-muted-foreground">Current yield used in this analysis</span>
                   <span className={cn(
                     'font-mono text-sm',
                     yieldVal >= 5 ? 'text-yield-positive' : yieldVal >= 3.5 ? 'text-yield-warning' : 'text-yield-negative'
@@ -985,6 +1018,12 @@ export function ReplacementSuggestions({
           );
         })}
       </div>
+
+      {removedStock && (
+        <DisclosureNotice className="mt-3 border-t border-border/50 pt-3">
+          Current yield shown is calculated from the price and dividend information available at the time of analysis. Market prices and company dividend policies can change. Alternatives are presented for educational comparison and are not investment recommendations.
+        </DisclosureNotice>
+      )}
 
       {removedStock && isPaid && onSwap && (
         <DisclosureNotice className="mt-3 border-t border-border/50 pt-3">

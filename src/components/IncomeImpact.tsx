@@ -167,7 +167,7 @@ export function IncomeImpact({
 
       <div className="flex items-center gap-2 mt-4 text-[13px] text-muted-foreground">
         <Info className="w-4 h-4 shrink-0" />
-        <span>Based on the latest recommendations you've reviewed.</span>
+        <span>Based on the latest alternatives you've reviewed.</span>
       </div>
     </div>
   );
