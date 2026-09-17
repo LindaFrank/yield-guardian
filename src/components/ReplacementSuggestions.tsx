@@ -39,6 +39,11 @@ function Teaser({ isPaid, children }: { isPaid: boolean; children: React.ReactNo
   );
 }
 
+function openSubscription(source: string) {
+  trackEvent('subscribe_click', { category: 'conversion', label: source });
+  window.dispatchEvent(new CustomEvent('yg:open-subscription'));
+}
+
 /** Explains what "rest-of-year dividend" means and how the two cards compare. */
 function RestOfYearExplainer({
   keepTicker,
