@@ -342,7 +342,7 @@ export function ReplacementSuggestions({
             </div>
             <p className="text-[15px] text-foreground leading-snug">
                 {mode === 'aggressive'
-                  ? 'You want maximum income now.'
+                  ? 'Models a strategy that prioritizes higher current dividend income using the values available at the time of analysis.'
                   : 'You want the smallest trade that hits your yield target.'}
             </p>
             <DisclosureNotice className="border-t border-border/50 pt-3">
