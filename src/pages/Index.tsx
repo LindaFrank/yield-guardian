@@ -938,8 +938,8 @@ const Index = () => {
 
           {/* Alternative Suggestions Dialog */}
           <Dialog open={replacementDialogOpen} onOpenChange={setReplacementDialogOpen}>
-            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" closeLabel="Back to Portfolio">
-              <DialogHeader>
+            <DialogContent className="max-w-lg h-[90dvh] max-h-[90dvh] flex flex-col overflow-hidden" closeLabel="Back to Portfolio">
+              <DialogHeader className="shrink-0 pr-36">
                 <DialogTitle className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
                   {selectedUnderperformer
@@ -947,42 +947,44 @@ const Index = () => {
                     : 'Matching Stocks'}
                 </DialogTitle>
               </DialogHeader>
-              <ReplacementSuggestions
-                removedStock={selectedUnderperformer}
-                candidates={replacements}
-                sharesYHeld={
-                  selectedUnderperformer
-                    ? sharesList.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
-                    : 0
-                }
-                targetYield={targetYield}
-                portfolioValue={portfolioStats.value}
-                portfolioIncome={portfolioStats.income}
-                onIncomeDeltaChange={(ticker, delta) =>
-                  setIncomeDeltaByTicker((prev) =>
-                    prev[ticker] === delta ? prev : { ...prev, [ticker]: delta }
-                  )
-                }
-                onAddStock={(stock, shares) => {
-                  handleAddStock(stock, shares);
-                  // Keep the list open so several stocks can be picked in one visit.
-                }}
+              <RedScrollContainer className="min-h-0 flex-1" innerClassName="pr-4 pb-6">
+                <ReplacementSuggestions
+                  removedStock={selectedUnderperformer}
+                  candidates={replacements}
+                  sharesYHeld={
+                    selectedUnderperformer
+                      ? sharesList.find((s) => s.ticker === selectedUnderperformer.ticker)?.shares_owned ?? 0
+                      : 0
+                  }
+                  targetYield={targetYield}
+                  portfolioValue={portfolioStats.value}
+                  portfolioIncome={portfolioStats.income}
+                  onIncomeDeltaChange={(ticker, delta) =>
+                    setIncomeDeltaByTicker((prev) =>
+                      prev[ticker] === delta ? prev : { ...prev, [ticker]: delta }
+                    )
+                  }
+                  onAddStock={(stock, shares) => {
+                    handleAddStock(stock, shares);
+                    // Keep the list open so several stocks can be picked in one visit.
+                  }}
 
 
-                onSwap={(candidate, buyShares, removeTicker, sellShares) => {
-                  const fromStock = stocks.find((s) => s.ticker === removeTicker);
-                  const sold = sellShares ?? 0;
-                  const incomeDelta = (buyShares * candidate.annualDividend) - (sold * (fromStock?.annualDividend ?? 0));
-                  const yieldDelta = (candidate.currentYield ?? 0) - (fromStock?.currentYield ?? 0);
-                  if (user) logReplacementEvent({
-                    userId: user.id, fromTicker: removeTicker, toTicker: candidate.ticker,
-                    sharesSold: sold, sharesBought: buyShares, incomeDelta, yieldDelta,
-                  });
-                  handleAddStock(candidate, buyShares);
-                  handleSellShares(removeTicker, sold);
-                  setReplacementDialogOpen(false);
-                }}
-              />
+                  onSwap={(candidate, buyShares, removeTicker, sellShares) => {
+                    const fromStock = stocks.find((s) => s.ticker === removeTicker);
+                    const sold = sellShares ?? 0;
+                    const incomeDelta = (buyShares * candidate.annualDividend) - (sold * (fromStock?.annualDividend ?? 0));
+                    const yieldDelta = (candidate.currentYield ?? 0) - (fromStock?.currentYield ?? 0);
+                    if (user) logReplacementEvent({
+                      userId: user.id, fromTicker: removeTicker, toTicker: candidate.ticker,
+                      sharesSold: sold, sharesBought: buyShares, incomeDelta, yieldDelta,
+                    });
+                    handleAddStock(candidate, buyShares);
+                    handleSellShares(removeTicker, sold);
+                    setReplacementDialogOpen(false);
+                  }}
+                />
+              </RedScrollContainer>
             </DialogContent>
           </Dialog>
 
