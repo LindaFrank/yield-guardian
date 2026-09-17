@@ -642,6 +642,22 @@ export function ReplacementSuggestions({
 
       {removedStock && (
         <div className="mb-3 space-y-2">
+          {!isPaid && (
+            <div className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-3 space-y-2">
+              <p className="text-[13px] leading-relaxed text-foreground/90">
+                Subscribe to unlock the complete alternative comparison, including stock names and modeled share counts.
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => openSubscription('alternatives_unlock_cta')}
+                className="gap-1.5 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-2 border-amber-600 font-semibold"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                Unlock Complete Analysis — $29.95/mo
+              </Button>
+            </div>
+          )}
           <h3 className="text-sm font-semibold text-foreground">Select an Alternative to Model</h3>
           <p className="text-[13px] leading-relaxed text-muted-foreground">
             The securities below currently meet the criteria used for this analysis. Select one to see how using it as an alternative would change the modeled portfolio yield and estimated annual dividend income.
