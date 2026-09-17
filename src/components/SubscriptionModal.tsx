@@ -11,7 +11,7 @@ import { PaymentTestModeBanner } from './PaymentTestModeBanner';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
-import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell } from 'lucide-react';
+import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell, Lock } from 'lucide-react';
 
 interface SubscriptionModalProps {
   open: boolean;
@@ -148,6 +148,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
     { icon: BarChart3, label: 'Continuous yield monitoring' },
     { icon: Zap, label: 'Smart alternatives' },
     { icon: TrendingUp, label: 'Track income improvements' },
+    { icon: Lock, label: 'See full ticker names and share counts in every alternative strategy going forward' },
     { icon: Bell, label: 'New opportunities as markets change' },
     { icon: Shield, label: 'Cancel anytime' },
   ];

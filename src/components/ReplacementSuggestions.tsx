@@ -347,7 +347,7 @@ export function ReplacementSuggestions({
                 <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-primary" />
                 <span className="text-[13px] leading-snug text-foreground/90">
                   <span className="font-semibold">Preview mode</span>{' '}
-                  — Subscribe to reveal the stock names and share counts used in each modeled alternative.
+                  — Subscribing unlocks the full comparison, and stock names and modeled share counts will stay visible on future visits too.
                 </span>
               </button>
             )}
