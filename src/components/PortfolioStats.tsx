@@ -117,6 +117,9 @@ export function PortfolioStats({ stocks, sharesMap = {}, targetYield, underperfo
       <DisclosureNotice>
         Dividends are not guaranteed. Estimates are based on company-reported financial information and published dividend statements available at the time of analysis. Actual results may differ.
       </DisclosureNotice>
+      <DisclosureNotice>
+        The dividend yields shown are the current calculated yields used in this analysis. Prices, dividends, and yields can change, so modeled results may differ from future results.
+      </DisclosureNotice>
     </div>
   );
 }
