@@ -104,7 +104,7 @@ export function Header({ onGuestReset }: HeaderProps) {
                   title="Subscribe to unlock alternatives"
                 >
                   <Save className="w-4 h-4" />
-                  Subscribe — $29.95/mo
+                  Subscribe
                 </Button>
               )}
               {user && (
