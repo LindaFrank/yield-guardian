@@ -209,14 +209,14 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                 <Checkbox id="sub-terms" checked={agreeTerms} onCheckedChange={(v) => setAgreeTerms(v === true)} className="mt-0.5" />
                 <Label htmlFor="sub-terms" className="text-sm font-normal leading-snug">
                   I agree to the{' '}
-                  <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline">Terms &amp; Conditions</a>.
+                  <a href="/terms" className="text-primary underline">Terms &amp; Conditions</a>.
                 </Label>
               </div>
               <div className="flex items-start gap-3">
                 <Checkbox id="sub-privacy" checked={agreePrivacy} onCheckedChange={(v) => setAgreePrivacy(v === true)} className="mt-0.5" />
                 <Label htmlFor="sub-privacy" className="text-sm font-normal leading-snug">
                   I acknowledge the{' '}
-                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">Privacy Policy</a>.
+                  <a href="/privacy" className="text-primary underline">Privacy Policy</a>.
                 </Label>
               </div>
             </div>
