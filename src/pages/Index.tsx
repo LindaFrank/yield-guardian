@@ -40,11 +40,11 @@ import qsg6 from '@/assets/quick-start-create-v2-6.jpg.asset.json';
 import qsg7 from '@/assets/quick-start-create-v2-7.jpg.asset.json';
 import qsg8 from '@/assets/quick-start-create-v2-8.jpg.asset.json';
 
-import quickStartImportPdf from '@/assets/YG_Quick_Start_Existing_Portfolio.pdf.asset.json';
+import quickStartImportPdf from '@/assets/YG_Quick_Start_Import_Your_Own_Portfolio.pdf.asset.json';
 import qsi1 from '@/assets/quick-start-import-1.jpg.asset.json';
 import qsi2 from '@/assets/quick-start-import-2.jpg.asset.json';
-import qsi3 from '@/assets/quick-start-import-3.jpg.asset.json';
-import qsi4 from '@/assets/quick-start-import-4.jpg.asset.json';
+import qsi3 from '@/assets/quick-start-import-3-replacement.png.asset.json';
+import qsi4 from '@/assets/quick-start-import-4-new.png.asset.json';
 import qsi5 from '@/assets/quick-start-import-5.jpg.asset.json';
 import qsi6 from '@/assets/quick-start-import-6.jpg.asset.json';
 import qsi7 from '@/assets/quick-start-import-7.jpg.asset.json';
@@ -562,6 +562,7 @@ const Index = () => {
             <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start Guide</DialogTitle>
             <a
               href={quickStartPdf.url}
+              download
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0 mr-8"
@@ -597,6 +598,7 @@ const Index = () => {
             <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start — Import Your Own Portfolio</DialogTitle>
             <a
               href={quickStartImportPdf.url}
+              download
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0 mr-8"
