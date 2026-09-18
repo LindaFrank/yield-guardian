@@ -148,7 +148,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
     { icon: BarChart3, label: 'Continuous yield monitoring' },
     { icon: Zap, label: 'Smart alternatives' },
     { icon: TrendingUp, label: 'Track income improvements' },
-    { icon: Lock, label: 'See full ticker names and share counts in every alternative strategy going forward' },
+    { icon: Lock, label: 'Unmask stock names and share counts in Guest Analysis Mode — saved for future visits' },
     { icon: Bell, label: 'New opportunities as markets change' },
     { icon: Shield, label: 'Cancel anytime' },
   ];
