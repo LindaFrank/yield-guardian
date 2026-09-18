@@ -98,13 +98,13 @@ export function Header({ onGuestReset }: HeaderProps) {
                   size="sm"
                   className="gap-1.5 bg-[#147a8a] hover:bg-[#1a8fa3] text-white border-2 border-amber-600 font-semibold"
                   onClick={() => {
-                    trackEvent('subscribe_header_click', { category: 'conversion', userId: user.id });
+                    trackEvent('save_portfolio_header_click', { category: 'conversion', userId: user.id });
                     window.dispatchEvent(new CustomEvent('yg:open-subscription'));
                   }}
-                  title="Subscribe to unlock alternatives"
+                  title="Save your portfolio and unlock the full analysis"
                 >
                   <Save className="w-4 h-4" />
-                  Subscribe
+                  Save my portfolio
                 </Button>
               )}
               {user && (
