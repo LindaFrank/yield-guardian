@@ -1,7 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Target } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Plus, Minus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface YieldTargetSliderProps {
   value: number;
@@ -13,11 +13,24 @@ const MAX = 10;
 const STEP = 0.5;
 
 export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
-  const decrease = () => onChange(Math.max(MIN, Number((value - STEP).toFixed(1))));
-  const increase = () => onChange(Math.min(MAX, Number((value + STEP).toFixed(1))));
+  const [inputValue, setInputValue] = useState(value.toFixed(1));
 
-  const keepStepperClick = (event: React.PointerEvent<HTMLDivElement>) => {
-    event.stopPropagation();
+  useEffect(() => {
+    setInputValue(value.toFixed(1));
+  }, [value]);
+
+  const commitInput = (rawValue: string) => {
+    const parsedValue = Number(rawValue);
+    if (!Number.isFinite(parsedValue)) {
+      setInputValue(value.toFixed(1));
+      return;
+    }
+
+    const clampedValue = Math.min(MAX, Math.max(MIN, parsedValue));
+    const steppedValue = Math.round(clampedValue / STEP) * STEP;
+    const nextValue = Number(steppedValue.toFixed(1));
+    setInputValue(nextValue.toFixed(1));
+    onChange(nextValue);
   };
 
   return (
@@ -42,35 +55,29 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
       <div className="relative z-20 flex justify-between mt-4 text-[15px] text-muted-foreground">
         <span>1%</span>
         <div className="flex items-center gap-2">
-          <div
-            className="inline-flex items-center rounded-lg border-[3px] border-primary overflow-hidden"
-            onPointerDown={keepStepperClick}
-          >
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={decrease}
-              disabled={value <= MIN}
-              aria-label="Decrease desired yield"
-              className="h-7 w-7 rounded-none bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary disabled:opacity-30"
-            >
-              <Minus className="w-4 h-4" />
-            </Button>
-            <div className="w-[2px] h-5 bg-primary/30" />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={increase}
-              disabled={value >= MAX}
-              aria-label="Increase desired yield"
-              className="h-7 w-7 rounded-none bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary disabled:opacity-30"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
           <span>10%</span>
+          <div className="flex items-center gap-1 rounded-lg border-[3px] border-primary bg-primary/10 px-1.5">
+            <Input
+              type="number"
+              min={MIN}
+              max={MAX}
+              step={STEP}
+              inputMode="decimal"
+              value={inputValue}
+              onChange={(event) => {
+                const nextInput = event.target.value;
+                setInputValue(nextInput);
+                if (nextInput !== '') commitInput(nextInput);
+              }}
+              onBlur={() => commitInput(inputValue)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') event.currentTarget.blur();
+              }}
+              aria-label="Desired dividend yield percentage"
+              className="h-8 w-[4.75rem] border-0 bg-transparent px-1 text-center font-mono font-semibold text-primary shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+            <span className="font-semibold text-primary">%</span>
+          </div>
         </div>
       </div>
     </div>
