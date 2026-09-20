@@ -10,7 +10,7 @@ interface YieldTargetSliderProps {
 
 const MIN = 1;
 const MAX = 10;
-const STEP = 0.5;
+const STEP = 1;
 
 export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
   const decrease = () => onChange(Math.max(MIN, Number((value - STEP).toFixed(1))));
