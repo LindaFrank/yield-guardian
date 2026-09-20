@@ -1,4 +1,6 @@
 import { Header } from '@/components/Header';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 export default function PrivacyPolicy() {
   return (
@@ -6,8 +8,17 @@ export default function PrivacyPolicy() {
       <Header />
 
       <main className="container mx-auto px-6 py-8 max-w-2xl prose prose-invert prose-sm">
-        <h1 className="text-2xl font-semibold mb-2 not-prose">Privacy Policy</h1>
-        <p className="text-muted-foreground text-sm not-prose mb-6">Last updated: March 17, 2026</p>
+        <div className="not-prose flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold mb-2">Privacy Policy</h1>
+            <p className="text-muted-foreground text-sm">Last updated: March 17, 2026</p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <a href="/Yield_Guardian_Terms_Privacy_Disclosures.pdf" download>
+              <Download className="mr-2 h-4 w-4" />Download PDF
+            </a>
+          </Button>
+        </div>
 
         <h2 className="text-foreground text-lg font-semibold mt-6">1. Information We Collect</h2>
         <p className="text-muted-foreground">
