@@ -70,7 +70,7 @@ export const DemoFeedbackModal = forwardRef<HTMLDivElement, DemoFeedbackModalPro
 
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent ref={ref} className="max-w-lg border-2 border-border/60" closeLabel="Back">
+        <DialogContent ref={ref} className="max-w-lg border-2 border-gray-500" closeLabel="Back">
           <DialogHeader>
             <DialogTitle>Feedback on the free demo</DialogTitle>
             <DialogDescription>
