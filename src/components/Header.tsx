@@ -101,7 +101,7 @@ export function Header({ onGuestReset }: HeaderProps) {
                   size="sm"
                   onClick={handleBack}
                   title="Go back"
-                  className="mt-1 min-w-[97px] text-[#0b4f5c] hover:text-[#0d5c6b] hover:bg-[#0b4f5c]/10 gap-1.5"
+                  className="mt-1 min-w-[97px] text-[#0d7a6a] hover:text-[#0b6a5c] hover:bg-[#0d7a6a]/10 gap-1.5"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span className="hidden sm:inline">Back</span>
