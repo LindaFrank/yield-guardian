@@ -113,6 +113,7 @@ export const DemoFeedbackModal = forwardRef<HTMLDivElement, DemoFeedbackModalPro
                 rows={6}
                 placeholder="What did you think of the free demo?"
                 required
+                className="border-gray-500"
               />
               <p className="text-xs text-muted-foreground text-right">{comment.length}/5000</p>
             </div>
