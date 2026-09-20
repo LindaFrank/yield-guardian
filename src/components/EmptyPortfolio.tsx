@@ -210,7 +210,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
 
       {/* Step 2: Checkbox multi-select */}
       {step === 2 && (
-        <div ref={step2Ref} className="space-y-6 py-4">
+        <div ref={step2Ref} className="scroll-mt-64 space-y-6 py-4">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-1">
               <TrendingUp className="w-6 h-6" />
