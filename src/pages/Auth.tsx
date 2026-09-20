@@ -278,6 +278,11 @@ export default function Auth() {
                         )}
                       </div>
                       <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} placeholder={mode === 'signup' ? 'At least 8 characters' : ''} className="border-2 border-muted-foreground/70 bg-card/50" />
+                      {mode === 'signup' && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          At least 8 characters. Common or previously leaked passwords are not accepted — please choose something unique.
+                        </p>
+                      )}
                     </div>
                   )}
                   {mode === 'signup' && inviteRequired && (
