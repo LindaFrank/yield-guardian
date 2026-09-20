@@ -70,7 +70,7 @@ export const DemoFeedbackModal = forwardRef<HTMLDivElement, DemoFeedbackModalPro
 
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent ref={ref} className="max-w-lg border-2 border-border/60">
+        <DialogContent ref={ref} className="max-w-lg border-2 border-gray-500" closeLabel="Back">
           <DialogHeader>
             <DialogTitle>Feedback on the free demo</DialogTitle>
             <DialogDescription>
@@ -87,6 +87,7 @@ export const DemoFeedbackModal = forwardRef<HTMLDivElement, DemoFeedbackModalPro
                   onChange={(e) => setName(e.target.value)}
                   maxLength={200}
                   placeholder="Your name"
+                  className="border-gray-500"
                 />
               </div>
               <div className="space-y-2">
@@ -98,6 +99,7 @@ export const DemoFeedbackModal = forwardRef<HTMLDivElement, DemoFeedbackModalPro
                   onChange={(e) => setEmail(e.target.value)}
                   maxLength={320}
                   placeholder="you@example.com"
+                  className="border-gray-500"
                 />
               </div>
             </div>
@@ -111,6 +113,7 @@ export const DemoFeedbackModal = forwardRef<HTMLDivElement, DemoFeedbackModalPro
                 rows={6}
                 placeholder="What did you think of the free demo?"
                 required
+                className="border-gray-500"
               />
               <p className="text-xs text-muted-foreground text-right">{comment.length}/5000</p>
             </div>

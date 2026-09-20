@@ -9,7 +9,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { StripeEmbeddedCheckout } from './StripeEmbeddedCheckout';
 import { PaymentTestModeBanner } from './PaymentTestModeBanner';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
-import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell } from 'lucide-react';
+import { TermsAgreementCheckbox } from '@/components/TermsAgreementCheckbox';
+import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell, ArrowLeft } from 'lucide-react';
 
 interface SubscriptionModalProps {
   open: boolean;
@@ -61,6 +62,8 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
   const { toast } = useToast();
@@ -73,6 +76,8 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
     setEmail('');
     setPassword('');
     setInviteCode('');
+    setTermsAccepted(false);
+    setPrivacyAccepted(false);
     setLoading(false);
     setUserId(undefined);
   };
@@ -92,6 +97,11 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
       if (authMode === 'signup') {
         if (password.length < 8) {
           toast({ title: 'Password too short', description: 'Use at least 8 characters.', variant: 'destructive' });
+          setLoading(false);
+          return;
+        }
+        if (!termsAccepted || !privacyAccepted) {
+          toast({ title: 'Agreement required', description: 'Please check both boxes to agree to the Terms & Conditions and acknowledge the Privacy Policy before creating your account.', variant: 'destructive' });
           setLoading(false);
           return;
         }
@@ -147,8 +157,21 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto" hideClose>
         <PaymentTestModeBanner />
+        {step === 'pricing' && (
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleClose(false)}
+              className="w-fit gap-1.5 font-semibold bg-[#0a0a0a] border-gray-500 text-[#2dd4bf] hover:bg-[#141414] hover:border-gray-400 hover:text-[#14b8a6]"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+          </div>
+        )}
         <DialogHeader>
           <div className="flex flex-col items-center gap-2 pb-2">
             <div className="p-2 rounded-lg bg-primary/10">
@@ -233,6 +256,16 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                   <Label htmlFor="sub-invite">Invite code</Label>
                   <Input id="sub-invite" type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} required={authMode === 'signup'} maxLength={100} placeholder="Enter your invite code" />
                 </div>
+              )}
+              {authMode === 'signup' && (
+                <TermsAgreementCheckbox
+                  termsChecked={termsAccepted}
+                  privacyChecked={privacyAccepted}
+                  onTermsChange={setTermsAccepted}
+                  onPrivacyChange={setPrivacyAccepted}
+                  termsId="sub-terms"
+                  privacyId="sub-privacy"
+                />
               )}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (authMode === 'signup' ? 'Create account & continue' : 'Sign in & continue')}

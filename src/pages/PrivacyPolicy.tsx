@@ -1,4 +1,6 @@
 import { Header } from '@/components/Header';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 export default function PrivacyPolicy() {
   return (
@@ -6,8 +8,17 @@ export default function PrivacyPolicy() {
       <Header />
 
       <main className="container mx-auto px-6 py-8 max-w-2xl prose prose-invert prose-sm">
-        <h1 className="text-2xl font-semibold mb-2 not-prose">Privacy Policy</h1>
-        <p className="text-muted-foreground text-sm not-prose mb-6">Last updated: March 17, 2026</p>
+        <div className="not-prose flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold mb-2">Privacy Policy</h1>
+            <p className="text-muted-foreground text-sm">Last updated: March 17, 2026</p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <a href="/Yield_Guardian_Terms_Privacy_Disclosures.pdf" download>
+              <Download className="mr-2 h-4 w-4" />Download PDF
+            </a>
+          </Button>
+        </div>
 
         <h2 className="text-foreground text-lg font-semibold mt-6">1. Information We Collect</h2>
         <p className="text-muted-foreground">
@@ -20,7 +31,6 @@ export default function PrivacyPolicy() {
         </p>
         <ul className="text-muted-foreground list-disc pl-5 space-y-1">
           <li>Displaying your portfolio and yield analysis</li>
-          <li>Sending you email updates and stock tips if you opt in</li>
           <li>Personalizing your experience</li>
           <li>Improving our features and functionality</li>
         </ul>
@@ -37,12 +47,15 @@ export default function PrivacyPolicy() {
 
         <h2 className="text-foreground text-lg font-semibold mt-6">5. Data Security</h2>
         <p className="text-muted-foreground">
-          We take reasonable measures to protect your personal information from unauthorized access, alteration, or destruction. However, no method of electronic transmission or storage is 100% secure.
+          We take reasonable measures to protect your personal information from unauthorized access, alteration, or destruction. Understanding, no method of electronic transmission or storage is 100% secure.
         </p>
 
         <h2 className="text-foreground text-lg font-semibold mt-6">6. Your Rights</h2>
         <p className="text-muted-foreground">
-          You may update or delete your personal information at any time through your profile settings. You can also opt out of communications by unchecking the relevant preferences on your profile page.
+          You may update or delete your personal information at any time through your profile settings.
+        </p>
+        <p className="text-muted-foreground">
+          You can also opt out of communications by unchecking the relevant preferences on your profile page.
         </p>
 
         <h2 className="text-foreground text-lg font-semibold mt-6">7. Changes to This Policy</h2>
@@ -54,8 +67,13 @@ export default function PrivacyPolicy() {
         <p className="text-muted-foreground">
           If you have any questions about this privacy policy or feedback about the app, please{' '}
           <a href="/contact" className="text-primary hover:underline">contact us</a> or email us at{' '}
-          <a href="mailto:lindafrank@aol.com" className="text-primary hover:underline">lindafrank@aol.com</a>.
+          <a href="mailto:linda@guardianyield.com" className="text-primary hover:underline">linda@guardianyield.com</a>.
         </p>
+
+        <footer className="not-prose mt-10 space-y-2 border-t border-border pt-6 text-center text-xs text-muted-foreground">
+          <p>© 2026 Linda L. Franklin, Mindi Briese, Annanesia Rankin and Michelle Evans. All Rights Reserved.</p>
+          <p>Yield Guardian is a portfolio analysis tool, not a registered investment advisor. All information is for educational purposes only and should not be considered personalized financial, investment, tax, or legal advice.</p>
+        </footer>
       </main>
     </div>
   );

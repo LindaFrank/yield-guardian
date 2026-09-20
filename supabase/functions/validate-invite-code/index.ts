@@ -12,7 +12,8 @@ Deno.serve(async (req) => {
     new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   try {
-    const { code } = await req.json().catch(() => ({}));
+    const body = await req.json().catch(() => ({}));
+    const { code, consume } = body as { code?: unknown; consume?: unknown };
     if (!code || typeof code !== "string") return json({ valid: false, error: "Missing code" }, 400);
 
     const admin = createClient(
@@ -20,7 +21,10 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { data, error } = await admin.rpc("consume_invite_code", { _code: code.trim() });
+    // Default is a non-destructive check. The code is only spent when
+    // the caller explicitly asks for it (after a successful sign-up).
+    const fn = consume === true ? "consume_invite_code" : "check_invite_code";
+    const { data, error } = await admin.rpc(fn, { _code: code.trim() });
     if (error) return json({ valid: false, error: error.message }, 500);
     return json({ valid: !!data });
   } catch (e) {

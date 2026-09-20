@@ -94,7 +94,7 @@ export function GuestAnalysisAlert({ onReset }: GuestAnalysisAlertProps) {
                 }}
               >
                 <RotateCcw className="w-4 h-4" />
-                Reset
+                Reset Portfolio
               </Button>
             </div>
           </div>

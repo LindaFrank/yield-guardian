@@ -14,6 +14,21 @@ import { checkDividendStability } from '@/lib/portfolioUtils';
 import { cn } from '@/lib/utils';
 
 
+function useScrollToOnValue<T extends HTMLElement>(value: unknown) {
+  const ref = useRef<T>(null);
+  const prevValueRef = useRef(value);
+  useEffect(() => {
+    if (value !== prevValueRef.current) {
+      prevValueRef.current = value;
+      setTimeout(() => {
+        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 0);
+    }
+  }, [value]);
+  return ref;
+}
+
+
 interface EmptyPortfolioProps {
   onSelectStocks: () => void;
   onSetYield: () => void;
@@ -40,6 +55,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const step2Ref = useScrollToOnValue<HTMLDivElement>(step === 2 ? 'step2' : '');
 
   const catalogTickers = useMemo(() => marketStocks.map((s) => s.ticker), []);
   const { data: liveStocks, isLoading: livePricesLoading } = useStockQuotes(catalogTickers);
@@ -127,7 +143,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             Let's build your dividend portfolio. We'll start by setting your desired yield target, then find stocks that match.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button onClick={() => setStep(1)} size="lg" className="gap-2">
+            <Button onClick={() => setStep(1)} size="lg" className="gap-2" autoFocus>
               <Target className="w-5 h-5" />
               Desired Dividend Yield
             </Button>
@@ -194,7 +210,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
 
       {/* Step 2: Checkbox multi-select */}
       {step === 2 && (
-        <div className="space-y-6 py-4">
+        <div ref={step2Ref} className="scroll-mt-64 space-y-6 py-4 px-4 sm:px-6 rounded-xl border-[4px] border-gray-500 bg-background">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-1">
               <TrendingUp className="w-6 h-6" />

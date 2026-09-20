@@ -11,11 +11,12 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Admin from "./pages/Admin";
+import AdminInbox from "./pages/AdminInbox";
 import Profile from "./pages/Profile";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
-import Unsubscribe from "./pages/Unsubscribe";
 import DownloadReport from "./pages/DownloadReport";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 
@@ -46,10 +47,11 @@ const AppRoutes = () => {
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
 
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+        <Route path="/admin/inbox" element={<ProtectedRoute><AdminInbox /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/unsubscribe" element={<Unsubscribe />} />
         <Route path="/download-report" element={<DownloadReport />} />
 
         <Route path="*" element={<NotFound />} />

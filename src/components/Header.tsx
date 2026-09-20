@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TrendingUp, User, ShieldCheck, Save, ArrowLeft, LogOut } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
@@ -29,7 +29,6 @@ export function Header({ onGuestReset }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
-  const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const showBackButton = true;
@@ -54,6 +53,16 @@ export function Header({ onGuestReset }: HeaderProps) {
   const confirmSignOut = async () => {
     setShowLogoutDialog(false);
     await signOut();
+  };
+
+  const handleBack = async () => {
+    const historyIndex = window.history.state?.idx;
+    if (typeof historyIndex === 'number' && historyIndex > 0) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(user ? '/' : '/auth');
   };
 
   return (
@@ -83,9 +92,9 @@ export function Header({ onGuestReset }: HeaderProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => navigate(-1)}
+                  onClick={handleBack}
                   title="Go back"
-                  className="mt-1 min-w-[92px] text-[#0f6f35] hover:text-[#147a3a] hover:bg-[#0f6f35]/10 gap-1.5"
+                  className="mt-1 min-w-[97px] text-[#2dd4bf] hover:text-[#14b8a6] hover:bg-[#2dd4bf]/10 gap-1.5"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span className="hidden sm:inline">Back</span>
@@ -134,7 +143,7 @@ export function Header({ onGuestReset }: HeaderProps) {
                 size="sm"
                 onClick={() => navigate('/auth')}
                 title="Go back"
-                className="bg-[#0a0a0a] border-gray-500 text-[#147a8a] hover:bg-[#141414] hover:border-gray-400 hover:text-[#1a8fa3] gap-1.5 font-semibold"
+                className="bg-[#0a0a0a] border-gray-500 text-[#2dd4bf] hover:bg-[#141414] hover:border-gray-400 hover:text-[#14b8a6] gap-1.5 font-semibold"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="hidden sm:inline">Back</span>

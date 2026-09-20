@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Target, FileDown, TrendingDown, Sparkles, Search, Loader2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles, Search, Loader2 } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -75,6 +75,7 @@ const Index = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
   const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
   const addTicker = useAddTicker();
   const removeTicker = useRemoveTicker();
@@ -126,7 +127,6 @@ const Index = () => {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [replacementDialogOpen, setReplacementDialogOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
-  const [actionBarCollapsed, setActionBarCollapsed] = useState(false);
   const [actionBarScrolled, setActionBarScrolled] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -584,7 +584,7 @@ const Index = () => {
                   loading={i === 0 ? 'eager' : 'lazy'}
                   width={850}
                   height={1100}
-                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-white object-contain"
+                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-card object-contain"
                 />
               ))}
             </div>
@@ -619,7 +619,7 @@ const Index = () => {
                   loading={i === 0 ? 'eager' : 'lazy'}
                   width={850}
                   height={1100}
-                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-white object-contain"
+                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-card object-contain"
                 />
               ))}
             </div>
@@ -648,31 +648,21 @@ const Index = () => {
               <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
                 What Do You Want To Do?
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                onClick={() => setActionBarCollapsed((v) => !v)}
-                aria-label={actionBarCollapsed ? 'Expand action menu' : 'Collapse action menu'}
-              >
-                {actionBarCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-              </Button>
             </div>
             <div
-              className={`flex items-center gap-2 flex-wrap overflow-hidden transition-all duration-500 [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5 ${
-                actionBarCollapsed ? 'max-h-0 opacity-0 pointer-events-none pt-0' : 'max-h-[500px] opacity-100 pt-2'
-              }`}
+              className="flex items-center gap-2 flex-wrap overflow-hidden transition-all duration-500 [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5 max-h-[500px] opacity-100 pt-2"
             >
               <Button
-                variant="outline"
-                className="gap-1.5 border-[3px] border-muted-foreground/50"
+                autoFocus
+                className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
                 onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
               >
                 <Target className="w-3.5 h-3.5" />
                 Desired Dividend Yield
               </Button>
               <Button
-                className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
+                variant="outline"
+                className="gap-1.5 border-[3px] border-muted-foreground/50"
                 onClick={() => {
                   setSelectedUnderperformer(null);
                   setReplacementDialogOpen(true);
@@ -939,7 +929,7 @@ const Index = () => {
 
           {/* Alternative Suggestions Dialog */}
           <Dialog open={replacementDialogOpen} onOpenChange={setReplacementDialogOpen}>
-            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" closeLabel="Back to Portfolio">
+            <DialogContent className="max-w-lg max-h-[95vh] overflow-y-auto border-[4px] border-gray-500 pb-8" closeLabel="Back to Portfolio">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
