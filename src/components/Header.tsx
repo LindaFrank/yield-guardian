@@ -57,12 +57,6 @@ export function Header({ onGuestReset }: HeaderProps) {
   };
 
   const handleBack = async () => {
-    if (user && location.pathname === '/') {
-      await signOut();
-      navigate('/auth', { replace: true });
-      return;
-    }
-
     const historyIndex = window.history.state?.idx;
     if (typeof historyIndex === 'number' && historyIndex > 0) {
       navigate(-1);
