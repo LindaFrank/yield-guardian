@@ -10,7 +10,7 @@ import { StripeEmbeddedCheckout } from './StripeEmbeddedCheckout';
 import { PaymentTestModeBanner } from './PaymentTestModeBanner';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
 import { TermsAgreementCheckbox } from '@/components/TermsAgreementCheckbox';
-import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell } from 'lucide-react';
+import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell, ArrowLeft } from 'lucide-react';
 
 interface SubscriptionModalProps {
   open: boolean;
@@ -159,6 +159,17 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <PaymentTestModeBanner />
+        {step === 'pricing' && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleClose(false)}
+            className="w-fit gap-1.5 font-semibold bg-[#0a0a0a] border-gray-500 text-[#2dd4bf] hover:bg-[#141414] hover:border-gray-400 hover:text-[#14b8a6]"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+        )}
         <DialogHeader>
           <div className="flex flex-col items-center gap-2 pb-2">
             <div className="p-2 rounded-lg bg-primary/10">
