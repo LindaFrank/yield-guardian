@@ -99,6 +99,7 @@ export const DemoFeedbackModal = forwardRef<HTMLDivElement, DemoFeedbackModalPro
                   onChange={(e) => setEmail(e.target.value)}
                   maxLength={320}
                   placeholder="you@example.com"
+                  className="border-gray-500"
                 />
               </div>
             </div>
