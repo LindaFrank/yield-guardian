@@ -145,7 +145,7 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
           Import Stocks from Another Portfolio
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg border-[3px] border-muted-foreground/60">
+      <DialogContent closeLabel="Back" className="sm:max-w-lg border-[3px] border-muted-foreground/60">
         <DialogHeader>
           <DialogTitle>
             {phase === 'upload' ? 'Import Stocks from File' : `Import Preview — ${fileName}`}
