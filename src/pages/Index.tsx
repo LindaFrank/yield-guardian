@@ -583,7 +583,7 @@ const Index = () => {
                   loading={i === 0 ? 'eager' : 'lazy'}
                   width={850}
                   height={1100}
-                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-white object-contain"
+                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-card object-contain"
                 />
               ))}
             </div>
@@ -618,7 +618,7 @@ const Index = () => {
                   loading={i === 0 ? 'eager' : 'lazy'}
                   width={850}
                   height={1100}
-                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-white object-contain"
+                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-card object-contain"
                 />
               ))}
             </div>
