@@ -10,7 +10,7 @@ import { StripeEmbeddedCheckout } from './StripeEmbeddedCheckout';
 import { PaymentTestModeBanner } from './PaymentTestModeBanner';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
 import { TermsAgreementCheckbox } from '@/components/TermsAgreementCheckbox';
-import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell } from 'lucide-react';
+import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell, ArrowLeft } from 'lucide-react';
 
 interface SubscriptionModalProps {
   open: boolean;
