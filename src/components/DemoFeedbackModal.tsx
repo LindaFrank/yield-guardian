@@ -87,6 +87,7 @@ export const DemoFeedbackModal = forwardRef<HTMLDivElement, DemoFeedbackModalPro
                   onChange={(e) => setName(e.target.value)}
                   maxLength={200}
                   placeholder="Your name"
+                  className="border-gray-500"
                 />
               </div>
               <div className="space-y-2">
