@@ -94,7 +94,7 @@ export function Header({ onGuestReset }: HeaderProps) {
                   size="sm"
                   onClick={handleBack}
                   title="Go back"
-                  className="mt-1 min-w-[97px] text-[#0a6659] hover:text-[#085749] hover:bg-[#0a6659]/10 gap-1.5"
+                  className="mt-1 min-w-[97px] text-[#07433a] hover:text-[#052f2a] hover:bg-[#07433a]/10 gap-1.5"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span className="hidden sm:inline">Back</span>
@@ -143,7 +143,7 @@ export function Header({ onGuestReset }: HeaderProps) {
                 size="sm"
                 onClick={() => navigate('/auth')}
                 title="Go back"
-                className="bg-[#0a0a0a] border-gray-500 text-[#0a6659] hover:bg-[#141414] hover:border-gray-400 hover:text-[#085749] gap-1.5 font-semibold"
+                className="bg-[#0a0a0a] border-gray-500 text-[#07433a] hover:bg-[#141414] hover:border-gray-400 hover:text-[#052f2a] gap-1.5 font-semibold"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="hidden sm:inline">Back</span>
