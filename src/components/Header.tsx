@@ -29,7 +29,6 @@ export function Header({ onGuestReset }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
-  const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const showBackButton = true;
