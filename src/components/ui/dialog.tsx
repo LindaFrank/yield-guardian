@@ -44,13 +44,14 @@ const DialogContent = React.forwardRef<
       {children}
       <DialogPrimitive.Close
         className={cn(
-          "absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full border-2 border-primary/50 bg-primary/10 text-primary opacity-90 ring-offset-background transition-all hover:opacity-100 hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none",
-          closeLabel ? "px-3 py-1.5 text-sm font-semibold" : "p-1.5",
+          "absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-md border-2 border-gray-500 bg-[#0a0a0a] text-[#2dd4bf] opacity-90 ring-offset-background transition-all hover:border-gray-400 hover:bg-[#141414] hover:text-[#14b8a6] hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none",
+          closeLabel ? "px-2.5 py-1.5 text-sm font-semibold" : "p-1.5",
         )}
       >
         <ArrowLeft className="h-4 w-4" />
         {closeLabel ? <span>{closeLabel}</span> : <span className="sr-only">Go back</span>}
       </DialogPrimitive.Close>
+
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
