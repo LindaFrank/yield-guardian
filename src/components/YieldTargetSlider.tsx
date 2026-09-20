@@ -53,39 +53,37 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
         step={STEP}
         className="w-full"
       />
-      <div className="relative z-20 flex justify-between mt-4 text-[15px] text-muted-foreground">
+      <div className="relative z-20 flex justify-between items-center mt-4 text-[15px] text-muted-foreground">
         <span>1%</span>
         <div className="flex items-center gap-2">
-          <span>10%</span>
-          <div className="flex items-center gap-1 rounded-lg border-[3px] border-primary bg-primary/10 px-1.5">
-            <Input
-              type="number"
-              min={MIN}
-              max={MAX}
-              step={STEP}
-              inputMode="decimal"
-              value={inputValue}
-              onChange={(event) => {
-                const nextInput = event.target.value;
-                setInputValue(nextInput);
-                const parsedValue = Number(nextInput);
-                if (nextInput !== '' && Number.isFinite(parsedValue) && parsedValue >= MIN && parsedValue <= MAX) {
-                  onChange(parsedValue);
-                }
-              }}
-              onFocus={() => { isEditingRef.current = true; }}
-              onBlur={() => {
-                isEditingRef.current = false;
-                commitInput(inputValue);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') event.currentTarget.blur();
-              }}
-              aria-label="Desired dividend yield percentage"
-              className="h-8 w-[4.75rem] border-0 bg-transparent px-1 text-center font-mono font-semibold text-primary shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-            <span className="font-semibold text-primary">%</span>
-          </div>
+          <Input
+            type="number"
+            min={MIN}
+            max={MAX}
+            step={STEP}
+            inputMode="decimal"
+            value={inputValue}
+            onChange={(event) => {
+              const nextInput = event.target.value;
+              setInputValue(nextInput);
+              const parsedValue = Number(nextInput);
+              if (nextInput !== '' && Number.isFinite(parsedValue) && parsedValue >= MIN && parsedValue <= MAX) {
+                const steppedValue = Math.round(parsedValue / STEP) * STEP;
+                onChange(Number(steppedValue.toFixed(1)));
+              }
+            }}
+            onFocus={() => { isEditingRef.current = true; }}
+            onBlur={() => {
+              isEditingRef.current = false;
+              commitInput(inputValue);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') event.currentTarget.blur();
+            }}
+            aria-label="Desired dividend yield percentage"
+            className="h-8 w-[5.5rem] text-center font-mono font-semibold text-primary text-sm"
+          />
+          <span className="font-semibold text-primary">10%</span>
         </div>
       </div>
     </div>
