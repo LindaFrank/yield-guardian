@@ -656,19 +656,18 @@ const Index = () => {
                 What Do You Want To Do?
               </span>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                onClick={() => setActionBarCollapsed((v) => !v)}
-                aria-label={actionBarCollapsed ? 'Expand action menu' : 'Collapse action menu'}
+                onClick={handleBack}
+                title="Go back"
+                className="bg-[#0a0a0a] border-gray-500 text-[#2dd4bf] hover:bg-[#141414] hover:border-gray-400 hover:text-[#14b8a6] gap-1.5 font-semibold"
               >
-                {actionBarCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Back</span>
               </Button>
             </div>
             <div
-              className={`flex items-center gap-2 flex-wrap overflow-hidden transition-all duration-500 [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5 ${
-                actionBarCollapsed ? 'max-h-0 opacity-0 pointer-events-none pt-0' : 'max-h-[500px] opacity-100 pt-2'
-              }`}
+              className="flex items-center gap-2 flex-wrap overflow-hidden transition-all duration-500 [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5 max-h-[500px] opacity-100 pt-2"
             >
               <Button
                 autoFocus
