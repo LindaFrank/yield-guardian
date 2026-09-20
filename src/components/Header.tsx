@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TrendingUp, User, ShieldCheck, Save, ArrowLeft, LogOut } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
@@ -29,7 +29,6 @@ export function Header({ onGuestReset }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
-  const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const showBackButton = true;
@@ -57,12 +56,6 @@ export function Header({ onGuestReset }: HeaderProps) {
   };
 
   const handleBack = async () => {
-    if (user && location.pathname === '/') {
-      await signOut();
-      navigate('/auth', { replace: true });
-      return;
-    }
-
     const historyIndex = window.history.state?.idx;
     if (typeof historyIndex === 'number' && historyIndex > 0) {
       navigate(-1);
