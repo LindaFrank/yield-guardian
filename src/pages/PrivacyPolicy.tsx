@@ -20,7 +20,6 @@ export default function PrivacyPolicy() {
         </p>
         <ul className="text-muted-foreground list-disc pl-5 space-y-1">
           <li>Displaying your portfolio and yield analysis</li>
-          <li>Sending you email updates and stock tips if you opt in</li>
           <li>Personalizing your experience</li>
           <li>Improving our features and functionality</li>
         </ul>
@@ -37,12 +36,15 @@ export default function PrivacyPolicy() {
 
         <h2 className="text-foreground text-lg font-semibold mt-6">5. Data Security</h2>
         <p className="text-muted-foreground">
-          We take reasonable measures to protect your personal information from unauthorized access, alteration, or destruction. However, no method of electronic transmission or storage is 100% secure.
+          We take reasonable measures to protect your personal information from unauthorized access, alteration, or destruction. Understanding, no method of electronic transmission or storage is 100% secure.
         </p>
 
         <h2 className="text-foreground text-lg font-semibold mt-6">6. Your Rights</h2>
         <p className="text-muted-foreground">
-          You may update or delete your personal information at any time through your profile settings. You can also opt out of communications by unchecking the relevant preferences on your profile page.
+          You may update or delete your personal information at any time through your profile settings.
+        </p>
+        <p className="text-muted-foreground">
+          You can also opt out of communications by unchecking the relevant preferences on your profile page.
         </p>
 
         <h2 className="text-foreground text-lg font-semibold mt-6">7. Changes to This Policy</h2>
@@ -56,6 +58,11 @@ export default function PrivacyPolicy() {
           <a href="/contact" className="text-primary hover:underline">contact us</a> or email us at{' '}
           <a href="mailto:linda@guardianyield.com" className="text-primary hover:underline">linda@guardianyield.com</a>.
         </p>
+
+        <footer className="not-prose mt-10 space-y-2 border-t border-border pt-6 text-center text-xs text-muted-foreground">
+          <p>© 2026 Linda L. Franklin, Mindi Briese, Annanesia Rankin and Michelle Evans. All Rights Reserved.</p>
+          <p>Yield Guardian is a portfolio analysis tool, not a registered investment advisor. All information is for educational purposes only and should not be considered personalized financial, investment, tax, or legal advice.</p>
+        </footer>
       </main>
     </div>
   );

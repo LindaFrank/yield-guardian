@@ -2,21 +2,26 @@ import { ArrowLeft, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
+const acknowledgments = [
+  'I have read and understand these Terms, Privacy & Educational Platform Disclosures.',
+  'Yield Guardian is an educational and informational platform and does not provide individualized investment advice.',
+  'Securities and strategies displayed by Yield Guardian are alternatives for educational and comparative analysis and are not recommendations to buy, sell, or hold securities.',
+  'My Desired Yield is an analytical target and is not guaranteed.',
+  'Dividends, dividend yields, projected dividend income, and investment performance are not guaranteed.',
+  'Yield Guardian may provide educational follow-up information describing the mechanics of an illustrated portfolio change, but does not place, initiate, authorize, transmit, or execute trades on my behalf.',
+  'Yield Guardian may record and track trades or portfolio transactions that I report for recordkeeping, historical analysis, calculations, and reporting; recording a transaction in Yield Guardian does not cause a trade to occur.',
+  'I am responsible for independently deciding whether to make any portfolio change and for executing any transaction through my own brokerage or authorized financial service provider.',
+  'Investing involves risk, including the possible loss of principal.',
+  'I may consult a qualified financial, investment, tax, legal, or other professional before making financial decisions.',
+];
+
 const sections = [
-  {
-    title: '1. Acceptance of Terms and Privacy Policy',
-    paragraphs: [
-      "Before using Yield Guardian's portfolio analysis features, users must affirmatively acknowledge these Terms, Privacy & Educational Platform Disclosures. The acknowledgment should not be pre-selected.",
-      'The application may present a concise acknowledgment such as: I have read and agree to the Yield Guardian Terms & Conditions and acknowledge the Privacy Policy. The Terms & Conditions and Privacy Policy should be separately accessible to the user.',
-      'Yield Guardian should retain the applicable terms version, privacy-policy version, and acceptance date/time. A returning user who has already accepted the current versions need not be asked to accept them again unless the applicable terms or privacy policy materially change.',
-    ],
-  },
   {
     title: '2. Educational and Informational Platform',
     paragraphs: [
       'Yield Guardian is an educational and informational platform designed to help users explore and better understand investment portfolios, dividend income, dividend yield, diversification, portfolio history, and potential portfolio alternatives.',
       'Yield Guardian is not a broker-dealer, investment adviser, financial planner, tax adviser, or trading platform. Information, calculations, analyses, projections, comparisons, securities, strategies, and other content presented by Yield Guardian are provided for educational and informational purposes only and are not individualized investment, financial, legal, or tax advice.',
-      'Nothing presented by Yield Guardian constitutes a recommendation, solicitation, instruction, or offer to buy, sell, hold, or trade any security. Users may choose to consult a qualified financial, investment, tax, legal, or other professional before making financial or investment decisions.',
+      'Nothing presented by Yield Guardian constitutes a recommendation, solicitation, instruction, or offer to buy, sell, hold, or trade any security. Users should choose to consult a qualified financial, investment, tax, legal, or other professional before making financial or investment decisions.',
     ],
   },
   {
@@ -65,8 +70,8 @@ const sections = [
     paragraphs: [
       'Yield Guardian is designed so that portfolio analysis itself does not require personally identifiable information (PII) about the owner of a portfolio. Users should not include unnecessary PII in portfolio information submitted for analysis.',
       'Portfolio analysis does not require information such as a Social Security number, brokerage account number, or home address. Personal information may nevertheless be collected when necessary for account creation, authentication, communication, customer support, security, or payment processing.',
-      'Payment information needed to purchase paid Yield Guardian services may be processed by a third-party payment service provider. The production Privacy Policy should accurately identify the categories of personal information collected, the service providers used, the purposes for processing, retention practices, user rights, and whether Yield Guardian itself receives or stores full payment-card information.',
-      'Yield Guardian may retain portfolio information, user-reported transactions, analysis history, and related data as necessary to provide portfolio tracking, historical analysis, calculations, and reporting. The production Privacy Policy should accurately describe the actual storage, retention, security, deletion, and sharing practices implemented by the application.',
+      "Payment information needed to purchase paid Yield Guardian services may be processed by a third-party payment service provider and will be covered by that third-party payment service provider's privacy policies.",
+      'Yield Guardian may retain portfolio information, user-reported transactions, analysis history, and related data as necessary to provide portfolio tracking, historical analysis, calculations, and reporting. This Privacy Policy may be updated to describe the actual storage, retention, security, deletion, and sharing practices implemented by the application.',
     ],
   },
   {
@@ -101,17 +106,14 @@ const sections = [
   },
 ];
 
-const acknowledgments = [
-  'I have read and understand these Terms, Privacy & Educational Platform Disclosures.',
-  'Yield Guardian is an educational and informational platform and does not provide individualized investment advice.',
-  'Securities and strategies displayed by Yield Guardian are alternatives for educational and comparative analysis and are not recommendations to buy, sell, or hold securities.',
-  'My Desired Yield is an analytical target and is not guaranteed.',
-  'Dividends, dividend yields, projected dividend income, and investment performance are not guaranteed.',
-  'Yield Guardian may provide educational follow-up information describing the mechanics of an illustrated portfolio change, but does not place, initiate, authorize, transmit, or execute trades on my behalf.',
-  'Yield Guardian may record and track trades or portfolio transactions that I report for recordkeeping, historical analysis, calculations, and reporting; recording a transaction in Yield Guardian does not cause a trade to occur.',
-  'I am responsible for independently deciding whether to make any portfolio change and for executing any transaction through my own brokerage or authorized financial service provider.',
-  'Investing involves risk, including the possible loss of principal.',
-  'I may consult a qualified financial, investment, tax, legal, or other professional before making financial decisions.',
+const disclosures = [
+  { label: 'General footer:', text: 'For educational and informational purposes only. Yield Guardian does not provide investment advice or execute trades. Securities shown are alternatives for analysis, not recommendations.' },
+  { label: 'Desired Yield:', text: 'Your Desired Yield is a target, not a guarantee. Market conditions, available securities, dividend changes, and portfolio constraints may prevent the selected yield from being achieved.' },
+  { label: 'Dividend results:', text: 'Dividends are not guaranteed. Estimates are based on company-reported financial information and published dividend statements available at the time of analysis. Actual results may differ.' },
+  { label: 'Alternative Strategy:', text: 'Illustrative analysis only. Alternatives are presented for comparison and are not recommendations to buy, sell, or hold a security. Prices, dividends, yields, and actual results may change.' },
+  { label: 'Transaction / how-to:', text: 'Educational steps only. Yield Guardian may explain how an illustrated portfolio change could be made, but does not recommend, place, transmit, or execute trades. You decide whether to proceed and execute transactions independently through your brokerage.' },
+  { label: 'Trade tracking:', text: 'Yield Guardian records transactions you report for portfolio tracking, history, calculations, and reporting. Recording a transaction in Yield Guardian does not execute or transmit a trade.' },
+  { label: 'Portfolio privacy:', text: 'Yield Guardian does not require personally identifiable information to analyze a portfolio. Please do not include unnecessary personal identifying information in portfolio data submitted for analysis.' },
 ];
 
 export default function Terms() {
@@ -133,12 +135,21 @@ export default function Terms() {
           <header className="space-y-3 text-center">
             <p className="text-sm font-semibold text-primary">Yield Guardian</p>
             <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">Terms, Privacy &amp; Educational Platform Disclosures</h1>
-            <p className="text-xs font-medium uppercase text-muted-foreground">Final Product Draft for Legal Review · September 12, 2026</p>
           </header>
 
-          <aside className="border-l-4 border-primary bg-muted/40 px-4 py-3 text-foreground">
-            <strong>Important:</strong> This document is intended to describe Yield Guardian&apos;s product boundaries, privacy approach, disclosures, and user acknowledgments in clear language. Because Yield Guardian provides financial portfolio analysis, this document and the implemented product flow should be reviewed by qualified legal counsel before production release.
-          </aside>
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold text-foreground">1. Acceptance of Terms and Privacy Policy: User Acknowledgment</h2>
+            <p>By checking the acknowledgment boxes on the sign-up page, I acknowledge that:</p>
+            <ul className="list-disc space-y-2 pl-6">
+              {acknowledgments.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+            <p className="border border-border bg-muted/40 px-4 py-3 font-medium text-foreground">
+              I have read and agree to the Yield Guardian Terms &amp; Conditions and acknowledge the Privacy Policy.
+            </p>
+            <p>
+              Yield Guardian will retain the applicable terms version, privacy-policy version, and acceptance date/time and you will not be asked to accept them again unless the applicable terms or privacy policy materially change.
+            </p>
+          </section>
 
           {sections.map((section) => (
             <section key={section.title} className="space-y-3">
@@ -148,26 +159,16 @@ export default function Terms() {
           ))}
 
           <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-foreground">13. User Acknowledgment</h2>
-            <p>By checking the acknowledgment box and continuing to use Yield Guardian, I acknowledge that:</p>
-            <ul className="list-disc space-y-2 pl-6">
-              {acknowledgments.map((item) => <li key={item}>{item}</li>)}
-            </ul>
-            <p className="border border-border bg-muted/40 px-4 py-3 font-medium text-foreground">
-              I have read and agree to the Yield Guardian Terms &amp; Conditions and acknowledge the Privacy Policy.
-            </p>
+            <h2 className="text-lg font-semibold text-foreground">13. Short In-App Disclosures</h2>
+            {disclosures.map((item) => (
+              <p key={item.label}><strong className="text-foreground">{item.label}</strong> {item.text}</p>
+            ))}
           </section>
 
-          <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-foreground">14. Recommended Short In-App Disclosures</h2>
-            <p><strong className="text-foreground">General footer:</strong> For educational and informational purposes only. Yield Guardian does not provide investment advice or execute trades. Securities shown are alternatives for analysis, not recommendations.</p>
-            <p><strong className="text-foreground">Desired Yield:</strong> Your Desired Yield is a target, not a guarantee. Market conditions, available securities, dividend changes, and portfolio constraints may prevent the selected yield from being achieved.</p>
-            <p><strong className="text-foreground">Dividend results:</strong> Dividends are not guaranteed. Estimates are based on company-reported financial information and published dividend statements available at the time of analysis. Actual results may differ.</p>
-            <p><strong className="text-foreground">Alternative Strategy:</strong> Illustrative analysis only. Alternatives are presented for comparison and are not recommendations to buy, sell, or hold a security. Prices, dividends, yields, and actual results may change.</p>
-            <p><strong className="text-foreground">Transaction / how-to:</strong> Educational steps only. Yield Guardian may explain how an illustrated portfolio change could be made, but does not recommend, place, transmit, or execute trades. You decide whether to proceed and execute transactions independently through your brokerage.</p>
-            <p><strong className="text-foreground">Trade tracking:</strong> Yield Guardian records transactions you report for portfolio tracking, history, calculations, and reporting. Recording a transaction in Yield Guardian does not execute or transmit a trade.</p>
-            <p><strong className="text-foreground">Portfolio privacy:</strong> Yield Guardian does not require personally identifiable information to analyze a portfolio. Please do not include unnecessary personal identifying information in portfolio data submitted for analysis.</p>
-          </section>
+          <footer className="space-y-2 border-t border-border pt-6 text-center text-xs text-muted-foreground">
+            <p>© 2026 Linda L. Franklin, Mindi Briese, Annanesia Rankin and Michelle Evans. All Rights Reserved.</p>
+            <p>Yield Guardian is a portfolio analysis tool, not a registered investment advisor. All information is for educational purposes only and should not be considered personalized financial, investment, tax, or legal advice.</p>
+          </footer>
         </article>
       </div>
     </main>
