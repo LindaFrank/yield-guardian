@@ -14,6 +14,21 @@ import { checkDividendStability } from '@/lib/portfolioUtils';
 import { cn } from '@/lib/utils';
 
 
+function useScrollToOnValue<T extends HTMLElement>(value: unknown) {
+  const ref = useRef<T>(null);
+  const prevValueRef = useRef(value);
+  useEffect(() => {
+    if (value !== prevValueRef.current) {
+      prevValueRef.current = value;
+      setTimeout(() => {
+        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 0);
+    }
+  }, [value]);
+  return ref;
+}
+
+
 interface EmptyPortfolioProps {
   onSelectStocks: () => void;
   onSetYield: () => void;
