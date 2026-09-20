@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Target, FileDown, TrendingDown, Sparkles, Search, Loader2, ArrowLeft } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles, Search, Loader2 } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -75,14 +75,6 @@ const Index = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const handleBack = () => {
-    const historyIndex = window.history.state?.idx;
-    if (typeof historyIndex === 'number' && historyIndex > 0) {
-      navigate(-1);
-    } else {
-      navigate(user ? '/' : '/auth');
-    }
-  };
   const { data: savedTickers, isLoading: tickersLoading } = useUserTickers();
   const addTicker = useAddTicker();
   const removeTicker = useRemoveTicker();
