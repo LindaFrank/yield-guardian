@@ -14,7 +14,7 @@ export function GuestAnalysisAlert({ onReset }: GuestAnalysisAlertProps) {
 
   return (
     <div className="absolute top-[85px] left-4 z-[60] w-64 sm:w-80 max-w-[calc(100%-2rem)] flex flex-col items-center gap-4">
-      <div className="w-full rounded-xl border-[3px] border-primary/60 bg-[hsl(var(--promo)/0.95)] backdrop-blur shadow-glow overflow-hidden">
+      <div className="w-full rounded-xl border-[3px] border-primary/60 bg-card/95 backdrop-blur shadow-glow overflow-hidden">
           <div className="flex items-center justify-between px-3 py-2 gap-2 bg-primary/10 border-b border-primary/20">
             <span className="text-sm font-semibold text-foreground">Guest Analysis Mode</span>
             <Button
