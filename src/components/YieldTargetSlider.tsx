@@ -10,11 +10,15 @@ interface YieldTargetSliderProps {
 
 const MIN = 1;
 const MAX = 10;
-const STEP = 1;
+const STEP = 0.5;
 
 export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
   const decrease = () => onChange(Math.max(MIN, Number((value - STEP).toFixed(1))));
   const increase = () => onChange(Math.min(MAX, Number((value + STEP).toFixed(1))));
+
+  const keepStepperClick = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+  };
 
   return (
     <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-elevated active:scale-[0.97]">
@@ -35,10 +39,13 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
         step={STEP}
         className="w-full"
       />
-      <div className="flex justify-between mt-2 text-[15px] text-muted-foreground">
+      <div className="relative z-20 flex justify-between mt-4 text-[15px] text-muted-foreground">
         <span>1%</span>
-        <div className="relative z-10 flex items-center gap-2">
-          <div className="inline-flex items-center rounded-lg border-[3px] border-primary overflow-hidden">
+        <div className="flex items-center gap-2">
+          <div
+            className="inline-flex items-center rounded-lg border-[3px] border-primary overflow-hidden"
+            onPointerDown={keepStepperClick}
+          >
             <Button
               type="button"
               variant="ghost"
