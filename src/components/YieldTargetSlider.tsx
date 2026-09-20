@@ -37,8 +37,7 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
       />
       <div className="flex justify-between mt-2 text-[15px] text-muted-foreground">
         <span>1%</span>
-        <div className="flex items-center gap-2">
-          <span>10%</span>
+        <div className="relative z-10 flex items-center gap-2">
           <div className="inline-flex items-center rounded-lg border-[3px] border-primary overflow-hidden">
             <Button
               type="button"
