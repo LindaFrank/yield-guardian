@@ -63,6 +63,7 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
               <Plus className="w-4 h-4" />
             </Button>
           </div>
+          <span>10%</span>
         </div>
       </div>
     </div>
