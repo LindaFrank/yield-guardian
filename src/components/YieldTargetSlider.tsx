@@ -63,7 +63,7 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
         <div className="flex items-center gap-2">
           <div className="flex items-center rounded-lg border-[3px] border-primary bg-primary/10 overflow-hidden">
             <Input
-              type="number"
+              type="text"
               min={MIN}
               max={MAX}
               step={STEP}
@@ -87,26 +87,26 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
                 if (event.key === 'Enter') event.currentTarget.blur();
               }}
               aria-label="Desired dividend yield percentage"
-              className="h-8 w-[4.5rem] border-0 bg-transparent px-1 text-center font-mono font-semibold text-primary shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="h-12 w-[4.5rem] border-0 bg-transparent px-1 text-center font-mono font-semibold text-primary shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
-            <div className="flex flex-col border-l border-primary/30">
+            <div className="flex flex-col self-stretch border-l border-primary/30">
               <button
                 type="button"
                 onClick={() => adjust(STEP)}
                 disabled={value >= MAX}
                 aria-label="Increase desired yield"
-                className="flex items-center justify-center h-4 w-6 text-primary hover:bg-primary/20 disabled:opacity-30 disabled:hover:bg-transparent"
+                className="flex flex-1 items-center justify-center w-10 text-primary hover:bg-primary/20 active:bg-primary/30 disabled:opacity-30 disabled:hover:bg-transparent"
               >
-                <ChevronUp className="w-3 h-3" />
+                <ChevronUp className="w-5 h-5" />
               </button>
               <button
                 type="button"
                 onClick={() => adjust(-STEP)}
                 disabled={value <= MIN}
                 aria-label="Decrease desired yield"
-                className="flex items-center justify-center h-4 w-6 text-primary hover:bg-primary/20 disabled:opacity-30 disabled:hover:bg-transparent border-t border-primary/30"
+                className="flex flex-1 items-center justify-center w-10 text-primary hover:bg-primary/20 active:bg-primary/30 disabled:opacity-30 disabled:hover:bg-transparent border-t border-primary/30"
               >
-                <ChevronDown className="w-3 h-3" />
+                <ChevronDown className="w-5 h-5" />
               </button>
             </div>
           </div>
