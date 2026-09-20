@@ -647,16 +647,6 @@ const Index = () => {
               <span className="text-xs font-semibold uppercase tracking-wide text-foreground/90 whitespace-nowrap">
                 What Do You Want To Do?
               </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBack}
-                title="Go back"
-                className="bg-[#0a0a0a] border-gray-500 text-[#2dd4bf] hover:bg-[#141414] hover:border-gray-400 hover:text-[#14b8a6] gap-1.5 font-semibold"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Back</span>
-              </Button>
             </div>
             <div
               className="flex items-center gap-2 flex-wrap overflow-hidden transition-all duration-500 [&_button]:text-xs [&_button]:h-7 [&_button]:px-2.5 max-h-[500px] opacity-100 pt-2"
