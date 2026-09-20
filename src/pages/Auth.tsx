@@ -89,8 +89,13 @@ export default function Auth() {
           options: { emailRedirectTo: window.location.origin, data: { display_name: name.trim() } },
         });
         if (error) { toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' }); }
-        else if (data.user && name.trim()) {
-          await supabase.from('profiles').update({ display_name: name.trim() }).eq('user_id', data.user.id);
+        else {
+          if (inviteRequired && inviteCode.trim()) {
+            await supabase.functions.invoke('validate-invite-code', { body: { code: inviteCode.trim(), consume: true } });
+          }
+          if (data.user && name.trim()) {
+            await supabase.from('profiles').update({ display_name: name.trim() }).eq('user_id', data.user.id);
+          }
         }
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
