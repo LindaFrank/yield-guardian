@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Target } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -14,9 +14,10 @@ const STEP = 0.5;
 
 export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
   const [inputValue, setInputValue] = useState(value.toFixed(1));
+  const isEditingRef = useRef(false);
 
   useEffect(() => {
-    setInputValue(value.toFixed(1));
+    if (!isEditingRef.current) setInputValue(value.toFixed(1));
   }, [value]);
 
   const commitInput = (rawValue: string) => {
@@ -67,9 +68,16 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
               onChange={(event) => {
                 const nextInput = event.target.value;
                 setInputValue(nextInput);
-                if (nextInput !== '') commitInput(nextInput);
+                const parsedValue = Number(nextInput);
+                if (nextInput !== '' && Number.isFinite(parsedValue) && parsedValue >= MIN && parsedValue <= MAX) {
+                  onChange(parsedValue);
+                }
               }}
-              onBlur={() => commitInput(inputValue)}
+              onFocus={() => { isEditingRef.current = true; }}
+              onBlur={() => {
+                isEditingRef.current = false;
+                commitInput(inputValue);
+              }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') event.currentTarget.blur();
               }}
