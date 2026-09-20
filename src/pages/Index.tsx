@@ -125,7 +125,6 @@ const Index = () => {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [replacementDialogOpen, setReplacementDialogOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
-  const [actionBarCollapsed, setActionBarCollapsed] = useState(false);
   const [actionBarScrolled, setActionBarScrolled] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
