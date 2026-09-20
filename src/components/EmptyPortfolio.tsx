@@ -55,6 +55,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const step2Ref = useScrollToOnValue<HTMLDivElement>(step === 2 ? 'step2' : '');
 
   const catalogTickers = useMemo(() => marketStocks.map((s) => s.ticker), []);
   const { data: liveStocks, isLoading: livePricesLoading } = useStockQuotes(catalogTickers);
