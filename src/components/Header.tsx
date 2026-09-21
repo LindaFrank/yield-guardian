@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TrendingUp, User, ShieldCheck, Save, ArrowLeft, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { usePaymentsEnabled } from '@/hooks/usePaymentsEnabled';
@@ -29,6 +29,7 @@ export function Header({ onGuestReset }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const showBackButton = true;
@@ -141,9 +142,15 @@ export function Header({ onGuestReset }: HeaderProps) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate('/auth')}
                 title="Go back"
                 className="bg-[#0a0a0a] border-gray-500 text-[#2dd4bf] hover:bg-[#141414] hover:border-gray-400 hover:text-[#14b8a6] gap-1.5 font-semibold"
+                onClick={() => {
+                  if (location.pathname === '/try') {
+                    window.dispatchEvent(new CustomEvent('yg:guest-back'));
+                  } else {
+                    handleBack();
+                  }
+                }}
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="hidden sm:inline">Back</span>
