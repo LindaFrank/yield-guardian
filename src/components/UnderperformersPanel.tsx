@@ -97,7 +97,7 @@ export function UnderperformersPanel({
             Click a ticker on the left to see curated alternative suggestions on the right.
           </p>
 
-          <div className="grid lg:grid-cols-[3fr_2fr] gap-4">
+          <div className="grid lg:grid-cols-2 gap-4">
             <UnderperformersList
               underperformers={underperformers}
               selectedStock={selectedStock}
