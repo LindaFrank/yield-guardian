@@ -214,6 +214,27 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
 
         {phase === 'preview' && validation && (
           <>
+            {skippedForLimit > 0 && (
+              <div className="rounded-lg border-[3px] border-yield-warning/60 bg-yield-warning/10 p-3 space-y-1">
+                <p className="text-sm font-medium text-yield-warning">
+                  This file has more stocks than a portfolio can hold
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  A portfolio holds up to {MAX_PORTFOLIO_POSITIONS} stocks. You already have{' '}
+                  {existingTickers.length}, so the first {totalNew} from this file will be imported and{' '}
+                  {skippedForLimit} will be left out.
+                </p>
+              </div>
+            )}
+            {skippedForLimit === 0 && willBeLarge && (
+              <div className="rounded-lg border-[3px] border-muted-foreground/40 bg-secondary/20 p-3">
+                <p className="text-xs text-muted-foreground">
+                  Heads up: this brings your portfolio to {existingTickers.length + totalNew} stocks. Portfolios
+                  larger than {LARGE_PORTFOLIO_WARNING_THRESHOLD} stocks can take longer to load and refresh.
+                </p>
+              </div>
+            )}
+
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 
               <TabsList className="w-full">
@@ -249,7 +270,7 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
                   ) : (
 
                     <div className="space-y-2">
-                      {validation.newStocks.map((row, i) => (
+                      {importableNew.map((row, i) => (
                         <StockRow key={`${row.ticker}-${i}`} row={row} variant="new" />
                       ))}
                     </div>
