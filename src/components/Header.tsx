@@ -142,7 +142,6 @@ export function Header({ onGuestReset }: HeaderProps) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate('/auth')}
                 title="Go back"
                 className="bg-[#0a0a0a] border-gray-500 text-[#2dd4bf] hover:bg-[#141414] hover:border-gray-400 hover:text-[#14b8a6] gap-1.5 font-semibold"
                 onClick={() => {
