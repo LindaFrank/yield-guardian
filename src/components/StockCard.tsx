@@ -133,7 +133,7 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
                 step="1"
                 value={sharesInput}
                 onChange={(e) => setSharesInput(e.target.value)}
-                className="h-7 w-14 text-xs px-1.5"
+                className="h-7 w-14 text-xs px-1.5 bg-card border-primary/50 focus-visible:border-primary"
                 autoFocus
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSaveShares(); if (e.key === 'Escape') setEditing(false); }}
               />

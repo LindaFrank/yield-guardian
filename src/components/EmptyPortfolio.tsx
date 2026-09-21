@@ -327,7 +327,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
                         placeholder="Shares"
                         value={val}
                         onChange={(e) => setSharesMap((prev) => ({ ...prev, [stock.ticker]: e.target.value }))}
-                        className="w-24"
+                        className="w-24 bg-card border-primary/50 focus-visible:border-primary"
                       />
                     </div>
                   </div>
