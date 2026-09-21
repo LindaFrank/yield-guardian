@@ -183,7 +183,7 @@ export function Header({ onGuestReset }: HeaderProps) {
       </header>
 
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-[4px] border-gray-400">
           <AlertDialogHeader>
             <AlertDialogTitle>Hold on!</AlertDialogTitle>
             <AlertDialogDescription>
