@@ -8,6 +8,12 @@ import { cn } from '@/lib/utils';
 import { parseFile, validateImport, ParsedRow, ImportValidation } from '@/lib/importParser';
 import { Stock } from '@/types/portfolio';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  MAX_PORTFOLIO_POSITIONS,
+  LARGE_PORTFOLIO_WARNING_THRESHOLD,
+  remainingCapacity,
+} from '@/lib/portfolioLimits';
+
 
 export interface ExistingStockShares {
   ticker: string;
@@ -98,7 +104,8 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
 
   const handleImport = () => {
     if (!validation) return;
-    for (const row of validation.newStocks) {
+    const allowed = validation.newStocks.slice(0, remainingCapacity(existingTickers.length));
+    for (const row of allowed) {
       const stock: Stock = {
         ticker: row.ticker.toUpperCase(),
         name: row.ticker,
@@ -110,6 +117,7 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
       };
       onAddStock(stock, row.shares);
     }
+
 
     // Update shares for accepted duplicates
     if (onUpdateShares) {
@@ -132,10 +140,16 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
     setIsLoading(false);
   };
 
-  const totalNew = validation?.newStocks.length ?? 0;
+  const capacity = remainingCapacity(existingTickers.length);
+  const parsedNew = validation?.newStocks ?? [];
+  const importableNew = parsedNew.slice(0, capacity);
+  const skippedForLimit = parsedNew.length - importableNew.length;
+  const totalNew = importableNew.length;
   const totalDupes = validation?.duplicates.length ?? 0;
   const totalErrors = validation?.errors.length ?? 0;
   const acceptedUpdates = duplicatesWithComparison.filter(d => d.updateAccepted).length;
+  const willBeLarge = existingTickers.length + totalNew > LARGE_PORTFOLIO_WARNING_THRESHOLD;
+
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) resetAndClose(); else setOpen(true); }}>
@@ -200,6 +214,27 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
 
         {phase === 'preview' && validation && (
           <>
+            {skippedForLimit > 0 && (
+              <div className="rounded-lg border-[3px] border-yield-warning/60 bg-yield-warning/10 p-3 space-y-1">
+                <p className="text-sm font-medium text-yield-warning">
+                  This file has more stocks than a portfolio can hold
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  A portfolio holds up to {MAX_PORTFOLIO_POSITIONS} stocks. You already have{' '}
+                  {existingTickers.length}, so the first {totalNew} from this file will be imported and{' '}
+                  {skippedForLimit} will be left out.
+                </p>
+              </div>
+            )}
+            {skippedForLimit === 0 && willBeLarge && (
+              <div className="rounded-lg border-[3px] border-muted-foreground/40 bg-secondary/20 p-3">
+                <p className="text-xs text-muted-foreground">
+                  Heads up: this brings your portfolio to {existingTickers.length + totalNew} stocks. Portfolios
+                  larger than {LARGE_PORTFOLIO_WARNING_THRESHOLD} stocks can take longer to load and refresh.
+                </p>
+              </div>
+            )}
+
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 
               <TabsList className="w-full">
@@ -235,7 +270,7 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
                   ) : (
 
                     <div className="space-y-2">
-                      {validation.newStocks.map((row, i) => (
+                      {importableNew.map((row, i) => (
                         <StockRow key={`${row.ticker}-${i}`} row={row} variant="new" />
                       ))}
                     </div>
