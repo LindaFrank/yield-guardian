@@ -8,6 +8,12 @@ import { cn } from '@/lib/utils';
 import { parseFile, validateImport, ParsedRow, ImportValidation } from '@/lib/importParser';
 import { Stock } from '@/types/portfolio';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  MAX_PORTFOLIO_POSITIONS,
+  LARGE_PORTFOLIO_WARNING_THRESHOLD,
+  remainingCapacity,
+} from '@/lib/portfolioLimits';
+
 
 export interface ExistingStockShares {
   ticker: string;
@@ -98,7 +104,8 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
 
   const handleImport = () => {
     if (!validation) return;
-    for (const row of validation.newStocks) {
+    const allowed = validation.newStocks.slice(0, remainingCapacity(existingTickers.length));
+    for (const row of allowed) {
       const stock: Stock = {
         ticker: row.ticker.toUpperCase(),
         name: row.ticker,
@@ -110,6 +117,7 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
       };
       onAddStock(stock, row.shares);
     }
+
 
     // Update shares for accepted duplicates
     if (onUpdateShares) {
@@ -132,10 +140,16 @@ export function ImportStocksModal({ existingTickers, existingShares, onAddStock,
     setIsLoading(false);
   };
 
-  const totalNew = validation?.newStocks.length ?? 0;
+  const capacity = remainingCapacity(existingTickers.length);
+  const parsedNew = validation?.newStocks ?? [];
+  const importableNew = parsedNew.slice(0, capacity);
+  const skippedForLimit = parsedNew.length - importableNew.length;
+  const totalNew = importableNew.length;
   const totalDupes = validation?.duplicates.length ?? 0;
   const totalErrors = validation?.errors.length ?? 0;
   const acceptedUpdates = duplicatesWithComparison.filter(d => d.updateAccepted).length;
+  const willBeLarge = existingTickers.length + totalNew > LARGE_PORTFOLIO_WARNING_THRESHOLD;
+
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) resetAndClose(); else setOpen(true); }}>
