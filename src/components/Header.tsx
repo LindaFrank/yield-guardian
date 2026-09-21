@@ -145,6 +145,13 @@ export function Header({ onGuestReset }: HeaderProps) {
                 onClick={() => navigate('/auth')}
                 title="Go back"
                 className="bg-[#0a0a0a] border-gray-500 text-[#2dd4bf] hover:bg-[#141414] hover:border-gray-400 hover:text-[#14b8a6] gap-1.5 font-semibold"
+                onClick={() => {
+                  if (location.pathname === '/try') {
+                    window.dispatchEvent(new CustomEvent('yg:guest-back'));
+                  } else {
+                    handleBack();
+                  }
+                }}
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="hidden sm:inline">Back</span>
