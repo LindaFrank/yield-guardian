@@ -8,6 +8,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { Search, Loader2, ChevronRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MAX_PORTFOLIO_POSITIONS, remainingCapacity } from '@/lib/portfolioLimits';
+
 
 interface AddStockModalProps {
   existingTickers: string[];
@@ -35,15 +37,20 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
     (r) => !existingTickers.includes(r.symbol.toUpperCase())
   );
 
+  const capacity = remainingCapacity(existingTickers.length);
+  const atLimit = capacity <= 0;
+  const selectionFull = selected.size >= capacity;
+
   // Yield-based suggestions removed — search-only modal
   const toggleSelect = (result: SearchResult) => {
     setSelected((prev) => {
       const next = new Map(prev);
       if (next.has(result.symbol)) next.delete(result.symbol);
-      else next.set(result.symbol, result);
+      else if (next.size < capacity) next.set(result.symbol, result);
       return next;
     });
   };
+
 
   const handleProceedToShares = () => {
     const initial: Record<string, string> = {};
