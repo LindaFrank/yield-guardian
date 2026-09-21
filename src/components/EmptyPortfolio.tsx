@@ -48,10 +48,26 @@ interface EnrichedStock extends Stock {
 
 export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel, existingTickers = [] }: EmptyPortfolioProps) {
   const [step, setStep] = useState(initialStep);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setStep(initialStep);
   }, [initialStep]);
+
+  useEffect(() => {
+    const handleGuestBack = () => {
+      setStep((s) => {
+        if (s > 0) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return s - 1;
+        }
+        navigate('/auth');
+        return s;
+      });
+    };
+    window.addEventListener('yg:guest-back', handleGuestBack);
+    return () => window.removeEventListener('yg:guest-back', handleGuestBack);
+  }, [navigate]);
   const [localYield, setLocalYield] = useState(currentYield);
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
