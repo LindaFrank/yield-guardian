@@ -526,6 +526,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_invite_code: { Args: { _code: string }; Returns: boolean }
       consume_invite_code: { Args: { _code: string }; Returns: boolean }
       get_admin_metrics: { Args: never; Returns: Json }
       get_payments_enabled: { Args: never; Returns: boolean }
