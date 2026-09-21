@@ -192,7 +192,7 @@ export function Header({ onGuestReset }: HeaderProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Stay</AlertDialogCancel>
+            <AlertDialogCancel className="border-gray-400">Stay</AlertDialogCancel>
             <AlertDialogAction onClick={confirmSignOut}>Yes, sign out</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
