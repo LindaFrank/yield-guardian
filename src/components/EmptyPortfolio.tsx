@@ -10,6 +10,7 @@ import { Stock } from '@/types/portfolio';
 import { marketStocks } from '@/data/mockData';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { useStockQuotes } from '@/hooks/useStockData';
+import { useNavigate } from 'react-router-dom';
 import { checkDividendStability } from '@/lib/portfolioUtils';
 import { cn } from '@/lib/utils';
 
