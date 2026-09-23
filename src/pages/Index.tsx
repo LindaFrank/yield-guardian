@@ -29,7 +29,7 @@ import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { HelpIconToggle } from '@/components/HelpIconToggle';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
-import { RedScrollContainer } from '@/components/RedScrollContainer';
+import { QuickStartSlideshow } from '@/components/QuickStartSlideshow';
 import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide_Create_ver_2.pdf.asset.json';
 import qsg1 from '@/assets/quick-start-create-v2-1.jpg.asset.json';
 import qsg2 from '@/assets/quick-start-create-v2-2.jpg.asset.json';
@@ -570,25 +570,7 @@ const Index = () => {
               Download PDF
             </a>
           </DialogHeader>
-          <RedScrollContainer
-            tabIndex={0}
-            className="flex-1 min-h-0 bg-muted/20"
-            innerClassName="px-4 py-4"
-          >
-            <div className="mx-auto max-w-[900px] space-y-4">
-              {quickStartPages.map((page, i) => (
-                <img
-                  key={page.url}
-                  src={page.url}
-                  alt={`Yield Guardian Quick Start Guide, page ${i + 1}`}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  width={850}
-                  height={1100}
-                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-card object-contain"
-                />
-              ))}
-            </div>
-          </RedScrollContainer>
+          <QuickStartSlideshow pages={quickStartPages} title="Quick Start Guide" className="flex-1 min-h-0 bg-muted/20" />
         </DialogContent>
       </Dialog>
 
@@ -605,25 +587,7 @@ const Index = () => {
               Download PDF
             </a>
           </DialogHeader>
-          <RedScrollContainer
-            tabIndex={0}
-            className="flex-1 min-h-0 bg-muted/20"
-            innerClassName="px-4 py-4"
-          >
-            <div className="mx-auto max-w-[900px] space-y-4">
-              {quickStartImportPages.map((page, i) => (
-                <img
-                  key={page.url}
-                  src={page.url}
-                  alt={`Yield Guardian import your own portfolio guide, page ${i + 1}`}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  width={850}
-                  height={1100}
-                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-card object-contain"
-                />
-              ))}
-            </div>
-          </RedScrollContainer>
+          <QuickStartSlideshow pages={quickStartImportPages} title="Quick Start — Import Your Own Portfolio" className="flex-1 min-h-0 bg-muted/20" />
         </DialogContent>
       </Dialog>
 
