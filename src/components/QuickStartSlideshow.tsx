@@ -135,7 +135,7 @@ export function QuickStartSlideshow({
           >
             {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </Button>
-          <span className="text-sm text-muted-foreground min-w-[4rem]">
+          <span data-testid="slideshow-counter" className="text-sm text-muted-foreground min-w-[4rem]">
             {current + 1} / {pages.length}
           </span>
         </div>
