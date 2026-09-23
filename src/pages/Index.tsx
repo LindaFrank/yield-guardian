@@ -558,15 +558,22 @@ const Index = () => {
       <Dialog open={quickStartOpen} onOpenChange={(o) => setQuickStartOpen(o)}>
         <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
           <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0 flex-row items-center justify-between gap-3">
-            <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start Guide</DialogTitle>
-            <a
-              href={quickStartPdf.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0 mr-8"
-            >
-              Download PDF
-            </a>
+            <DialogTitle className="text-sm leading-snug text-left">Quick Start Guide</DialogTitle>
+            <div className="flex items-center gap-2">
+              <a
+                href={quickStartPdf.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0"
+              >
+                Download PDF
+              </a>
+              <DialogClose asChild>
+                <Button variant="outline" size="icon" aria-label="Close guide" className="shrink-0 h-7 w-7">
+                  <X className="h-4 w-4" />
+                </Button>
+              </DialogClose>
+            </div>
           </DialogHeader>
           <QuickStartSlideshow pages={quickStartPages} title="Quick Start Guide" className="flex-1 min-h-0 bg-muted/20" />
         </DialogContent>
