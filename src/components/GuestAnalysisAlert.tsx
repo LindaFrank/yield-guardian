@@ -18,7 +18,7 @@ export function GuestAnalysisAlert({ onReset }: GuestAnalysisAlertProps) {
           <div className="flex items-center justify-between px-3 py-2 gap-2 bg-primary/10 border-b border-primary/20">
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">Guest Analysis Mode</span>
-              <span className="text-[10px] font-medium text-primary leading-tight">Read this first</span>
+              <span className="text-[10px] font-medium text-primary leading-tight">READ THIS FIRST</span>
             </div>
             <Button
             variant="ghost"
