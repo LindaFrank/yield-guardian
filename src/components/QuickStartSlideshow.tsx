@@ -67,6 +67,13 @@ export function QuickStartSlideshow({
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isTyping =
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable);
+      if (isTyping) return;
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         next();
