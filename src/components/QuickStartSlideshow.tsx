@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, Pause, ChevronLeft, ChevronRight, Square, Maximize2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +24,7 @@ export function QuickStartSlideshow({
   const [playing, setPlaying] = useState(true);
   const [hovered, setHovered] = useState(false);
   const [fading, setFading] = useState(false);
+  const [enlarged, setEnlarged] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -47,6 +48,11 @@ export function QuickStartSlideshow({
   const prev = useCallback(() => {
     goTo((current - 1 + pages.length) % pages.length);
   }, [current, goTo, pages.length]);
+
+  const stop = useCallback(() => {
+    setPlaying(false);
+    setCurrent(0);
+  }, []);
 
   useEffect(() => {
     if (!playing || hovered) {
@@ -74,6 +80,10 @@ export function QuickStartSlideshow({
           target.tagName === 'TEXTAREA' ||
           target.isContentEditable);
       if (isTyping) return;
+      if (e.key === 'Escape' && enlarged) {
+        setEnlarged(false);
+        return;
+      }
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         next();
@@ -87,7 +97,7 @@ export function QuickStartSlideshow({
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [next, prev]);
+  }, [next, prev, enlarged]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -140,6 +150,24 @@ export function QuickStartSlideshow({
           >
             {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={stop}
+            aria-label="Stop slideshow and return to first page"
+            className="shrink-0"
+          >
+            <Square className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setEnlarged(true)}
+            aria-label="Enlarge current page"
+            className="shrink-0"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </Button>
           <span data-testid="slideshow-counter" className="text-sm text-muted-foreground min-w-[4rem]">
             {current + 1} / {pages.length}
           </span>
@@ -182,6 +210,43 @@ export function QuickStartSlideshow({
           </Button>
         </div>
       </div>
+
+      {enlarged && (
+        <div
+          className="fixed inset-0 z-[100] bg-background/95 flex flex-col"
+          role="dialog"
+          aria-label={`${title}, enlarged page ${current + 1} of ${pages.length}`}
+        >
+          <div className="shrink-0 flex items-center justify-between px-4 py-2 border-b border-border/60">
+            <span className="text-sm text-muted-foreground">
+              Page {current + 1} of {pages.length}
+            </span>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="icon" onClick={prev} aria-label="Previous page">
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={next} aria-label="Next page">
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setEnlarged(false)}
+                aria-label="Close enlarged view"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="flex-1 min-h-0 overflow-auto p-4 flex justify-center">
+            <img
+              src={pages[current].url}
+              alt={`${title}, page ${current + 1} of ${pages.length}`}
+              className="w-full max-w-[1100px] h-auto rounded-md border border-border/60 shadow-elevated bg-card self-start"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
