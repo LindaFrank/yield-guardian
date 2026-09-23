@@ -580,7 +580,7 @@ const Index = () => {
       </Dialog>
 
       <Dialog open={quickStartImportOpen} onOpenChange={(o) => setQuickStartImportOpen(o)}>
-        <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
+        <DialogContent hideClose className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
           <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0 flex-row items-center justify-between gap-3">
             <DialogTitle className="text-sm leading-snug text-left">Quick Start — Import Your Own Portfolio</DialogTitle>
             <div className="flex items-center gap-2">
