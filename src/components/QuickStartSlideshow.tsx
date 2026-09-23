@@ -49,13 +49,11 @@ export function QuickStartSlideshow({
   }, [current, goTo, pages.length]);
 
   useEffect(() => {
-    console.log('slideshow timer effect', { playing, hovered, intervalMs });
     if (!playing || hovered) {
       if (timerRef.current) clearInterval(timerRef.current);
       return;
     }
     timerRef.current = setInterval(() => {
-      console.log('slideshow interval tick');
       setFading(true);
       setTimeout(() => {
         setCurrent((c) => (c + 1) % pages.length);
