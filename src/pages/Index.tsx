@@ -569,7 +569,7 @@ const Index = () => {
                 >
                   Download PDF
                 </a>
-                <span className="text-[10px] text-muted-foreground leading-tight">
+                <span className="text-[10px] text-foreground/90 leading-tight mt-1">
                   If blocked, right-click → Save link as…
                 </span>
               </div>
