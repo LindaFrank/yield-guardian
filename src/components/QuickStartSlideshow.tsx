@@ -63,7 +63,7 @@ export function QuickStartSlideshow({
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [playing, hovered, intervalMs, pages.length]);
+  }, [playing, hovered, intervalMs]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
