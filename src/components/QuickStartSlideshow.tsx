@@ -109,9 +109,6 @@ export function QuickStartSlideshow({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="absolute top-2 right-2 z-50 bg-black/80 text-green-400 text-xs p-2 rounded font-mono">
-        playing: {String(playing)} | hovered: {String(hovered)} | current: {current + 1}
-      </div>
       <div className="flex-1 min-h-0 p-4 flex items-center justify-center overflow-hidden">
         <div className="h-full max-w-full aspect-[8.5/11] relative">
           <img
