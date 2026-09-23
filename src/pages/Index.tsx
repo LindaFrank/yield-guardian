@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Target, FileDown, TrendingDown, Sparkles, Search, Loader2 } from 'lucide-react';
+import { Target, FileDown, TrendingDown, Sparkles, Search, Loader2, X } from 'lucide-react';
 import { Stock } from '@/types/portfolio';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { marketStocks as mockMarketStocks } from '@/data/mockData';
 import { 
@@ -29,34 +29,32 @@ import { EmptyPortfolio } from '@/components/EmptyPortfolio';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { HelpIconToggle } from '@/components/HelpIconToggle';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
-import { RedScrollContainer } from '@/components/RedScrollContainer';
-import quickStartPdf from '@/assets/YieldGuardian_Quick_Start_Guide_Create_ver_2.pdf.asset.json';
-import qsg1 from '@/assets/quick-start-create-v2-1.jpg.asset.json';
-import qsg2 from '@/assets/quick-start-create-v2-2.jpg.asset.json';
-import qsg3 from '@/assets/quick-start-create-v2-3.jpg.asset.json';
-import qsg4 from '@/assets/quick-start-create-v2-4.jpg.asset.json';
-import qsg5 from '@/assets/quick-start-create-v2-5.jpg.asset.json';
-import qsg6 from '@/assets/quick-start-create-v2-6.jpg.asset.json';
-import qsg7 from '@/assets/quick-start-create-v2-7.jpg.asset.json';
-import qsg8 from '@/assets/quick-start-create-v2-8.jpg.asset.json';
+import { QuickStartSlideshow } from '@/components/QuickStartSlideshow';
+import quickStartPdf from '@/assets/quick-start-create-v3.pdf.asset.json';
+import qsg1 from '@/assets/quick-start-create-v3-1.jpg.asset.json';
+import qsg2 from '@/assets/quick-start-create-v3-2.jpg.asset.json';
+import qsg3 from '@/assets/quick-start-create-v3-3.jpg.asset.json';
+import qsg4 from '@/assets/quick-start-create-v3-4.jpg.asset.json';
+import qsg5 from '@/assets/quick-start-create-v3-5.jpg.asset.json';
+import qsg6 from '@/assets/quick-start-create-v3-6.jpg.asset.json';
+import qsg7 from '@/assets/quick-start-create-v3-7.jpg.asset.json';
+import qsg8 from '@/assets/quick-start-create-v3-8.jpg.asset.json';
 
-import quickStartImportPdf from '@/assets/YG_Quick_Start_Existing_Portfolio.pdf.asset.json';
-import qsi1 from '@/assets/quick-start-import-1.jpg.asset.json';
-import qsi2 from '@/assets/quick-start-import-2.jpg.asset.json';
-import qsi3 from '@/assets/quick-start-import-3-replacement.png.asset.json';
-import qsi4 from '@/assets/quick-start-import-4-new.png.asset.json';
-
-import qsi5 from '@/assets/quick-start-import-5.jpg.asset.json';
-import qsi6 from '@/assets/quick-start-import-6.jpg.asset.json';
-import qsi7 from '@/assets/quick-start-import-7.jpg.asset.json';
-import qsi8 from '@/assets/quick-start-import-8.jpg.asset.json';
-import qsi9 from '@/assets/quick-start-import-9.jpg.asset.json';
-import qsi10 from '@/assets/quick-start-import-10.jpg.asset.json';
-import qsi11 from '@/assets/quick-start-import-11.jpg.asset.json';
-import qsi12 from '@/assets/quick-start-import-12.jpg.asset.json';
+import quickStartImportPdf from '@/assets/quick-start-import-v3.pdf.asset.json';
+import qsi1 from '@/assets/quick-start-import-v3-01.jpg.asset.json';
+import qsi2 from '@/assets/quick-start-import-v3-02.jpg.asset.json';
+import qsi3 from '@/assets/quick-start-import-v3-03.jpg.asset.json';
+import qsi4 from '@/assets/quick-start-import-v3-04.jpg.asset.json';
+import qsi5 from '@/assets/quick-start-import-v3-05.jpg.asset.json';
+import qsi6 from '@/assets/quick-start-import-v3-06.jpg.asset.json';
+import qsi7 from '@/assets/quick-start-import-v3-07.jpg.asset.json';
+import qsi8 from '@/assets/quick-start-import-v3-08.jpg.asset.json';
+import qsi9 from '@/assets/quick-start-import-v3-09.jpg.asset.json';
+import qsi10 from '@/assets/quick-start-import-v3-10.jpg.asset.json';
+import qsi11 from '@/assets/quick-start-import-v3-11.jpg.asset.json';
 
 const quickStartPages = [qsg1, qsg2, qsg3, qsg4, qsg5, qsg6, qsg7, qsg8];
-const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, qsi9, qsi10, qsi11, qsi12];
+const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, qsi9, qsi10, qsi11];
 import { useStockQuotes } from '@/hooks/useStockData';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
@@ -558,72 +556,60 @@ const Index = () => {
 
 
       <Dialog open={quickStartOpen} onOpenChange={(o) => setQuickStartOpen(o)}>
-        <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
+        <DialogContent hideClose className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
           <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0 flex-row items-center justify-between gap-3">
-            <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start Guide</DialogTitle>
-            <a
-              href={quickStartPdf.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0 mr-8"
-            >
-              Download PDF
-            </a>
-          </DialogHeader>
-          <RedScrollContainer
-            tabIndex={0}
-            className="flex-1 min-h-0 bg-muted/20"
-            innerClassName="px-4 py-4"
-          >
-            <div className="mx-auto max-w-[900px] space-y-4">
-              {quickStartPages.map((page, i) => (
-                <img
-                  key={page.url}
-                  src={page.url}
-                  alt={`Yield Guardian Quick Start Guide, page ${i + 1}`}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  width={850}
-                  height={1100}
-                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-card object-contain"
-                />
-              ))}
+            <DialogTitle className="text-sm leading-snug text-left">Quick Start Guide</DialogTitle>
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col items-end">
+                <a
+                  href={quickStartPdf.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0"
+                >
+                  Download PDF
+                </a>
+                <span className="text-[10px] text-foreground/90 leading-tight mt-1">
+                  If blocked, right-click → Save link as…
+                </span>
+              </div>
+              <DialogClose asChild>
+                <Button variant="outline" size="icon" aria-label="Close guide" className="shrink-0 h-7 w-7">
+                  <X className="h-4 w-4" />
+                </Button>
+              </DialogClose>
             </div>
-          </RedScrollContainer>
+          </DialogHeader>
+          <QuickStartSlideshow pages={quickStartPages} title="Quick Start Guide" className="flex-1 min-h-0 bg-muted/20" />
         </DialogContent>
       </Dialog>
 
       <Dialog open={quickStartImportOpen} onOpenChange={(o) => setQuickStartImportOpen(o)}>
-        <DialogContent className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
+        <DialogContent hideClose className="w-[98vw] max-w-[1800px] h-[94vh] p-0 gap-0 border-2 border-border/60 overflow-hidden flex flex-col">
           <DialogHeader className="px-4 py-2 border-b border-border/60 shrink-0 flex-row items-center justify-between gap-3">
-            <DialogTitle className="text-sm leading-snug pr-8 text-left">Quick Start — Import Your Own Portfolio</DialogTitle>
-            <a
-              href={quickStartImportPdf.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0 mr-8"
-            >
-              Download PDF
-            </a>
-          </DialogHeader>
-          <RedScrollContainer
-            tabIndex={0}
-            className="flex-1 min-h-0 bg-muted/20"
-            innerClassName="px-4 py-4"
-          >
-            <div className="mx-auto max-w-[900px] space-y-4">
-              {quickStartImportPages.map((page, i) => (
-                <img
-                  key={page.url}
-                  src={page.url}
-                  alt={`Yield Guardian import your own portfolio guide, page ${i + 1}`}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  width={850}
-                  height={1100}
-                  className="w-full aspect-[8.5/11] rounded-md border border-border/60 shadow-sm bg-card object-contain"
-                />
-              ))}
+            <DialogTitle className="text-sm leading-snug text-left">Quick Start — Import Your Own Portfolio</DialogTitle>
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col items-end">
+                <a
+                  href={quickStartImportPdf.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-semibold text-primary underline underline-offset-4 shrink-0"
+                >
+                  Download PDF
+                </a>
+                <span className="text-[10px] text-foreground/90 leading-tight mt-1">
+                  If blocked, right-click → Save link as…
+                </span>
+              </div>
+              <DialogClose asChild>
+                <Button variant="outline" size="icon" aria-label="Close guide" className="shrink-0 h-7 w-7">
+                  <X className="h-4 w-4" />
+                </Button>
+              </DialogClose>
             </div>
-          </RedScrollContainer>
+          </DialogHeader>
+          <QuickStartSlideshow pages={quickStartImportPages} title="Quick Start — Import Your Own Portfolio" className="flex-1 min-h-0 bg-muted/20" />
         </DialogContent>
       </Dialog>
 
