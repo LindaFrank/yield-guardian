@@ -361,7 +361,7 @@ export function ReplacementSuggestions({
                   mode === 'aggressive' ? 'bg-primary text-primary-foreground' : 'text-white hover:text-foreground',
                 )}
               >
-                Higher-Income Alternative
+                Aggressive
               </button>
               <button
                 onClick={() => { trackEvent('strategy_mode_select', { category: 'strategy', label: 'conservative' }); setMode('conservative'); }}
