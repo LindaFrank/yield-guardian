@@ -1,14 +1,5 @@
-# Yield Guardian Task Roadmap
+# Roadmap
 
-## Done
-- [x] Darken and widen email/password input borders on sign-in page
-- [x] Fix signed-in trash-can deletion not removing stock card (ARCC)
-- [x] Move "What do you want to do?" action bar below lower header separator
-- [x] Tighten action bar spacing by 10px
-- [x] Halve the borders on the visible Matching Stocks cards and restore selection bubbles for every user
-- [x] Halve the outer outline around the Matching Stocks list
-- [x] Make "What do you want to do?" action bar collapse again, hide when any dialog/modal opens, and blur/fade on scroll
-- [x] Keep Portfolio Stats boxes (Portfolio Value, Expected Annual Dividends, Your Portfolio Income Rate, Underperformers) the same fixed size and matching the Underperformers box
-
-## In Progress
-- [ ] Credit adjustment request — blocked because project editing tools cannot issue account credits
+- [in-progress] Batched FMP ticker requests (feature/batchRequests): batch quotes (50/chunk), 7-day dividend cache with separate dividends_cached_at column — code edited, deploy + verify pending
+- [open] Guest /try header Back button fix (Linda, unanswered offer)
+- [open] Check GSC indexing for guardianyield.com (Linda, ~1 week after Sep 2026)
