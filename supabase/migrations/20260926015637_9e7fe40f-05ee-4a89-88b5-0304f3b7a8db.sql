@@ -1,1 +1,0 @@
-ALTER TABLE public.stock_cache ADD COLUMN IF NOT EXISTS dividends_cached_at timestamptz;
