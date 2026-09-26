@@ -124,7 +124,7 @@ serve(async (req) => {
       // Check cache first
       const { data: cached } = await sb
         .from('stock_cache')
-        .select('ticker, dividends_data, cached_at')
+        .select('ticker, dividends_data, cached_at, dividends_cached_at')
         .in('ticker', cleanTickers);
 
       const now = Date.now();
