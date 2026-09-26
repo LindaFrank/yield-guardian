@@ -7,7 +7,9 @@ const corsHeaders = {
 };
 
 const FMP_BASE = 'https://financialmodelingprep.com/stable';
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (quotes)
+const DIVIDENDS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (dividend history rarely changes)
+const QUOTE_BATCH_SIZE = 50; // tickers per batched FMP quote request
 
 function getServiceClient() {
   return createClient(
@@ -75,29 +77,41 @@ serve(async (req) => {
         }
       }
 
-      // Fetch stale/missing from FMP
+      // Fetch stale/missing from FMP in batched requests (one FMP call per chunk)
       if (stale.length > 0) {
-        await Promise.all(
-          stale.map(async (ticker: string) => {
-            const url = `${FMP_BASE}/quote?symbol=${ticker}&apikey=${apiKey}`;
-            console.log(`Fetching quote: ${url.replace(apiKey, '***')}`);
+        for (let i = 0; i < stale.length; i += QUOTE_BATCH_SIZE) {
+          const chunk = stale.slice(i, i + QUOTE_BATCH_SIZE);
+          const url = `${FMP_BASE}/quote?symbol=${encodeURIComponent(chunk.join(','))}&apikey=${apiKey}`;
+          console.log(`Fetching batched quotes (${chunk.length} tickers): ${url.replace(apiKey, '***')}`);
+          try {
             const res = await fetch(url);
-            if (!res.ok) {
-              console.error(`FMP quote failed for ${ticker}: ${res.status}`);
-              return;
-            }
-            const data = await res.json();
-            const quote = Array.isArray(data) ? data[0] : data;
-            if (quote) {
-              fresh[ticker] = quote;
-              // Upsert cache
-              await sb.from('stock_cache').upsert(
-                { ticker, quote_data: quote, cached_at: new Date().toISOString() },
-                { onConflict: 'ticker' }
+            if (res.ok) {
+              const data = await res.json();
+              const quotes: any[] = Array.isArray(data) ? data : data ? [data] : [];
+              const bySymbol = new Map<string, any>();
+              for (const q of quotes) {
+                if (q?.symbol) bySymbol.set(q.symbol.toUpperCase(), q);
+              }
+              const nowIso = new Date().toISOString();
+              await Promise.all(
+                chunk.map(async (ticker: string) => {
+                  const quote = bySymbol.get(ticker);
+                  if (quote) {
+                    fresh[ticker] = quote;
+                    await sb.from('stock_cache').upsert(
+                      { ticker, quote_data: quote, cached_at: nowIso },
+                      { onConflict: 'ticker' }
+                    );
+                  }
+                })
               );
+            } else {
+              console.error(`FMP batched quote failed (${chunk.length} tickers): ${res.status}`);
             }
-          })
-        );
+          } catch (e) {
+            console.error('FMP batched quote error:', e);
+          }
+        }
       }
 
       const allQuotes = cleanTickers.map((t) => fresh[t]).filter(Boolean);
@@ -119,7 +133,7 @@ serve(async (req) => {
 
       for (const ticker of cleanTickers) {
         const hit = cached?.find((c: any) => c.ticker === ticker);
-        if (hit && hit.dividends_data && (now - new Date(hit.cached_at).getTime()) < CACHE_TTL_MS) {
+        if (hit && hit.dividends_data && (now - new Date(hit.dividends_cached_at ?? 0).getTime()) < DIVIDENDS_CACHE_TTL_MS) {
           results[ticker] = hit.dividends_data as any[];
         } else {
           stale.push(ticker);
@@ -136,9 +150,9 @@ serve(async (req) => {
               const data = await res.json();
               const historical = Array.isArray(data) ? data.slice(0, 20) : [];
               results[ticker] = historical;
-              // Upsert cache
+              // Upsert cache — refresh only the dividend timestamp so quote freshness is untouched
               await sb.from('stock_cache').upsert(
-                { ticker, dividends_data: historical, cached_at: new Date().toISOString() },
+                { ticker, dividends_data: historical, dividends_cached_at: new Date().toISOString() },
                 { onConflict: 'ticker' }
               );
             } else {
