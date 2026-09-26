@@ -87,6 +87,7 @@ serve(async (req) => {
             const res = await fetch(url);
             if (res.ok) {
               const data = await res.json();
+              console.log(`[batch] raw response type=${Array.isArray(data) ? 'array' : typeof data} preview=${JSON.stringify(data).slice(0, 500)}`);
               const quotes: any[] = Array.isArray(data) ? data : data ? [data] : [];
               const bySymbol = new Map<string, any>();
               for (const q of quotes) {
