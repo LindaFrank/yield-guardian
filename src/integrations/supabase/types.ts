@@ -347,21 +347,18 @@ export type Database = {
       stock_cache: {
         Row: {
           cached_at: string
-          dividends_cached_at: string | null
           dividends_data: Json | null
           quote_data: Json | null
           ticker: string
         }
         Insert: {
           cached_at?: string
-          dividends_cached_at?: string | null
           dividends_data?: Json | null
           quote_data?: Json | null
           ticker: string
         }
         Update: {
           cached_at?: string
-          dividends_cached_at?: string | null
           dividends_data?: Json | null
           quote_data?: Json | null
           ticker?: string
