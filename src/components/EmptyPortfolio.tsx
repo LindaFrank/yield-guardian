@@ -55,7 +55,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   }, [initialStep]);
 
   useEffect(() => {
-    const handleGuestBack = () => {
+    const handleGuestBack = (e: Event) => {
+      e.preventDefault(); // tell the header the wizard handled it
       setStep((s) => {
         if (s > 0) {
           window.scrollTo({ top: 0, behavior: 'smooth' });
