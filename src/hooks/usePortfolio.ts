@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { isAtPortfolioLimit, portfolioLimitMessage } from '@/lib/portfolioLimits';
+
 
 export interface UserStockEntry {
   ticker: string;
@@ -52,6 +54,14 @@ export function useAddTicker() {
   return useMutation({
     mutationFn: async ({ ticker, shares }: { ticker: string; shares?: number }) => {
       if (!user) throw new Error('Not authenticated');
+      // Enforce the portfolio size cap against the stored rows, so it cannot be
+      // bypassed by stale client state or repeated rapid adds.
+      const { count, error: countError } = await supabase
+        .from('user_stocks')
+        .select('ticker', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if (countError) throw countError;
+      if (isAtPortfolioLimit(count ?? 0)) throw new Error(portfolioLimitMessage);
       const { error } = await supabase
         .from('user_stocks')
         .insert({ user_id: user.id, ticker, shares_owned: shares ?? null });
@@ -63,6 +73,7 @@ export function useAddTicker() {
     },
   });
 }
+
 
 export function useAddTickerWithCostBasis() {
   const { user } = useAuth();

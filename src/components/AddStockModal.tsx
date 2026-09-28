@@ -8,6 +8,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { Search, Loader2, ChevronRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MAX_PORTFOLIO_POSITIONS, remainingCapacity } from '@/lib/portfolioLimits';
+
 
 interface AddStockModalProps {
   existingTickers: string[];
@@ -35,15 +37,20 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
     (r) => !existingTickers.includes(r.symbol.toUpperCase())
   );
 
+  const capacity = remainingCapacity(existingTickers.length);
+  const atLimit = capacity <= 0;
+  const selectionFull = selected.size >= capacity;
+
   // Yield-based suggestions removed — search-only modal
   const toggleSelect = (result: SearchResult) => {
     setSelected((prev) => {
       const next = new Map(prev);
       if (next.has(result.symbol)) next.delete(result.symbol);
-      else next.set(result.symbol, result);
+      else if (next.size < capacity) next.set(result.symbol, result);
       return next;
     });
   };
+
 
   const handleProceedToShares = () => {
     const initial: Record<string, string> = {};
@@ -105,6 +112,24 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
 
         {phase === 'search' && (
           <>
+            {atLimit ? (
+              <div className="rounded-lg border-[3px] border-yield-warning/60 bg-yield-warning/10 p-3">
+                <p className="text-sm text-yield-warning font-medium">
+                  Your portfolio is full at {MAX_PORTFOLIO_POSITIONS} stocks
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Remove a stock from your portfolio before adding another one.
+                </p>
+              </div>
+            ) : selectionFull ? (
+              <div className="rounded-lg border-[3px] border-muted-foreground/40 bg-secondary/20 p-3">
+                <p className="text-xs text-muted-foreground">
+                  You can add {capacity} more stock{capacity !== 1 ? 's' : ''} before reaching the{' '}
+                  {MAX_PORTFOLIO_POSITIONS}-stock limit.
+                </p>
+              </div>
+            ) : null}
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
