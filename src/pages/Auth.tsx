@@ -86,7 +86,7 @@ export default function Auth() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin, data: { display_name: name.trim() } },
+          options: { emailRedirectTo: `${window.location.origin}/auth`, data: { display_name: name.trim() } },
         });
         if (error) { toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' }); }
         else {
@@ -112,7 +112,7 @@ export default function Auth() {
   };
 
   const oauth = async (provider: 'google' | 'apple') => {
-    const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
+    const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: `${window.location.origin}/auth` });
     if (result.error) toast({ title: 'Sign in failed', description: (result.error as Error).message ?? String(result.error), variant: 'destructive' });
   };
 

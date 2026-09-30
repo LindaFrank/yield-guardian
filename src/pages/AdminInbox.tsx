@@ -50,7 +50,7 @@ export default function AdminInbox() {
     if (authLoading) return;
     if (!user) { navigate('/auth', { replace: true }); return; }
     if (isLoading) return;
-    if (!isAdmin) { navigate('/', { replace: true }); return; }
+    if (!isAdmin) { navigate('/app', { replace: true }); return; }
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, isLoading, authLoading, user]);

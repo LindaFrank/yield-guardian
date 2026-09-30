@@ -71,7 +71,7 @@ export default function Admin() {
     if (authLoading) return;
     if (!user) { navigate('/auth', { replace: true }); return; }
     if (isLoading) return;
-    if (!isAdmin) { navigate('/', { replace: true }); return; }
+    if (!isAdmin) { navigate('/app', { replace: true }); return; }
     load();
     loadCodes();
     loadSetting();
@@ -173,7 +173,7 @@ export default function Admin() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-6 py-8 max-w-5xl">
-        <Button variant="outline" onClick={() => navigate('/')} className="mb-4">
+        <Button variant="outline" onClick={() => navigate('/app')} className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to dashboard
         </Button>
         <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
