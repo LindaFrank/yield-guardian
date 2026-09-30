@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { StripeEmbeddedCheckout } from './StripeEmbeddedCheckout';
 import { PaymentTestModeBanner } from './PaymentTestModeBanner';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
@@ -67,6 +68,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
   const { required: inviteRequired } = useInviteCodeRequired();
 
   const reset = () => {
@@ -219,7 +221,20 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                 ))}
               </ul>
             </div>
-            <Button className="w-full shadow-glow" size="lg" onClick={() => setStep('auth')}>
+            <Button
+              className="w-full shadow-glow"
+              size="lg"
+              onClick={() => {
+                if (currentUser) {
+                  setUserId(currentUser.id);
+                  setEmail(currentUser.email ?? '');
+                  savePendingGuestPortfolio(guestTickers, guestShares);
+                  setStep('checkout');
+                } else {
+                  setStep('auth');
+                }
+              }}
+            >
               Start monitoring — $29.95/month
             </Button>
             <p className="text-center text-xs text-muted-foreground">
