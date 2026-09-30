@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { LIVE_STOCK_DATA_ENABLED } from '@/lib/featureFlags';
 import { Stock, DividendPayment } from '@/types/portfolio';
 
 interface FMPQuote {
@@ -21,6 +22,9 @@ interface FMPDividend {
 }
 
 async function callStockFunction(action: string, tickers: string[]) {
+  if (!LIVE_STOCK_DATA_ENABLED) {
+    throw new Error('Live stock data is temporarily disabled.');
+  }
   const { data, error } = await supabase.functions.invoke('stock-data', {
     body: { action, tickers },
   });

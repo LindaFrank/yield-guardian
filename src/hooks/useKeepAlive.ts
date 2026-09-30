@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { LIVE_STOCK_DATA_ENABLED } from '@/lib/featureFlags';
 
 const INTERVAL_MS = 4 * 60 * 1000; // 4 minutes — keeps the edge function warm
 
@@ -10,6 +11,7 @@ const INTERVAL_MS = 4 * 60 * 1000; // 4 minutes — keeps the edge function warm
  */
 export function useKeepAlive() {
   useEffect(() => {
+    if (!LIVE_STOCK_DATA_ENABLED) return;
     let cancelled = false;
 
     const ping = async () => {
