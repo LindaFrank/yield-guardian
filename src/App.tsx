@@ -20,6 +20,7 @@ import Contact from "./pages/Contact";
 import DownloadReport from "./pages/DownloadReport";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import ComingSoon from "./pages/ComingSoon";
 
 
 const queryClient = new QueryClient();
@@ -34,7 +35,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AuthRoute({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth();
   if (loading) return null;
-  if (session) return <Navigate to="/" replace />;
+  if (session) return <Navigate to="/app" replace />;
   return <>{children}</>;
 }
 
@@ -52,14 +53,16 @@ function PageViewTracker() {
 
 const AppRoutes = () => {
   useKeepAlive();
+  const location = useLocation();
   return (
     <BrowserRouter>
       <PageViewTracker />
       <Routes>
+        <Route path="/" element={<ComingSoon />} />
         <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/try" element={<Index />} />
-        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+        <Route path="/app" element={<ProtectedRoute><Index /></ProtectedRoute>} />
 
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="/admin/inbox" element={<ProtectedRoute><AdminInbox /></ProtectedRoute>} />
@@ -71,6 +74,7 @@ const AppRoutes = () => {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      {location.pathname !== "/" && <Footer />}
     </BrowserRouter>
   );
 };
@@ -83,7 +87,6 @@ const App = () => (
           <Toaster />
           <Sonner />
           <AppRoutes />
-          <Footer />
         </TooltipProvider>
       </HelpWizardProvider>
     </AuthProvider>
