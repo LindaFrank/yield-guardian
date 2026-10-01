@@ -146,10 +146,12 @@ export function Header({ onGuestReset }: HeaderProps) {
                 className="bg-[#0a0a0a] border-gray-500 text-[#2dd4bf] hover:bg-[#141414] hover:border-gray-400 hover:text-[#14b8a6] gap-1.5 font-semibold"
                 onClick={() => {
                   if (location.pathname === '/try') {
-                    window.dispatchEvent(new CustomEvent('yg:guest-back'));
-                  } else {
-                    handleBack();
+                    const notHandled = window.dispatchEvent(
+                      new CustomEvent('yg:guest-back', { cancelable: true }),
+                    );
+                    if (!notHandled) return;
                   }
+                  handleBack();
                 }}
               >
                 <ArrowLeft className="w-4 h-4" />

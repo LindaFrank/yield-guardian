@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { trackEvent } from "@/lib/analytics";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { HelpWizardProvider } from "@/contexts/HelpWizardContext";
 import { useKeepAlive } from "@/hooks/useKeepAlive";
@@ -37,11 +39,24 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function PageViewTracker() {
+  const location = useLocation();
+  const { user } = useAuth();
+  const last = useRef<string | null>(null);
+  useEffect(() => {
+    if (last.current === location.pathname) return;
+    last.current = location.pathname;
+    trackEvent('page_view', { category: 'Page visits', label: location.pathname, userId: user?.id ?? null });
+  }, [location.pathname, user?.id]);
+  return null;
+}
+
 const AppRoutes = () => {
   useKeepAlive();
   const location = useLocation();
   return (
     <>
+      <PageViewTracker />
       <Routes>
         <Route path="/" element={<ComingSoon />} />
         <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
