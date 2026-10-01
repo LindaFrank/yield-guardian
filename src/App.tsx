@@ -51,9 +51,13 @@ function PageViewTracker() {
   return null;
 }
 
+function ConditionalFooter() {
+  const location = useLocation();
+  return location.pathname !== "/" ? <Footer /> : null;
+}
+
 const AppRoutes = () => {
   useKeepAlive();
-  const location = useLocation();
   return (
     <BrowserRouter>
       <PageViewTracker />
@@ -74,7 +78,7 @@ const AppRoutes = () => {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {location.pathname !== "/" && <Footer />}
+      <ConditionalFooter />
     </BrowserRouter>
   );
 };
