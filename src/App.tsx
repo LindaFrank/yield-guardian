@@ -55,7 +55,7 @@ const AppRoutes = () => {
   useKeepAlive();
   const location = useLocation();
   return (
-    <>
+    <BrowserRouter>
       <PageViewTracker />
       <Routes>
         <Route path="/" element={<ComingSoon />} />
@@ -75,7 +75,7 @@ const AppRoutes = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {location.pathname !== "/" && <Footer />}
-    </>
+    </BrowserRouter>
   );
 };
 
@@ -86,9 +86,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
+          <AppRoutes />
         </TooltipProvider>
       </HelpWizardProvider>
     </AuthProvider>
