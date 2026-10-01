@@ -3,4 +3,4 @@
  * backend function, so no FMP requests are made from this build.
  * Branch-scoped: the backend function itself is shared by every branch/publish.
  */
-export const LIVE_STOCK_DATA_ENABLED = false;
+export const LIVE_STOCK_DATA_ENABLED = true;
