@@ -9,7 +9,6 @@ const corsHeaders = {
 const FMP_BASE = 'https://financialmodelingprep.com/stable';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (quotes)
 const DIVIDENDS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (dividend history rarely changes)
-const QUOTE_BATCH_SIZE = 50; // tickers per batched FMP quote request
 
 function getServiceClient() {
   return createClient(
