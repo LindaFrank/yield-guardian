@@ -9,7 +9,6 @@ const corsHeaders = {
 const FMP_BASE = 'https://financialmodelingprep.com/stable';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (quotes)
 const DIVIDENDS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (dividend history rarely changes)
-const QUOTE_BATCH_SIZE = 50; // tickers per batched FMP quote request
 
 function getServiceClient() {
   return createClient(
@@ -77,40 +76,38 @@ serve(async (req) => {
         }
       }
 
-      // Fetch stale/missing from FMP in batched requests (one FMP call per chunk)
+      // Fetch stale/missing from FMP one ticker per request.
+      // The current FMP plan returns [] for comma-separated multi-symbol quotes,
+      // so batching silently drops every price. Run in small parallel groups.
       if (stale.length > 0) {
-        for (let i = 0; i < stale.length; i += QUOTE_BATCH_SIZE) {
-          const chunk = stale.slice(i, i + QUOTE_BATCH_SIZE);
-          const url = `${FMP_BASE}/quote?symbol=${encodeURIComponent(chunk.join(','))}&apikey=${apiKey}`;
-          console.log(`Fetching batched quotes (${chunk.length} tickers): ${url.replace(apiKey, '***')}`);
-          try {
-            const res = await fetch(url);
-            if (res.ok) {
-              const data = await res.json();
-              const quotes: any[] = Array.isArray(data) ? data : data ? [data] : [];
-              const bySymbol = new Map<string, any>();
-              for (const q of quotes) {
-                if (q?.symbol) bySymbol.set(q.symbol.toUpperCase(), q);
+        const nowIso = new Date().toISOString();
+        const CONCURRENCY = 8;
+        for (let i = 0; i < stale.length; i += CONCURRENCY) {
+          const group = stale.slice(i, i + CONCURRENCY);
+          await Promise.all(
+            group.map(async (ticker: string) => {
+              try {
+                const res = await fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`);
+                if (!res.ok) {
+                  console.error(`FMP quote failed for ${ticker}: ${res.status}`);
+                  return;
+                }
+                const data = await res.json();
+                const quote = Array.isArray(data) ? data[0] : data;
+                if (quote?.symbol) {
+                  fresh[ticker] = quote;
+                  await sb.from('stock_cache').upsert(
+                    { ticker, quote_data: quote, cached_at: nowIso },
+                    { onConflict: 'ticker' }
+                  );
+                } else {
+                  console.error(`FMP quote empty for ${ticker}`);
+                }
+              } catch (e) {
+                console.error(`FMP quote error for ${ticker}:`, e);
               }
-              const nowIso = new Date().toISOString();
-              await Promise.all(
-                chunk.map(async (ticker: string) => {
-                  const quote = bySymbol.get(ticker);
-                  if (quote) {
-                    fresh[ticker] = quote;
-                    await sb.from('stock_cache').upsert(
-                      { ticker, quote_data: quote, cached_at: nowIso },
-                      { onConflict: 'ticker' }
-                    );
-                  }
-                })
-              );
-            } else {
-              console.error(`FMP batched quote failed (${chunk.length} tickers): ${res.status}`);
-            }
-          } catch (e) {
-            console.error('FMP batched quote error:', e);
-          }
+            })
+          );
         }
       }
 
