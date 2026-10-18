@@ -9,7 +9,7 @@ Tracked in one place so everyone can see what's happening. Update statuses here 
 - [ ] FMP commercial licence — Alex's reply to the 9-point email is pending (Linda)
 - [ ] Turn on live data feed / publish — blocked until the licence is signed (Linda gives the word)
 - [ ] Restore beta testers' sign-ins — waiting on Linda to name who gets back in
-- [ ] Close sign-ups for removed team members — Linda names which accounts (candidates: Anna, Shelly x2, Mindi, David Foreman, booking.it@gmail.com)
+- [ ] Include Anna — Linda says include her; confirm which account is hers (best candidate: anna@guardianyield.com, signed up Jul 24, 2026) and whether she gets app sign-in, workspace/project access, or both
 - [ ] Mindi's Project Charges tracker — keep until Mindi is paid back; Linda deletes it afterwards (permanent)
 - [ ] Mindi & Shelly app sign-ins — unlocked only with Linda's authorization
 - [ ] Shelly's contribution report — moved to her own workspace; confirmations of her design work (header separators, Back-button design) pending
