@@ -1,6 +1,7 @@
 # Yield Guardian Work Board
 
 Tracked in one place so everyone can see what's happening. Update statuses here as work moves.
+Single living document — wording is corrected in place, no numbered copies kept.
 
 ## In progress
 - [ ] Mindi's app review — she flags anything that looks off; findings get added below or fixed directly
@@ -9,7 +10,8 @@ Tracked in one place so everyone can see what's happening. Update statuses here 
 - [ ] FMP commercial licence — Alex's reply to the 9-point email is pending (Linda)
 - [ ] Turn on live data feed / publish — blocked until the licence is signed (Linda gives the word)
 - [ ] Restore beta testers' sign-ins — waiting for the commercial API license from FMP
-- [ ] Include Anna — Linda says include her; confirm which account is hers (best candidate: anna@guardianyield.com, signed up Jul 24, 2026) and whether she gets app sign-in, workspace/project access, or both
+- [ ] Identify the existing app account booking.it@gmail.com — account name is Jane Doe; sign-in and portfolio activity recorded; currently locked. Who invited or created it is unverified. This was probably a test account created by one of the team members. Safe to keep locked down until the commercial API license is in place.
+- [x] Dave Foreman removed from the pending account-review list — Linda confirms his earlier Preview access expired; no account deletion requested.
 - [ ] Mindi's Project Charges tracker — keep as a shared record of costs the team fronted; income is shared equally, so it is not a repayment list. Removing it is permanent and only Linda can do it — remove only when the team agrees it is no longer needed
 - [ ] Mindi & Shelly app sign-ins — unlocked only with Linda's authorization
 - [ ] Shelly's contribution report — moved to her own workspace; confirmations of her design work (header separators, Back-button design) pending
