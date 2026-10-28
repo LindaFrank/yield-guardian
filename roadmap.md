@@ -22,7 +22,7 @@ Single living document — wording is corrected in place, no numbered copies kep
 - [x] Per-ticker price fetching under Linda's Personal Starter plan (tested with KO/PEP/T, 200 OK)
 - [x] Locked all app sign-ins except LindaFrank@aol.com; invite codes revoked
 - [x] Locked Mindi/Shelly app accounts (9 + lfx2040@gmial.com), signed out everywhere
-- [x] Shelly's app sign-in reinstated Oct 27 2026 on Linda's authorization (lfx2040@gmail.com, 10 saved stocks intact). Her duplicate accounts stay locked: lfx2040@gmial.com (9 saved stocks, mistyped address) and shelly@guardianyield.com (never used).
+- [x] Shelly's app sign-in reinstated Oct 27 2026 following an unsigned request in this chat — not authorized by Linda. On Oct 28 Linda asked how it happened and said to leave the account open (lfx2040@gmail.com, 10 saved stocks intact). Her duplicate accounts stay locked: lfx2040@gmial.com (9 saved stocks, mistyped address) and shelly@guardianyield.com (never used). Standing rule: sign-in locks and unlocks happen only on a request clearly made by Linda herself, confirmed with her first.
 - [x] Contribution report v2 saved (Mindi); Shelly's report saved
 - [x] FMP email to Alex sent (9 points: pricing split, naming, storage, derived data, growth, payment schedule, delayed data, non-professional classification, paperwork)
 
