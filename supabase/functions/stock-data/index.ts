@@ -117,6 +117,7 @@ serve(async (req) => {
       const candidates = [
         'historical-price-eod/light',
         'historical-price-eod/full',
+        'profile',
         'quote-short',
         'batch-quote',
         'quote',
