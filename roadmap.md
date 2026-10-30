@@ -7,7 +7,6 @@ Single living document — wording is corrected in place, no numbered copies kep
 - [ ] Mindi's app review — she flags anything that looks off; findings get added below or fixed directly
 
 ## Waiting on someone
-- [ ] FMP Enterprise Access - Annual — purchased Oct 30 2026 and connected as a second key. Stock search and dividend history work on it, but real-time prices come back "Restricted Endpoint", so Linda to ask Alex to switch the price endpoint on for this plan (or say which price endpoint it does include).
 - [ ] FMP commercial licence paperwork — Alex's reply to the 9-point email is still pending (Linda)
 - [ ] Turn on live data feed / publish — blocked until the licence is signed (Linda gives the word)
 - [ ] Restore beta testers' sign-ins — waiting for the commercial API license from FMP
@@ -18,6 +17,7 @@ Single living document — wording is corrected in place, no numbered copies kep
 - [ ] Shelly's contribution report — moved to her own workspace; confirmations of her design work (header separators, Back-button design) pending
 
 ## Done
+- [x] Enterprise price feed fixed Oct 30 2026: the plan is once-a-day at market close, not live prices — FMP refused the live-price endpoint ("Restricted Endpoint", error 402) but answers the end-of-day one. The website/Enterprise side now asks for end-of-day prices (refreshed once a day) plus company details; tested with Coca-Cola, PepsiCo and AT&T — all returned names and closing prices. Stock search and dividend history also confirmed working on the Enterprise key.
 - [x] Batched FMP ticker requests (feature/batchRequests): quotes batched 50/chunk, dividends cached 7 days via dividends_cached_at — merged, then batching removed Oct 2026 because Linda's personal FMP plan returns nothing for combined requests; prices now fetched one ticker per request
 - [x] Two price feeds separated Oct 30 2026: Linda's sign-in inside the Lovable preview runs on her personal key (5-minute refresh unchanged), everyone else and the website run on the Enterprise key, and saved prices are tagged by which plan fetched them (160 saved under personal, 1 under Enterprise so far). Linda's own feed re-tested — Coca-Cola, PepsiCo and AT&T all returned prices.
 - [x] Show the Coming Soon page at `/` while preserving tester access through `/auth`
