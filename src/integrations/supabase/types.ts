@@ -212,6 +212,30 @@ export type Database = {
         }
         Relationships: []
       }
+      fmp_eod_snapshot: {
+        Row: {
+          id: string
+          market_date: string | null
+          next_attempt_at: string
+          prices: Json
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          market_date?: string | null
+          next_attempt_at?: string
+          prices?: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          market_date?: string | null
+          next_attempt_at?: string
+          prices?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       login_events: {
         Row: {
           id: string
@@ -533,6 +557,7 @@ export type Database = {
     }
     Functions: {
       check_invite_code: { Args: { _code: string }; Returns: boolean }
+      claim_fmp_eod_download: { Args: never; Returns: boolean }
       consume_invite_code: { Args: { _code: string }; Returns: boolean }
       get_admin_metrics: { Args: never; Returns: Json }
       get_payments_enabled: { Args: never; Returns: boolean }

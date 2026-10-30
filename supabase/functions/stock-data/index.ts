@@ -1,10 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-};
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import Papa from 'npm:papaparse@5.7.0';
+import { z } from 'npm:zod@3.25.76';
+import { completedSessionDate, decodeEod, latestCompletedEod, type EodRow } from './eod.ts';
 
 const FMP_BASE = 'https://financialmodelingprep.com/stable';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (personal plan: live quotes)
@@ -24,9 +23,12 @@ type DataSource = 'personal' | 'commercial';
 const PERSONAL_OWNER_EMAIL = (Deno.env.get('FMP_PERSONAL_USER_EMAIL') || 'lindafrank@aol.com').toLowerCase();
 
 function getServiceClient() {
+  const url = Deno.env.get('SUPABASE_URL');
+  const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!url || !key) throw new Error('Price service is not configured');
   return createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    url,
+    key
   );
 }
 
@@ -57,11 +59,42 @@ async function callerEmail(sb: ReturnType<typeof getServiceClient>, req: Request
 async function resolveSource(req: Request, sb: ReturnType<typeof getServiceClient>): Promise<DataSource> {
   const email = await callerEmail(sb, req);
   if (email === PERSONAL_OWNER_EMAIL && isPreviewOrigin(req)) return 'personal';
-  // Transitional: until the Enterprise key is stored, the preview keeps working on
-  // the personal feed. The published website never takes this path.
-  if (isPreviewOrigin(req) && !Deno.env.get('FMP_ENTERPRISE_API_KEY')) return 'personal';
   return 'commercial';
 }
+
+async function bulkEod(sb: ReturnType<typeof getServiceClient>, apiKey: string, date: string): Promise<Record<string, EodRow>> {
+  const { data: snapshot, error } = await sb.from('fmp_eod_snapshot').select('market_date, prices').eq('id', 'commercial').maybeSingle();
+  if (error) throw new Error('Cannot read shared closing-price snapshot');
+  if (snapshot?.market_date === date) return snapshot.prices as Record<string, EodRow>;
+  const { data: claimed, error: claimError } = await sb.rpc('claim_fmp_eod_download');
+  if (claimError) throw new Error('Cannot claim closing-price download');
+  if (!claimed) {
+    console.log(`[eod-bulk] retry deferred date=${date}`);
+    return {};
+  }
+  try {
+    const response = await fetch(`${FMP_BASE}/eod-bulk?date=${date}&apikey=${encodeURIComponent(apiKey)}`, { signal: AbortSignal.timeout(45000) });
+    if (!response.ok) {
+      console.warn(`[eod-bulk] unavailable status=${response.status} date=${date}; using per-ticker fallback`);
+      return {};
+    }
+    const prices = decodeEod(await response.text(), date, (text) =>
+      Papa.parse<Record<string, unknown>>(text, { header: true, skipEmptyLines: true }).data);
+    if (!Object.keys(prices).length) return {};
+    const { error: saveError } = await sb.from('fmp_eod_snapshot').update({ market_date: date, prices, updated_at: new Date().toISOString() }).eq('id', 'commercial');
+    if (saveError) throw new Error('Cannot save shared closing prices');
+    console.log(`[eod-bulk] saved date=${date} symbols=${Object.keys(prices).length}`);
+    return prices;
+  } catch (error) {
+    console.warn(`[eod-bulk] download failed: ${redactKey(String(error))}`);
+    return {};
+  }
+}
+
+const BodySchema = z.object({
+  action: z.enum(['ping', 'quote', 'dividends', 'search']),
+  tickers: z.array(z.string().min(1).max(100)).min(1).max(100).optional(),
+}).refine((body) => body.action === 'ping' || Boolean(body.tickers?.length), { message: 'tickers array required' });
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -69,7 +102,11 @@ serve(async (req) => {
   }
 
   try {
-    const { action, tickers } = await req.json();
+    const parsed = BodySchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) return new Response(JSON.stringify({ error: 'Invalid price request' }), {
+      status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+    const { action, tickers } = parsed.data;
 
     // Lightweight keep-alive ping — no FMP call, no DB call.
     if (action === 'ping') {
@@ -114,23 +151,25 @@ serve(async (req) => {
         .in('ticker', cleanTickers);
 
       const now = Date.now();
+      const completedDate = completedSessionDate(new Date(now));
       const fresh: Record<string, any> = {};
       const stale: string[] = [];
 
       const quoteTtl = source === 'personal' ? CACHE_TTL_MS : COMMERCIAL_CACHE_TTL_MS;
       for (const ticker of cleanTickers) {
         const hit = cached?.find((c: any) => c.ticker === ticker);
-        if (hit && hit.quote_data && (now - new Date(hit.cached_at).getTime()) < quoteTtl) {
+        if (hit && hit.quote_data && (now - new Date(hit.cached_at).getTime()) < quoteTtl &&
+          (source === 'personal' || hit.quote_data.eodDate === completedDate)) {
           fresh[ticker] = hit.quote_data;
         } else {
           stale.push(ticker);
         }
       }
 
-      // Neither plan supports combined quotes: fetch one ticker per request.
-      // Personal uses the live /quote endpoint; Enterprise (once-a-day at market
-      // close) uses /historical-price-eod/full for the close price and /profile
-      // for the company name and market details.
+      // Only Enterprise uses the date-wide bulk EOD download. Personal remains per ticker.
+      const bulk = source === 'commercial' && stale.length ? await bulkEod(sb, apiKey, completedDate) : {};
+      let bulkHits = 0;
+      let fallbackHits = 0;
       if (stale.length > 0) {
         const nowIso = new Date().toISOString();
         await Promise.all(
@@ -151,33 +190,31 @@ serve(async (req) => {
                 }
                 quote = q;
               } else {
-                const [eodRes, profileRes] = await Promise.all([
-                  fetch(`${FMP_BASE}/historical-price-eod/full?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`),
-                  fetch(`${FMP_BASE}/profile?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`),
-                ]);
-                const eodText = await eodRes.text();
-                let eodData: any = null;
-                try { eodData = JSON.parse(eodText); } catch { /* non-JSON body */ }
-                const eod = Array.isArray(eodData) ? eodData[0] : eodData;
-                if (!eodRes.ok || !eod?.symbol) {
-                  console.error(
-                    `FMP eod quote unusable for ${ticker} (${source}): status=${eodRes.status} body=${redactKey(eodText).slice(0, 300)}`
-                  );
-                  return;
+                let eod = bulk[ticker];
+                if (eod) bulkHits++;
+                else {
+                  fallbackHits++;
+                  const res = await fetch(`${FMP_BASE}/historical-price-eod/full?symbol=${encodeURIComponent(ticker)}&to=${completedDate}&apikey=${apiKey}`);
+                  const rows = res.ok ? await res.json() : [];
+                  const completed = latestCompletedEod(Array.isArray(rows) ? rows : [], completedDate);
+                  if (!completed) return;
+                  eod = completed;
                 }
-                let profile: any = null;
-                if (profileRes.ok) {
-                  const pd = await profileRes.json();
-                  profile = Array.isArray(pd) ? pd[0] : pd;
+                // Reuse saved company details; never use the profile's live price.
+                let profile: any = cached?.find((c: any) => c.ticker === ticker)?.quote_data;
+                if (!profile?.name || profile.name === ticker) {
+                  const profileRes = await fetch(`${FMP_BASE}/profile?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`);
+                  if (profileRes.ok) {
+                    const pd = await profileRes.json();
+                    profile = Array.isArray(pd) ? pd[0] : pd;
+                  }
                 }
                 // Shape the end-of-day record like a live quote so the rest of
                 // the app doesn't care which plan answered.
                 quote = {
                   symbol: eod.symbol,
-                  name: profile?.companyName || eod.symbol,
+                  name: profile?.companyName || profile?.name || eod.symbol,
                   price: eod.close,
-                  change: eod.change,
-                  changePercentage: eod.changePercent,
                   dayHigh: eod.high,
                   dayLow: eod.low,
                   open: eod.open,
@@ -200,8 +237,10 @@ serve(async (req) => {
       }
 
       const allQuotes = cleanTickers.map((t) => fresh[t]).filter(Boolean);
+      if (source === 'commercial') console.log(`[eod-bulk] requested=${stale.length} bulk=${bulkHits} fallback=${fallbackHits}`);
       return new Response(JSON.stringify(allQuotes), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'x-fmp-source': source },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'x-fmp-source': source,
+          'x-eod-bulk-count': String(bulkHits), 'x-eod-fallback-count': String(fallbackHits) },
       });
     }
 
