@@ -104,6 +104,38 @@ serve(async (req) => {
     // For search, preserve the raw query (so things like "AT&T" still match by name)
     const rawQuery = typeof tickers[0] === 'string' ? tickers[0].trim() : '';
 
+    // Temporary diagnostic: ask the Enterprise key which price endpoints it will
+    // answer. Linda's plan is once-a-day at market close, so we expect an
+    // end-of-day endpoint to work where /quote did not. Remove once settled.
+    if (action === 'probe') {
+      const key = Deno.env.get('FMP_ENTERPRISE_API_KEY');
+      if (!key) {
+        return new Response(JSON.stringify({ error: 'No Enterprise key stored' }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const candidates = [
+        'historical-price-eod/light',
+        'historical-price-eod/full',
+        'quote-short',
+        'batch-quote',
+        'quote',
+      ];
+      const out: Record<string, any> = {};
+      for (const path of candidates) {
+        try {
+          const res = await fetch(`${FMP_BASE}/${path}?symbol=KO&apikey=${key}`);
+          const text = await res.text();
+          out[path] = { status: res.status, body: redactKey(text).slice(0, 200) };
+        } catch (e) {
+          out[path] = { status: 0, body: String(e) };
+        }
+      }
+      return new Response(JSON.stringify(out), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     if (action === 'quote') {
       // Check cache first — only rows fetched under the same plan.
       const { data: cached } = await sb
