@@ -7,7 +7,8 @@ const corsHeaders = {
 };
 
 const FMP_BASE = 'https://financialmodelingprep.com/stable';
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (quotes)
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (personal plan: live quotes)
+const COMMERCIAL_CACHE_TTL_MS = 20 * 60 * 60 * 1000; // 20 hours (Enterprise plan: once-a-day at market close)
 const DIVIDENDS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (dividend history rarely changes)
 
 // Two FMP plans run side by side in this project:
@@ -116,31 +117,75 @@ serve(async (req) => {
       const fresh: Record<string, any> = {};
       const stale: string[] = [];
 
+      const quoteTtl = source === 'personal' ? CACHE_TTL_MS : COMMERCIAL_CACHE_TTL_MS;
       for (const ticker of cleanTickers) {
         const hit = cached?.find((c: any) => c.ticker === ticker);
-        if (hit && hit.quote_data && (now - new Date(hit.cached_at).getTime()) < CACHE_TTL_MS) {
+        if (hit && hit.quote_data && (now - new Date(hit.cached_at).getTime()) < quoteTtl) {
           fresh[ticker] = hit.quote_data;
         } else {
           stale.push(ticker);
         }
       }
 
-      // Personal Starter plan does not support combined quotes: fetch one ticker per request.
+      // Neither plan supports combined quotes: fetch one ticker per request.
+      // Personal uses the live /quote endpoint; Enterprise (once-a-day at market
+      // close) uses /historical-price-eod/full for the close price and /profile
+      // for the company name and market details.
       if (stale.length > 0) {
         const nowIso = new Date().toISOString();
         await Promise.all(
           stale.map(async (ticker: string) => {
             try {
-              const res = await fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`);
-              const text = await res.text();
-              let data: any = null;
-              try { data = JSON.parse(text); } catch { /* non-JSON body */ }
-              const quote = Array.isArray(data) ? data[0] : data;
-              if (!res.ok || !quote?.symbol) {
-                console.error(
-                  `FMP quote unusable for ${ticker} (${source}): status=${res.status} body=${redactKey(text).slice(0, 300)}`
-                );
-                return;
+              let quote: any = null;
+              if (source === 'personal') {
+                const res = await fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`);
+                const text = await res.text();
+                let data: any = null;
+                try { data = JSON.parse(text); } catch { /* non-JSON body */ }
+                const q = Array.isArray(data) ? data[0] : data;
+                if (!res.ok || !q?.symbol) {
+                  console.error(
+                    `FMP quote unusable for ${ticker} (${source}): status=${res.status} body=${redactKey(text).slice(0, 300)}`
+                  );
+                  return;
+                }
+                quote = q;
+              } else {
+                const [eodRes, profileRes] = await Promise.all([
+                  fetch(`${FMP_BASE}/historical-price-eod/full?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`),
+                  fetch(`${FMP_BASE}/profile?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`),
+                ]);
+                const eodText = await eodRes.text();
+                let eodData: any = null;
+                try { eodData = JSON.parse(eodText); } catch { /* non-JSON body */ }
+                const eod = Array.isArray(eodData) ? eodData[0] : eodData;
+                if (!eodRes.ok || !eod?.symbol) {
+                  console.error(
+                    `FMP eod quote unusable for ${ticker} (${source}): status=${eodRes.status} body=${redactKey(eodText).slice(0, 300)}`
+                  );
+                  return;
+                }
+                let profile: any = null;
+                if (profileRes.ok) {
+                  const pd = await profileRes.json();
+                  profile = Array.isArray(pd) ? pd[0] : pd;
+                }
+                // Shape the end-of-day record like a live quote so the rest of
+                // the app doesn't care which plan answered.
+                quote = {
+                  symbol: eod.symbol,
+                  name: profile?.companyName || eod.symbol,
+                  price: eod.close,
+                  change: eod.change,
+                  changePercentage: eod.changePercent,
+                  dayHigh: eod.high,
+                  dayLow: eod.low,
+                  open: eod.open,
+                  volume: eod.volume,
+                  marketCap: profile?.marketCap,
+                  exchange: profile?.exchange,
+                  eodDate: eod.date,
+                };
               }
               fresh[ticker] = quote;
               await sb.from('stock_cache').upsert(
@@ -220,12 +265,14 @@ serve(async (req) => {
       async function runSearch(q: string) {
         if (!q) return [] as any[];
         console.log(`[search] querying FMP with q="${q}"`);
+        // Enterprise key can't call /quote; /profile serves the same exact-match lookup.
+        const exactPath = source === 'personal' ? 'quote' : 'profile';
         const [searchRes, nameRes, quoteRes] = await Promise.all([
           fetch(`${FMP_BASE}/search-symbol?query=${encodeURIComponent(q)}&apikey=${apiKey}`),
           fetch(`${FMP_BASE}/search-name?query=${encodeURIComponent(q)}&apikey=${apiKey}`),
-          fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(q)}&apikey=${apiKey}`),
+          fetch(`${FMP_BASE}/${exactPath}?symbol=${encodeURIComponent(q)}&apikey=${apiKey}`),
         ]);
-        console.log(`[search] status sym=${searchRes.status} name=${nameRes.status} quote=${quoteRes.status}`);
+        console.log(`[search] status sym=${searchRes.status} name=${nameRes.status} exact=${quoteRes.status}`);
         let acc: any[] = [];
         if (searchRes.ok) {
           const d = await searchRes.json();
@@ -244,12 +291,13 @@ serve(async (req) => {
           const quote = Array.isArray(qd) ? qd[0] : qd;
           if (quote && quote.symbol) {
             const idx = acc.findIndex((r: any) => r.symbol === quote.symbol);
+            // /quote returns name; /profile returns companyName + exchangeShortName
             const entry = {
               symbol: quote.symbol,
-              name: quote.name,
+              name: quote.name || quote.companyName,
               currency: 'USD',
-              stockExchange: quote.exchange,
-              exchange: quote.exchange,
+              stockExchange: quote.exchange || quote.exchangeShortName,
+              exchange: quote.exchange || quote.exchangeShortName,
             };
             if (idx >= 0) acc.splice(idx, 1);
             acc.unshift(entry);
