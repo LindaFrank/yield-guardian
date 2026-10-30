@@ -350,6 +350,7 @@ export type Database = {
           dividends_cached_at: string | null
           dividends_data: Json | null
           quote_data: Json | null
+          source: string
           ticker: string
         }
         Insert: {
@@ -357,6 +358,7 @@ export type Database = {
           dividends_cached_at?: string | null
           dividends_data?: Json | null
           quote_data?: Json | null
+          source?: string
           ticker: string
         }
         Update: {
@@ -364,6 +366,7 @@ export type Database = {
           dividends_cached_at?: string | null
           dividends_data?: Json | null
           quote_data?: Json | null
+          source?: string
           ticker?: string
         }
         Relationships: []

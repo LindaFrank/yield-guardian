@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793372349867,
+      "tag": "0000_add_data_source_to_stock_cache",
+      "breakpoints": true
+    }
+  ]
+}
