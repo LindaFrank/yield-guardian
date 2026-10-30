@@ -220,7 +220,7 @@ serve(async (req) => {
           if (Array.isArray(d)) acc = d;
         }
         if (nameRes.ok) {
-          const d = await resJson(nameRes);
+          const d = await nameRes.json();
           if (Array.isArray(d)) {
             for (const item of d) {
               if (item?.symbol && !acc.some((r: any) => r.symbol === item.symbol)) acc.push(item);
@@ -272,10 +272,3 @@ serve(async (req) => {
   }
 });
 
-async function resJson(res: Response) {
-  try {
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
