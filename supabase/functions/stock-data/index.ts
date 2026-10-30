@@ -35,6 +35,11 @@ function isPreviewOrigin(req: Request): boolean {
   return origin.includes('preview') || origin.includes('localhost') || origin.includes('127.0.0.1');
 }
 
+// Never let a key leak into the logs if a provider ever echoes the request back.
+function redactKey(text: string): string {
+  return (text || '').replace(/apikey=[^&"' ]+/gi, 'apikey=[redacted]');
+}
+
 async function callerEmail(sb: ReturnType<typeof getServiceClient>, req: Request): Promise<string | null> {
   const authHeader = req.headers.get('authorization') || '';
   const token = authHeader.replace(/^Bearer\s+/i, '').trim();
