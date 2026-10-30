@@ -4,6 +4,7 @@ Tracked in one place so everyone can see what's happening. Update statuses here 
 Single living document — wording is corrected in place, no numbered copies kept.
 
 ## In progress
+- [ ] Try Enterprise end-of-day batching; verify FMP support and preserve Linda's personal five-minute feed. Do not publish.
 - [ ] Mindi's app review — she flags anything that looks off; findings get added below or fixed directly
 
 ## Waiting on someone
