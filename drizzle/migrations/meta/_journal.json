@@ -8,6 +8,13 @@
       "when": 1793372349867,
       "tag": "0000_add_data_source_to_stock_cache",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793375804359,
+      "tag": "0001_shared_enterprise_eod_snapshot",
+      "breakpoints": true
     }
   ]
 }
