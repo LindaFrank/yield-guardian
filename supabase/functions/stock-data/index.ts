@@ -180,18 +180,23 @@ serve(async (req) => {
             const res = await fetch(
               `${FMP_BASE}/dividends?symbol=${ticker}&apikey=${apiKey}`
             );
-            if (res.ok) {
-              const data = await res.json();
-              const historical = Array.isArray(data) ? data.slice(0, 20) : [];
-              results[ticker] = historical;
-              // Upsert cache — refresh only the dividend timestamp so quote freshness is untouched
-              await sb.from('stock_cache').upsert(
-                { ticker, source, dividends_data: historical, dividends_cached_at: new Date().toISOString() },
-                { onConflict: 'ticker,source' }
+            const text = await res.text();
+            let data: any = null;
+            try { data = JSON.parse(text); } catch { /* non-JSON body */ }
+            const historical = Array.isArray(data) ? data.slice(0, 20) : [];
+            if (!res.ok || historical.length === 0) {
+              console.error(
+                `FMP dividends unusable for ${ticker} (${source}): status=${res.status} body=${redactKey(text).slice(0, 300)}`
               );
-            } else {
               results[ticker] = [];
+              return;
             }
+            results[ticker] = historical;
+            // Upsert cache — refresh only the dividend timestamp so quote freshness is untouched
+            await sb.from('stock_cache').upsert(
+              { ticker, source, dividends_data: historical, dividends_cached_at: new Date().toISOString() },
+              { onConflict: 'ticker,source' }
+            );
           })
         );
       }
