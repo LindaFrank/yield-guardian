@@ -127,19 +127,21 @@ serve(async (req) => {
           stale.map(async (ticker: string) => {
             try {
               const res = await fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`);
-              if (!res.ok) {
-                console.error(`FMP quote failed for ${ticker}: ${res.status}`);
+              const text = await res.text();
+              let data: any = null;
+              try { data = JSON.parse(text); } catch { /* non-JSON body */ }
+              const quote = Array.isArray(data) ? data[0] : data;
+              if (!res.ok || !quote?.symbol) {
+                console.error(
+                  `FMP quote unusable for ${ticker} (${source}): status=${res.status} body=${redactKey(text).slice(0, 300)}`
+                );
                 return;
               }
-              const data = await res.json();
-              const quote = Array.isArray(data) ? data[0] : data;
-              if (quote?.symbol) {
-                fresh[ticker] = quote;
-                await sb.from('stock_cache').upsert(
-                  { ticker, source, quote_data: quote, cached_at: nowIso },
-                  { onConflict: 'ticker,source' }
-                );
-              }
+              fresh[ticker] = quote;
+              await sb.from('stock_cache').upsert(
+                { ticker, source, quote_data: quote, cached_at: nowIso },
+                { onConflict: 'ticker,source' }
+              );
             } catch (e) {
               console.error(`FMP quote error for ${ticker}:`, e);
             }
