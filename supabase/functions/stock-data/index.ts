@@ -7,7 +7,8 @@ const corsHeaders = {
 };
 
 const FMP_BASE = 'https://financialmodelingprep.com/stable';
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (quotes)
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (personal plan: live quotes)
+const COMMERCIAL_CACHE_TTL_MS = 20 * 60 * 60 * 1000; // 20 hours (Enterprise plan: once-a-day at market close)
 const DIVIDENDS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (dividend history rarely changes)
 
 // Two FMP plans run side by side in this project:
