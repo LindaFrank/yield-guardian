@@ -298,12 +298,14 @@ serve(async (req) => {
       async function runSearch(q: string) {
         if (!q) return [] as any[];
         console.log(`[search] querying FMP with q="${q}"`);
+        // Enterprise key can't call /quote; /profile serves the same exact-match lookup.
+        const exactPath = source === 'personal' ? 'quote' : 'profile';
         const [searchRes, nameRes, quoteRes] = await Promise.all([
           fetch(`${FMP_BASE}/search-symbol?query=${encodeURIComponent(q)}&apikey=${apiKey}`),
           fetch(`${FMP_BASE}/search-name?query=${encodeURIComponent(q)}&apikey=${apiKey}`),
-          fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(q)}&apikey=${apiKey}`),
+          fetch(`${FMP_BASE}/${exactPath}?symbol=${encodeURIComponent(q)}&apikey=${apiKey}`),
         ]);
-        console.log(`[search] status sym=${searchRes.status} name=${nameRes.status} quote=${quoteRes.status}`);
+        console.log(`[search] status sym=${searchRes.status} name=${nameRes.status} exact=${quoteRes.status}`);
         let acc: any[] = [];
         if (searchRes.ok) {
           const d = await searchRes.json();
