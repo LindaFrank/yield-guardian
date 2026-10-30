@@ -324,12 +324,13 @@ serve(async (req) => {
           const quote = Array.isArray(qd) ? qd[0] : qd;
           if (quote && quote.symbol) {
             const idx = acc.findIndex((r: any) => r.symbol === quote.symbol);
+            // /quote returns name; /profile returns companyName + exchangeShortName
             const entry = {
               symbol: quote.symbol,
-              name: quote.name,
+              name: quote.name || quote.companyName,
               currency: 'USD',
-              stockExchange: quote.exchange,
-              exchange: quote.exchange,
+              stockExchange: quote.exchange || quote.exchangeShortName,
+              exchange: quote.exchange || quote.exchangeShortName,
             };
             if (idx >= 0) acc.splice(idx, 1);
             acc.unshift(entry);
