@@ -160,22 +160,65 @@ serve(async (req) => {
         }
       }
 
-      // Personal Starter plan does not support combined quotes: fetch one ticker per request.
+      // Neither plan supports combined quotes: fetch one ticker per request.
+      // Personal uses the live /quote endpoint; Enterprise (once-a-day at market
+      // close) uses /historical-price-eod/full for the close price and /profile
+      // for the company name and market details.
       if (stale.length > 0) {
         const nowIso = new Date().toISOString();
         await Promise.all(
           stale.map(async (ticker: string) => {
             try {
-              const res = await fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`);
-              const text = await res.text();
-              let data: any = null;
-              try { data = JSON.parse(text); } catch { /* non-JSON body */ }
-              const quote = Array.isArray(data) ? data[0] : data;
-              if (!res.ok || !quote?.symbol) {
-                console.error(
-                  `FMP quote unusable for ${ticker} (${source}): status=${res.status} body=${redactKey(text).slice(0, 300)}`
-                );
-                return;
+              let quote: any = null;
+              if (source === 'personal') {
+                const res = await fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`);
+                const text = await res.text();
+                let data: any = null;
+                try { data = JSON.parse(text); } catch { /* non-JSON body */ }
+                const q = Array.isArray(data) ? data[0] : data;
+                if (!res.ok || !q?.symbol) {
+                  console.error(
+                    `FMP quote unusable for ${ticker} (${source}): status=${res.status} body=${redactKey(text).slice(0, 300)}`
+                  );
+                  return;
+                }
+                quote = q;
+              } else {
+                const [eodRes, profileRes] = await Promise.all([
+                  fetch(`${FMP_BASE}/historical-price-eod/full?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`),
+                  fetch(`${FMP_BASE}/profile?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`),
+                ]);
+                const eodText = await eodRes.text();
+                let eodData: any = null;
+                try { eodData = JSON.parse(eodText); } catch { /* non-JSON body */ }
+                const eod = Array.isArray(eodData) ? eodData[0] : eodData;
+                if (!eodRes.ok || !eod?.symbol) {
+                  console.error(
+                    `FMP eod quote unusable for ${ticker} (${source}): status=${eodRes.status} body=${redactKey(eodText).slice(0, 300)}`
+                  );
+                  return;
+                }
+                let profile: any = null;
+                if (profileRes.ok) {
+                  const pd = await profileRes.json();
+                  profile = Array.isArray(pd) ? pd[0] : pd;
+                }
+                // Shape the end-of-day record like a live quote so the rest of
+                // the app doesn't care which plan answered.
+                quote = {
+                  symbol: eod.symbol,
+                  name: profile?.companyName || eod.symbol,
+                  price: eod.close,
+                  change: eod.change,
+                  changePercentage: eod.changePercent,
+                  dayHigh: eod.high,
+                  dayLow: eod.low,
+                  open: eod.open,
+                  volume: eod.volume,
+                  marketCap: profile?.marketCap,
+                  exchange: profile?.exchange,
+                  eodDate: eod.date,
+                };
               }
               fresh[ticker] = quote;
               await sb.from('stock_cache').upsert(
