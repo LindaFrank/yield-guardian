@@ -7,7 +7,8 @@ Single living document — wording is corrected in place, no numbered copies kep
 - [ ] Mindi's app review — she flags anything that looks off; findings get added below or fixed directly
 
 ## Waiting on someone
-- [ ] FMP commercial licence — Alex's reply to the 9-point email is pending (Linda)
+- [ ] FMP Enterprise Access - Annual — purchased Oct 30 2026 and connected as a second key. Stock search and dividend history work on it, but real-time prices come back "Restricted Endpoint", so Linda to ask Alex to switch the price endpoint on for this plan (or say which price endpoint it does include).
+- [ ] FMP commercial licence paperwork — Alex's reply to the 9-point email is still pending (Linda)
 - [ ] Turn on live data feed / publish — blocked until the licence is signed (Linda gives the word)
 - [ ] Restore beta testers' sign-ins — waiting for the commercial API license from FMP
 - [ ] Identify the existing app account booking.it@gmail.com — account name is Jane Doe; sign-in and portfolio activity recorded; currently locked. Who invited or created it is unverified. This was probably a test account created by one of the team members. Safe to keep locked down until the commercial API license is in place.
@@ -18,6 +19,7 @@ Single living document — wording is corrected in place, no numbered copies kep
 
 ## Done
 - [x] Batched FMP ticker requests (feature/batchRequests): quotes batched 50/chunk, dividends cached 7 days via dividends_cached_at — merged, then batching removed Oct 2026 because Linda's personal FMP plan returns nothing for combined requests; prices now fetched one ticker per request
+- [x] Two price feeds separated Oct 30 2026: Linda's sign-in inside the Lovable preview runs on her personal key (5-minute refresh unchanged), everyone else and the website run on the Enterprise key, and saved prices are tagged by which plan fetched them (160 saved under personal, 1 under Enterprise so far). Linda's own feed re-tested — Coca-Cola, PepsiCo and AT&T all returned prices.
 - [x] Show the Coming Soon page at `/` while preserving tester access through `/auth`
 - [x] Per-ticker price fetching under Linda's Personal Starter plan (tested with KO/PEP/T, 200 OK)
 - [x] Locked all app sign-ins except LindaFrank@aol.com; invite codes revoked

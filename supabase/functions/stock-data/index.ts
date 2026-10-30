@@ -35,6 +35,11 @@ function isPreviewOrigin(req: Request): boolean {
   return origin.includes('preview') || origin.includes('localhost') || origin.includes('127.0.0.1');
 }
 
+// Never let a key leak into the logs if a provider ever echoes the request back.
+function redactKey(text: string): string {
+  return (text || '').replace(/apikey=[^&"' ]+/gi, 'apikey=[redacted]');
+}
+
 async function callerEmail(sb: ReturnType<typeof getServiceClient>, req: Request): Promise<string | null> {
   const authHeader = req.headers.get('authorization') || '';
   const token = authHeader.replace(/^Bearer\s+/i, '').trim();
@@ -127,19 +132,21 @@ serve(async (req) => {
           stale.map(async (ticker: string) => {
             try {
               const res = await fetch(`${FMP_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`);
-              if (!res.ok) {
-                console.error(`FMP quote failed for ${ticker}: ${res.status}`);
+              const text = await res.text();
+              let data: any = null;
+              try { data = JSON.parse(text); } catch { /* non-JSON body */ }
+              const quote = Array.isArray(data) ? data[0] : data;
+              if (!res.ok || !quote?.symbol) {
+                console.error(
+                  `FMP quote unusable for ${ticker} (${source}): status=${res.status} body=${redactKey(text).slice(0, 300)}`
+                );
                 return;
               }
-              const data = await res.json();
-              const quote = Array.isArray(data) ? data[0] : data;
-              if (quote?.symbol) {
-                fresh[ticker] = quote;
-                await sb.from('stock_cache').upsert(
-                  { ticker, source, quote_data: quote, cached_at: nowIso },
-                  { onConflict: 'ticker,source' }
-                );
-              }
+              fresh[ticker] = quote;
+              await sb.from('stock_cache').upsert(
+                { ticker, source, quote_data: quote, cached_at: nowIso },
+                { onConflict: 'ticker,source' }
+              );
             } catch (e) {
               console.error(`FMP quote error for ${ticker}:`, e);
             }
@@ -180,18 +187,23 @@ serve(async (req) => {
             const res = await fetch(
               `${FMP_BASE}/dividends?symbol=${ticker}&apikey=${apiKey}`
             );
-            if (res.ok) {
-              const data = await res.json();
-              const historical = Array.isArray(data) ? data.slice(0, 20) : [];
-              results[ticker] = historical;
-              // Upsert cache — refresh only the dividend timestamp so quote freshness is untouched
-              await sb.from('stock_cache').upsert(
-                { ticker, source, dividends_data: historical, dividends_cached_at: new Date().toISOString() },
-                { onConflict: 'ticker,source' }
+            const text = await res.text();
+            let data: any = null;
+            try { data = JSON.parse(text); } catch { /* non-JSON body */ }
+            const historical = Array.isArray(data) ? data.slice(0, 20) : [];
+            if (!res.ok || historical.length === 0) {
+              console.error(
+                `FMP dividends unusable for ${ticker} (${source}): status=${res.status} body=${redactKey(text).slice(0, 300)}`
               );
-            } else {
               results[ticker] = [];
+              return;
             }
+            results[ticker] = historical;
+            // Upsert cache — refresh only the dividend timestamp so quote freshness is untouched
+            await sb.from('stock_cache').upsert(
+              { ticker, source, dividends_data: historical, dividends_cached_at: new Date().toISOString() },
+              { onConflict: 'ticker,source' }
+            );
           })
         );
       }
