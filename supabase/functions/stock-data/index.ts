@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import Papa from 'npm:papaparse@5.7.0';
-import { z } from 'npm:zod@3.25.76';
+import { BodySchema } from './request.ts';
 import { completedSessionDate, decodeEod, latestCompletedEod, type EodRow } from './eod.ts';
 
 const FMP_BASE = 'https://financialmodelingprep.com/stable';
@@ -90,11 +90,6 @@ async function bulkEod(sb: ReturnType<typeof getServiceClient>, apiKey: string, 
     return {};
   }
 }
-
-const BodySchema = z.object({
-  action: z.enum(['ping', 'quote', 'dividends', 'search']),
-  tickers: z.array(z.string().min(1).max(100)).min(1).max(100).optional(),
-}).refine((body) => body.action === 'ping' || Boolean(body.tickers?.length), { message: 'tickers array required' });
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
