@@ -150,9 +150,10 @@ serve(async (req) => {
       const fresh: Record<string, any> = {};
       const stale: string[] = [];
 
+      const quoteTtl = source === 'personal' ? CACHE_TTL_MS : COMMERCIAL_CACHE_TTL_MS;
       for (const ticker of cleanTickers) {
         const hit = cached?.find((c: any) => c.ticker === ticker);
-        if (hit && hit.quote_data && (now - new Date(hit.cached_at).getTime()) < CACHE_TTL_MS) {
+        if (hit && hit.quote_data && (now - new Date(hit.cached_at).getTime()) < quoteTtl) {
           fresh[ticker] = hit.quote_data;
         } else {
           stale.push(ticker);
