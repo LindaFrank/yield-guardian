@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { LIVE_STOCK_DATA_ENABLED } from '@/lib/featureFlags';
+import type { FeedSource } from '@/lib/feedLabels';
 import { Stock, DividendPayment } from '@/types/portfolio';
 
 interface FMPQuote {
@@ -25,11 +27,17 @@ async function callStockFunction(action: string, tickers: string[]) {
   if (!LIVE_STOCK_DATA_ENABLED) {
     throw new Error('Live stock data is temporarily disabled.');
   }
-  const { data, error } = await supabase.functions.invoke('stock-data', {
+  const { data, error, response } = await supabase.functions.invoke('stock-data', {
     body: { action, tickers },
   });
   if (error) throw new Error(error.message);
-  return data;
+  // The function reports which plan answered (x-fmp-source) so the screen can
+  // describe the prices honestly: live for the personal feed, closing for the
+  // commercial one.
+  const header = response?.headers?.get?.('x-fmp-source');
+  const feed: FeedSource =
+    header === 'personal' || header === 'commercial' ? header : null;
+  return { data, feed };
 }
 
 function mapQuoteAndDividends(
@@ -62,16 +70,20 @@ function mapQuoteAndDividends(
 }
 
 export function useStockQuotes(tickers: string[]) {
-  return useQuery({
+  const [feed, setFeed] = useState<FeedSource>(null);
+  const query = useQuery({
     queryKey: ['stock-quotes', tickers.sort().join(',')],
     queryFn: async (): Promise<Stock[]> => {
       if (tickers.length === 0) return [];
 
       // Fetch quotes and dividends in parallel
-      const [quotes, dividendsMap] = await Promise.all([
-        callStockFunction('quote', tickers) as Promise<FMPQuote[]>,
-        callStockFunction('dividends', tickers) as Promise<Record<string, FMPDividend[]>>,
+      const [quotesRes, dividendsRes] = await Promise.all([
+        callStockFunction('quote', tickers),
+        callStockFunction('dividends', tickers),
       ]);
+      const quotes = quotesRes.data as FMPQuote[];
+      const dividendsMap = dividendsRes.data as Record<string, FMPDividend[]>;
+      if (quotesRes.feed) setFeed(quotesRes.feed);
 
       return quotes.map((q) =>
         mapQuoteAndDividends(q, dividendsMap[q.symbol] || [])
@@ -81,6 +93,7 @@ export function useStockQuotes(tickers: string[]) {
     refetchInterval: 5 * 60 * 1000,
     enabled: tickers.length > 0,
   });
+  return { ...query, feed };
 }
 
 export interface SearchResult {
@@ -95,7 +108,7 @@ export function useStockSearch(query: string) {
     queryKey: ['stock-search', query],
     queryFn: async (): Promise<SearchResult[]> => {
       if (!query || query.length < 1) return [];
-      const data = await callStockFunction('search', [query]);
+      const { data } = await callStockFunction('search', [query]);
       return data as SearchResult[];
     },
     enabled: query.length >= 1,
