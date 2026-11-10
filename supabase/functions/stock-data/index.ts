@@ -10,6 +10,14 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (personal plan: live quotes)
 const COMMERCIAL_CACHE_TTL_MS = 20 * 60 * 60 * 1000; // 20 hours (Enterprise plan: once-a-day at market close)
 const DIVIDENDS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (dividend history rarely changes)
 
+// The app reads x-fmp-source to describe its prices honestly (live vs closing).
+// Browsers hide custom response headers on cross-origin calls unless the
+// service names them here, so the label would silently fall back otherwise.
+const corsExpose = {
+  ...corsHeaders,
+  'Access-Control-Expose-Headers': 'x-fmp-source, x-eod-bulk-count, x-eod-fallback-count',
+};
+
 // Two FMP plans run side by side in this project:
 //   personal   -> FMP_API_KEY            Linda's Personal Starter plan. Her own
 //                private feed, served only from the Lovable preview.
@@ -234,7 +242,7 @@ serve(async (req) => {
       const allQuotes = cleanTickers.map((t) => fresh[t]).filter(Boolean);
       if (source === 'commercial') console.log(`[eod-bulk] requested=${stale.length} bulk=${bulkHits} fallback=${fallbackHits}`);
       return new Response(JSON.stringify(allQuotes), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'x-fmp-source': source,
+        headers: { ...corsExpose, 'Content-Type': 'application/json', 'x-fmp-source': source,
           'x-eod-bulk-count': String(bulkHits), 'x-eod-fallback-count': String(fallbackHits) },
       });
     }
@@ -288,7 +296,7 @@ serve(async (req) => {
       }
 
       return new Response(JSON.stringify(results), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'x-fmp-source': source },
+        headers: { ...corsExpose, 'Content-Type': 'application/json', 'x-fmp-source': source },
       });
     }
 
@@ -348,7 +356,7 @@ serve(async (req) => {
       }
 
       return new Response(JSON.stringify(results), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'x-fmp-source': source },
+        headers: { ...corsExpose, 'Content-Type': 'application/json', 'x-fmp-source': source },
       });
     }
 

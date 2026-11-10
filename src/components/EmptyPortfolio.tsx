@@ -10,6 +10,7 @@ import { Stock } from '@/types/portfolio';
 import { marketStocks } from '@/data/mockData';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { useStockQuotes } from '@/hooks/useStockData';
+import { feedLabels } from '@/lib/feedLabels';
 import { useNavigate } from 'react-router-dom';
 import { checkDividendStability } from '@/lib/portfolioUtils';
 import { cn } from '@/lib/utils';
@@ -76,7 +77,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   const step2Ref = useScrollToOnValue<HTMLDivElement>(step === 2 ? 'step2' : '');
 
   const catalogTickers = useMemo(() => marketStocks.map((s) => s.ticker), []);
-  const { data: liveStocks, isLoading: livePricesLoading } = useStockQuotes(catalogTickers);
+  const { data: liveStocks, isLoading: livePricesLoading, feed } = useStockQuotes(catalogTickers);
 
   const matchingStocks = useMemo(() => {
     const stocksToUse = marketStocks.map((mock) => {
@@ -236,7 +237,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             <h2 className="text-xl font-semibold">Stocks Matching {localYield.toFixed(1)}%+ Yield</h2>
             <p className="text-sm text-muted-foreground">
               {livePricesLoading
-                ? 'Loading live prices…'
+                ? feedLabels(feed).fetching
                 : `${matchingStocks.length} stock${matchingStocks.length !== 1 ? 's' : ''} found — check the ones you want to add`}
             </p>
             {livePricesLoading && <Loader2 className="w-5 h-5 animate-spin text-primary mx-auto mt-2" />}
