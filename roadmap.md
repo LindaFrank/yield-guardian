@@ -7,12 +7,10 @@ Single living document — wording is corrected in place, no numbered copies kep
 - [ ] Mindi's app review — she flags anything that looks off; findings get added below or fixed directly
 
 ## Waiting on someone
-- [ ] Publish — license is in effect; waiting for Linda's explicit instruction. Nothing published.
-- [ ] Restore beta testers' sign-ins — license is in effect; waiting for Linda's named authorizations, confirmed before changes.
-- [ ] Identify the existing app account booking.it@gmail.com — account name is Jane Doe; sign-in and portfolio activity recorded; currently locked. Who invited or created it is unverified. This was probably a test account created by one of the team members. Safe to keep locked down until the commercial API license is in place.
+- [ ] Identify the existing app account booking.it@gmail.com — account name is Jane Doe; sign-in and portfolio activity recorded; reopened Nov 10 2026 with the other accounts. Who invited or created it is unverified; probably a test account created by one of the team members.
+- [x] Nov 10 2026, on Linda's signed request (confirmed in chat): guardianyield.com now opens on the sign-in page instead of Coming Soon; all 100 locked app accounts reopened (102 of 102 can sign in, including Mindi, Anna and all beta testers); sign-up open to anyone — it turned out no invite code had been required since Sep 13, and no new accounts were created after Sep 21; published.
 - [x] Dave Foreman removed from the pending account-review list — Linda confirms his earlier Preview access expired; no account deletion requested.
 - [ ] Mindi's Project Charges tracker — keep as a shared record of costs the team fronted; income is shared equally, so it is not a repayment list. Removing it is permanent and only Linda can do it — remove only when the team agrees it is no longer needed
-- [ ] Mindi app sign-in — unlocked with Linda's (the Owner's) authorization.
 - [ ] Shelly's contribution report — moved to her own workspace; confirmations of her design work (header separators, Back-button design) pending
 
 ## Done
