@@ -20,7 +20,6 @@ import Contact from "./pages/Contact";
 import DownloadReport from "./pages/DownloadReport";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
-import ComingSoon from "./pages/ComingSoon";
 
 
 const queryClient = new QueryClient();
@@ -62,7 +61,7 @@ const AppRoutes = () => {
     <BrowserRouter>
       <PageViewTracker />
       <Routes>
-        <Route path="/" element={<ComingSoon />} />
+        <Route path="/" element={<Navigate to="/auth" replace />} />
         <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/try" element={<Index />} />
