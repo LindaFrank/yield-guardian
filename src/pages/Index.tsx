@@ -56,6 +56,7 @@ import qsi11 from '@/assets/quick-start-import-v3-11.jpg.asset.json';
 const quickStartPages = [qsg1, qsg2, qsg3, qsg4, qsg5, qsg6, qsg7, qsg8];
 const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, qsi9, qsi10, qsi11];
 import { useStockQuotes } from '@/hooks/useStockData';
+import { feedLabels } from '@/lib/feedLabels';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -142,10 +143,13 @@ const Index = () => {
   const { toast } = useToast();
 
   // Fetch live data for portfolio tickers
-  const { data: liveStocks, isLoading, error } = useStockQuotes(tickers);
+  const { data: liveStocks, isLoading, error, feed } = useStockQuotes(tickers);
 
   // Fetch live quotes for candidate alternative stocks
   const { data: liveCandidates } = useStockQuotes(candidateTickers);
+
+  // What the app may say about its prices depends on which feed answered.
+  const labels = feedLabels(feed);
 
   // Keep local portfolio state in sync when user/account tickers change
   useEffect(() => {
@@ -199,21 +203,21 @@ const Index = () => {
     ) {
       feedNotifiedRef.current = true;
       toast({
-        title: '📡 Live feed active!',
-        description: 'Real-time quotes from FMP are now flowing. Data refreshes every 5 min.',
+        title: labels.toastTitle,
+        description: labels.toastDescription,
       });
     }
-  }, [liveStocks]);
+  }, [liveStocks, labels]);
 
   useEffect(() => {
     if (error) {
       toast({
-        title: 'Live data unavailable',
+        title: labels.errorTitle,
         description: 'Using cached data. Will retry automatically.',
         variant: 'destructive',
       });
     }
-  }, [error]);
+  }, [error, labels]);
 
   // Fade/blur the action bar as the user scrolls so it doesn't dominate the view.
   useEffect(() => {
@@ -715,27 +719,27 @@ const Index = () => {
         </section>
 
 
-        {/* Live Data Status */}
+        {/* Price feed status */}
         <div className="mb-4 flex items-center justify-between">
-          <HelpTooltip text="Market data is refreshed automatically every few minutes." side="bottom">
+          <HelpTooltip text={labels.tooltip} side="bottom">
             <div>
               {(isLoading || portfolioLoading) && (
 
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
                   <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-                  Fetching live market data…
+                  {labels.fetching}
                 </div>
               )}
               {!isLoading && !portfolioLoading && liveStocks && liveStocks.some((s) => s.currentPrice > 0) && (
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
                   <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                  Live data · Refreshes every 5 min
+                  {labels.ready}
                 </div>
               )}
               {!isLoading && !portfolioLoading && (!liveStocks || !liveStocks.some((s) => s.currentPrice > 0)) && (
                 <div className="text-base text-primary flex items-center gap-2">
                   <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  Waiting for live feed…
+                  {labels.waiting}
                 </div>
               )}
             </div>

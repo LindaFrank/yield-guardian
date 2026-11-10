@@ -14,6 +14,7 @@ describe('commercial (public site) price-feed wording', () => {
       labels.tooltip,
       labels.toastTitle,
       labels.toastDescription,
+      labels.errorTitle,
     ]) {
       expect(text).not.toMatch(CLAIMS_LIVE);
     }

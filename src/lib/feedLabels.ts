@@ -20,6 +20,7 @@ export interface FeedLabels {
   tooltip: string;
   toastTitle: string;
   toastDescription: string;
+  errorTitle: string;
 }
 
 const PERSONAL: FeedLabels = {
@@ -30,6 +31,7 @@ const PERSONAL: FeedLabels = {
   toastTitle: '📡 Live feed active!',
   toastDescription:
     'Real-time quotes from FMP are now flowing. Data refreshes every 5 min.',
+  errorTitle: 'Live data unavailable',
 };
 
 const COMMERCIAL: FeedLabels = {
@@ -41,6 +43,7 @@ const COMMERCIAL: FeedLabels = {
   toastTitle: '📡 Price feed active!',
   toastDescription:
     'Closing prices from FMP are now flowing. Prices update once a day after market close.',
+  errorTitle: 'Price data unavailable',
 };
 
 export function feedLabels(feed: FeedSource): FeedLabels {
