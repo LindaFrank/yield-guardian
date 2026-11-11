@@ -299,7 +299,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
               quantity={1}
               customerEmail={email}
               userId={userId}
-              returnUrl={`${window.location.origin}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`}
+              returnUrl={`${window.location.origin}/app?checkout=success&session_id={CHECKOUT_SESSION_ID}`}
             />
           </div>
         )}
