@@ -559,6 +559,10 @@ export type Database = {
       check_invite_code: { Args: { _code: string }; Returns: boolean }
       claim_fmp_eod_download: { Args: never; Returns: boolean }
       consume_invite_code: { Args: { _code: string }; Returns: boolean }
+      fmp_eod_prices_for: {
+        Args: { p_date: string; p_tickers: string[] }
+        Returns: Json
+      }
       get_admin_metrics: { Args: never; Returns: Json }
       get_payments_enabled: { Args: never; Returns: boolean }
       get_require_invite_code: { Args: never; Returns: boolean }

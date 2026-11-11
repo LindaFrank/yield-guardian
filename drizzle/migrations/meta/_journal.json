@@ -15,6 +15,13 @@
       "when": 1793375804359,
       "tag": "0001_shared_enterprise_eod_snapshot",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794408480280,
+      "tag": "0002_eod_snapshot_ticker_lookup",
+      "breakpoints": true
     }
   ]
 }

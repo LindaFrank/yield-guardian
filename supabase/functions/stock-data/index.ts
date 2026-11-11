@@ -70,12 +70,20 @@ async function resolveSource(req: Request, sb: ReturnType<typeof getServiceClien
   return 'commercial';
 }
 
-async function bulkEod(sb: ReturnType<typeof getServiceClient>, apiKey: string, date: string): Promise<Record<string, EodRow>> {
-  const { data: snapshot, error } = await sb.from('fmp_eod_snapshot').select('market_date, prices').eq('id', 'commercial').maybeSingle();
-  if (error) throw new Error('Cannot read shared closing-price snapshot');
-  if (snapshot?.market_date === date) return snapshot.prices as Record<string, EodRow>;
+async function bulkEod(sb: ReturnType<typeof getServiceClient>, apiKey: string, date: string, wanted: string[]): Promise<Record<string, EodRow>> {
+  // Read only the requested tickers from the shared snapshot (never the whole market blob).
+  // Any read failure falls back to per-ticker lookups instead of failing the request.
+  const { data: subset, error } = await sb.rpc('fmp_eod_prices_for', { p_date: date, p_tickers: wanted });
+  if (error) {
+    console.warn(`[eod-bulk] snapshot read failed (${error.code ?? 'unknown'}); using per-ticker fallback`);
+    return {};
+  }
+  if (subset) return subset as Record<string, EodRow>;
   const { data: claimed, error: claimError } = await sb.rpc('claim_fmp_eod_download');
-  if (claimError) throw new Error('Cannot claim closing-price download');
+  if (claimError) {
+    console.warn(`[eod-bulk] claim failed (${claimError.code ?? 'unknown'}); using per-ticker fallback`);
+    return {};
+  }
   if (!claimed) {
     console.log(`[eod-bulk] retry deferred date=${date}`);
     return {};
@@ -90,8 +98,8 @@ async function bulkEod(sb: ReturnType<typeof getServiceClient>, apiKey: string, 
       Papa.parse<Record<string, unknown>>(text, { header: true, skipEmptyLines: true }).data);
     if (!Object.keys(prices).length) return {};
     const { error: saveError } = await sb.from('fmp_eod_snapshot').update({ market_date: date, prices, updated_at: new Date().toISOString() }).eq('id', 'commercial');
-    if (saveError) throw new Error('Cannot save shared closing prices');
-    console.log(`[eod-bulk] saved date=${date} symbols=${Object.keys(prices).length}`);
+    if (saveError) console.warn(`[eod-bulk] snapshot save failed (${saveError.code ?? 'unknown'}); serving this download only`);
+    else console.log(`[eod-bulk] saved date=${date} symbols=${Object.keys(prices).length}`);
     return prices;
   } catch (error) {
     console.warn(`[eod-bulk] download failed: ${redactKey(String(error))}`);
@@ -170,7 +178,7 @@ serve(async (req) => {
       }
 
       // Only Enterprise uses the date-wide bulk EOD download. Personal remains per ticker.
-      const bulk = source === 'commercial' && stale.length ? await bulkEod(sb, apiKey, completedDate) : {};
+      const bulk = source === 'commercial' && stale.length ? await bulkEod(sb, apiKey, completedDate, stale) : {};
       let bulkHits = 0;
       let fallbackHits = 0;
       if (stale.length > 0) {

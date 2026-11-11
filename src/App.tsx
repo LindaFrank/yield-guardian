@@ -38,6 +38,15 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Checkout sessions started before the return address moved to /app still land on "/".
+// Keep their ?checkout=success query so the dashboard can confirm and restore the guest portfolio.
+function RootRedirect() {
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  if (params.get('checkout')) return <Navigate to={`/app${search}`} replace />;
+  return <Navigate to="/auth" replace />;
+}
+
 function PageViewTracker() {
   const location = useLocation();
   const { user } = useAuth();
@@ -61,7 +70,7 @@ const AppRoutes = () => {
     <BrowserRouter>
       <PageViewTracker />
       <Routes>
-        <Route path="/" element={<Navigate to="/auth" replace />} />
+        <Route path="/" element={<RootRedirect />} />
         <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/try" element={<Index />} />
