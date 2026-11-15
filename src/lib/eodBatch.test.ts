@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import Papa from 'papaparse';
-import { completedSessionDate, decodeEod, latestCompletedEod } from '../../supabase/functions/stock-data/eod';
+import { completedSessionDate, decodeEod, eodRowChunks, latestCompletedEod } from '../../supabase/functions/stock-data/eod';
 
 describe('Enterprise closing-price batching', () => {
   it('reads KO, PEP and T closing prices from one provider CSV', () => {
@@ -27,5 +27,14 @@ describe('Enterprise closing-price batching', () => {
       { symbol: 'KO', date: '2026-10-30', close: 94.445 },
       { symbol: 'KO', date: '2026-10-29', close: 92.82 },
     ], '2026-10-29')?.close).toBe(92.82);
+  });
+  it('saves the full market in batches of 2,000 so no single write is too large', () => {
+    const prices: Record<string, { symbol: string; date: string; close: number }> = {};
+    for (let i = 0; i < 67013; i++) prices[`S${i}`] = { symbol: `S${i}`, date: '2026-11-13', close: 10 };
+    const chunks = eodRowChunks(prices, '2026-11-13');
+    expect(chunks.length).toBe(34);
+    expect(Math.max(...chunks.map((c) => c.length))).toBe(2000);
+    expect(chunks.flat().length).toBe(67013);
+    expect(chunks[0][0]).toEqual({ market_date: '2026-11-13', symbol: 'S0', close: 10, open: null, high: null, low: null, volume: null });
   });
 });

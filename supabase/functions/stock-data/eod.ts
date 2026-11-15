@@ -60,3 +60,24 @@ export function latestCompletedEod(rows: Record<string, unknown>[], date: string
   }
   return null;
 }
+export type EodDbRow = {
+  market_date: string;
+  symbol: string;
+  close: number;
+  open: number | null;
+  high: number | null;
+  low: number | null;
+  volume: number | null;
+};
+
+// The full market is ~67,000 symbols. Saving it as one record was too big for
+// the database to write reliably, so it is saved as small batches of rows.
+export function eodRowChunks(prices: Record<string, EodRow>, date: string, size = 2000): EodDbRow[][] {
+  const rows = Object.values(prices).map((p) => ({
+    market_date: date, symbol: p.symbol, close: p.close,
+    open: p.open ?? null, high: p.high ?? null, low: p.low ?? null, volume: p.volume ?? null,
+  }));
+  const chunks: EodDbRow[][] = [];
+  for (let i = 0; i < rows.length; i += size) chunks.push(rows.slice(i, i + size));
+  return chunks;
+}
