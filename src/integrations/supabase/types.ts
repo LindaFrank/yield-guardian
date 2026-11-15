@@ -212,6 +212,36 @@ export type Database = {
         }
         Relationships: []
       }
+      fmp_eod_prices: {
+        Row: {
+          close: number
+          high: number | null
+          low: number | null
+          market_date: string
+          open: number | null
+          symbol: string
+          volume: number | null
+        }
+        Insert: {
+          close: number
+          high?: number | null
+          low?: number | null
+          market_date: string
+          open?: number | null
+          symbol: string
+          volume?: number | null
+        }
+        Update: {
+          close?: number
+          high?: number | null
+          low?: number | null
+          market_date?: string
+          open?: number | null
+          symbol?: string
+          volume?: number | null
+        }
+        Relationships: []
+      }
       fmp_eod_snapshot: {
         Row: {
           id: string

@@ -3,7 +3,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import Papa from 'npm:papaparse@5.7.0';
 import { BodySchema } from './request.ts';
-import { completedSessionDate, decodeEod, latestCompletedEod, type EodRow } from './eod.ts';
+import { completedSessionDate, decodeEod, eodRowChunks, latestCompletedEod, type EodRow } from './eod.ts';
+
+declare const EdgeRuntime: { waitUntil(promise: Promise<unknown>): void } | undefined;
 
 const FMP_BASE = 'https://financialmodelingprep.com/stable';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (personal plan: live quotes)
@@ -70,6 +72,33 @@ async function resolveSource(req: Request, sb: ReturnType<typeof getServiceClien
   return 'commercial';
 }
 
+// Writes the day's prices in small batches, then marks the date complete. Until
+// the final step succeeds, readers keep using per-ticker lookups; a failed
+// batch leaves the date unmarked and the four-hour lease retries later.
+async function saveSnapshot(sb: ReturnType<typeof getServiceClient>, date: string, prices: Record<string, EodRow>): Promise<void> {
+  const started = Date.now();
+  try {
+    const chunks = eodRowChunks(prices, date);
+    let next = 0;
+    const worker = async () => {
+      while (next < chunks.length) {
+        const chunk = chunks[next++];
+        const { error } = await sb.from('fmp_eod_prices').upsert(chunk, { onConflict: 'market_date,symbol' });
+        if (error) throw new Error(`batch save failed (${error.code ?? 'unknown'})`);
+      }
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
+    const { error: markError } = await sb.from('fmp_eod_snapshot')
+      .update({ market_date: date, prices: {}, updated_at: new Date().toISOString() }).eq('id', 'commercial');
+    if (markError) throw new Error(`completion mark failed (${markError.code ?? 'unknown'})`);
+    console.log(`[eod-bulk] saved date=${date} symbols=${Object.keys(prices).length} batches=${chunks.length} ms=${Date.now() - started}`);
+    const { error: pruneError } = await sb.from('fmp_eod_prices').delete().lt('market_date', date);
+    if (pruneError) console.warn(`[eod-bulk] old-date cleanup failed (${pruneError.code ?? 'unknown'}); will retry next day`);
+  } catch (error) {
+    console.warn(`[eod-bulk] snapshot save failed: ${redactKey(String(error))}; serving this download only`);
+  }
+}
+
 async function bulkEod(sb: ReturnType<typeof getServiceClient>, apiKey: string, date: string, wanted: string[]): Promise<Record<string, EodRow>> {
   // Read only the requested tickers from the shared snapshot (never the whole market blob).
   // Any read failure falls back to per-ticker lookups instead of failing the request.
@@ -97,9 +126,10 @@ async function bulkEod(sb: ReturnType<typeof getServiceClient>, apiKey: string, 
     const prices = decodeEod(await response.text(), date, (text) =>
       Papa.parse<Record<string, unknown>>(text, { header: true, skipEmptyLines: true }).data);
     if (!Object.keys(prices).length) return {};
-    const { error: saveError } = await sb.from('fmp_eod_snapshot').update({ market_date: date, prices, updated_at: new Date().toISOString() }).eq('id', 'commercial');
-    if (saveError) console.warn(`[eod-bulk] snapshot save failed (${saveError.code ?? 'unknown'}); serving this download only`);
-    else console.log(`[eod-bulk] saved date=${date} symbols=${Object.keys(prices).length}`);
+    // Save in the background so the visitor who triggered the download isn't kept waiting.
+    const saving = saveSnapshot(sb, date, prices);
+    if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime?.waitUntil) EdgeRuntime.waitUntil(saving);
+    else await saving;
     return prices;
   } catch (error) {
     console.warn(`[eod-bulk] download failed: ${redactKey(String(error))}`);
