@@ -32,6 +32,7 @@
  */
 
 import { Stock } from '@/types/portfolio';
+import { isEligibleAlternative } from './alternativeSafeguards';
 
 export type OptimizerMode = 'aggressive' | 'conservative';
 
@@ -498,7 +499,7 @@ export function optimizeReplacement(input: OptimizerInput): OptimizerResult {
 /** Helper: turn a Stock[] candidate pool into OptimizerCandidate[]. */
 export function toOptimizerCandidates(stocks: Stock[]): OptimizerCandidate[] {
   return stocks
-    .filter((s) => s.currentPrice > 0)
+    .filter((s) => isEligibleAlternative(s))
     .map((s) => ({
       stock: s,
       A: s.annualDividend,

@@ -1,4 +1,5 @@
 import { Stock, StockAnalysis, StabilityStatus, ReplacementCandidate } from '@/types/portfolio';
+import { isEligibleAlternative } from './alternativeSafeguards';
 
 export function calculateDividendYield(stock: Stock): number {
   return (stock.annualDividend / stock.currentPrice) * 100;
@@ -127,6 +128,8 @@ export function suggestReplacements(
   const vettedCandidates = marketData
     // Always exclude the underperformer itself — replacing it with itself is a no-op.
     .filter((stock) => stock.ticker !== removedStock.ticker)
+    // Never suggest retired/stale-priced stocks or impossible (bad-data) yields.
+    .filter((stock) => isEligibleAlternative(stock))
     .map((stock) => {
       const currentYield = calculateDividendYield(stock);
       const stability = checkDividendStability(stock, 2, targetMinYield);

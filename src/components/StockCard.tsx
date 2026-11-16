@@ -4,6 +4,7 @@ import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, XCircle, Trash2, Pencil, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { isImplausibleYield } from '@/lib/alternativeSafeguards';
 
 interface StockCardProps {
   analysis: StockAnalysis;
@@ -173,6 +174,12 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
             {formatPercentage(currentYield)}
           </div>
         </div>
+        {isImplausibleYield(stock) && (
+          <p className="mt-2 flex items-center gap-1 text-xs font-medium text-yield-warning">
+            <AlertTriangle className="w-3 h-3" />
+            Yield over 50% — price data looks wrong
+          </p>
+        )}
       </div>
     </div>
   );

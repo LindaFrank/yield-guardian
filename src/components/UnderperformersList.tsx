@@ -2,6 +2,7 @@ import { StockAnalysis, Stock } from '@/types/portfolio';
 import { formatPercentage } from '@/lib/portfolioUtils';
 import { AlertTriangle, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isImplausibleYield } from '@/lib/alternativeSafeguards';
 
 interface UnderperformersListProps {
   underperformers: StockAnalysis[];
@@ -53,6 +54,9 @@ export function UnderperformersList({
               )}>
                 {formatPercentage(analysis.currentYield)}
               </span>
+              {isImplausibleYield(analysis.stock) && (
+                <span className="text-xs text-yield-warning">Bad price data?</span>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">Alternative Suggestions</span>

@@ -15,6 +15,10 @@ interface FMPQuote {
   yearLow: number;
   marketCap: number;
   exchange: string;
+  /** Commercial feed: session date of the closing price. */
+  eodDate?: string;
+  /** Personal feed: last trade time (seconds since epoch). */
+  timestamp?: number;
 }
 
 interface FMPDividend {
@@ -38,6 +42,14 @@ async function callStockFunction(action: string, tickers: string[]) {
   const feed: FeedSource =
     header === 'personal' || header === 'commercial' ? header : null;
   return { data, feed };
+}
+
+function priceDateOf(quote: FMPQuote): string | undefined {
+  if (quote.eodDate) return quote.eodDate.slice(0, 10);
+  if (typeof quote.timestamp === 'number' && quote.timestamp > 0) {
+    return new Date(quote.timestamp * 1000).toISOString().slice(0, 10);
+  }
+  return undefined;
 }
 
 function mapQuoteAndDividends(
@@ -66,6 +78,7 @@ function mapQuoteAndDividends(
     annualDividend,
     dividendHistory,
     currentYield: Math.round(currentYield * 100) / 100,
+    priceDate: priceDateOf(quote),
   };
 }
 
