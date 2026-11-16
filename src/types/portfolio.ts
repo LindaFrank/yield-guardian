@@ -11,6 +11,8 @@ export interface Stock {
   annualDividend: number;
   dividendHistory: DividendPayment[];
   currentYield: number;
+  /** Date (YYYY-MM-DD) of the price shown; used to skip retired/stale stocks. */
+  priceDate?: string;
 }
 
 export interface Portfolio {

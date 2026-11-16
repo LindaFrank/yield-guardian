@@ -56,6 +56,7 @@ import qsi11 from '@/assets/quick-start-import-v3-11.jpg.asset.json';
 const quickStartPages = [qsg1, qsg2, qsg3, qsg4, qsg5, qsg6, qsg7, qsg8];
 const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, qsi9, qsi10, qsi11];
 import { useStockQuotes } from '@/hooks/useStockData';
+import { isEligibleAlternative } from '@/lib/alternativeSafeguards';
 import { feedLabels } from '@/lib/feedLabels';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
@@ -392,7 +393,7 @@ const Index = () => {
     // This prevents stocks like WBA (suspended dividend) from appearing as
     // suggestions just because their trailing yield looks high.
     return scored
-      .filter((c) => c.yield >= targetYield && c.stabilityScore === 3)
+      .filter((c) => c.yield >= targetYield && c.stabilityScore === 3 && isEligibleAlternative(c.stock))
       .slice(0, 5);
   }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks, candidatePool]);
 
