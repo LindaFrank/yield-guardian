@@ -32,6 +32,7 @@
  */
 
 import { Stock } from '@/types/portfolio';
+import { isEligibleAlternative } from './alternativeSafeguards';
 
 export type OptimizerMode = 'aggressive' | 'conservative';
 
