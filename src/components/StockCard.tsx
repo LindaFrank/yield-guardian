@@ -74,6 +74,10 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
         'transition-all duration-200 ease-out',
         'hover:shadow-elevated hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.02]',
         'active:scale-[0.97]',
+        // Pressing a button inside the card (trash can, shares pencil) must not
+        // shrink the card — the shrink slid the small button out from under the
+        // pointer, so the first tap was lost and the stock stayed.
+        '[&:has(button:active)]:scale-[1.02]',
         isSelected && 'ring-2 ring-primary border-primary/40',
         isUnderperforming && 'border-yield-negative',
         isStable === 'warning' && 'border-[hsl(var(--yield-warning)/0.6)] hover:border-[hsl(var(--yield-warning)/0.85)]',
@@ -106,7 +110,7 @@ export function StockCard({ analysis, sharesOwned, onRemove, onSelect, onUpdateS
               e.stopPropagation();
               onRemove(stock.ticker);
             }}
-            className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
+            className="-m-1 p-2.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
             aria-label="Remove stock"
             title="Remove from portfolio"
           >
