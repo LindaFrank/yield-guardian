@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Search, Loader2, ChevronRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MAX_PORTFOLIO_POSITIONS, remainingCapacity } from '@/lib/portfolioLimits';
+import { ownedStocksMessage } from '@/lib/ownedStockMessage';
 
 
 interface AddStockModalProps {
@@ -31,11 +32,13 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const { data: results, isLoading } = useStockSearch(search);
+  const { data: results, isLoading, isError } = useStockSearch(search);
 
-  const filtered = (results ?? []).filter(
-    (r) => !existingTickers.includes(r.symbol.toUpperCase())
-  );
+  const matches = results ?? [];
+  const isOwned = (symbol: string) => existingTickers.includes(symbol.toUpperCase());
+  const filtered = matches.filter((r) => !isOwned(r.symbol));
+  // Search did find these — they're just hidden because they're already held.
+  const alreadyOwned = matches.filter((r) => isOwned(r.symbol));
 
   const capacity = remainingCapacity(existingTickers.length);
   const atLimit = capacity <= 0;
@@ -157,10 +160,34 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
 
               {search.length > 0 && !isLoading && filtered.length === 0 && (
                 <div className="text-center py-8 space-y-2">
-                  <p className="text-muted-foreground text-sm">No results found</p>
-                  <p className="text-muted-foreground/70 text-xs">
-                    Data provider may be temporarily unavailable — please try again later.
-                  </p>
+                  {alreadyOwned.length > 0 ? (
+                    <>
+                      <p className="text-muted-foreground text-sm">
+                        {ownedStocksMessage(alreadyOwned.map((r) => r.symbol))}
+                      </p>
+                      <p className="text-muted-foreground/70 text-xs">
+                        It's hidden from the results so you don't add it twice.
+                      </p>
+                    </>
+                  ) : isError ? (
+                    <>
+                      <p className="text-muted-foreground text-sm">
+                        Couldn't reach the price feed
+                      </p>
+                      <p className="text-muted-foreground/70 text-xs">
+                        Please try again in a minute.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-muted-foreground text-sm">
+                        No stocks match "{search.trim()}"
+                      </p>
+                      <p className="text-muted-foreground/70 text-xs">
+                        Check the spelling, or try a company name instead.
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
 

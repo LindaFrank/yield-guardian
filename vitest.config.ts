@@ -11,6 +11,11 @@ export default defineConfig({
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
   },
   resolve: {
-    alias: { "@": path.resolve(__dirname, "./src") },
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      // The edge function is written for Deno, which reads `npm:` specifiers;
+      // the Node regression tests resolve the same import to the installed copy.
+      "npm:zod@3.25.76": "zod",
+    },
   },
 });
