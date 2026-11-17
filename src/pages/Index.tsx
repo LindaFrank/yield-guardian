@@ -9,8 +9,6 @@ import {
   analyzeStock, 
   scanPortfolioForUnderperformers, 
   suggestReplacements,
-  checkDividendStability,
-  calculateDividendYield
 } from '@/lib/portfolioUtils';
 import { generatePortfolioReport } from '@/lib/generatePortfolioReport';
 import { Header } from '@/components/Header';
@@ -56,7 +54,8 @@ import qsi11 from '@/assets/quick-start-import-v3-11.jpg.asset.json';
 const quickStartPages = [qsg1, qsg2, qsg3, qsg4, qsg5, qsg6, qsg7, qsg8];
 const quickStartImportPages = [qsi1, qsi2, qsi3, qsi4, qsi5, qsi6, qsi7, qsi8, qsi9, qsi10, qsi11];
 import { useStockQuotes } from '@/hooks/useStockData';
-import { isEligibleAlternative } from '@/lib/alternativeSafeguards';
+import { yieldTargetMatches } from '@/lib/yieldTargetMatches';
+import { HIGH_YIELD_CANDIDATES, HIGH_YIELD_CANDIDATE_TICKERS } from '@/data/highYieldCandidates';
 import { feedLabels } from '@/lib/feedLabels';
 import { useUserTickers, useUserStocksWithShares, useAddTicker, useRemoveTicker, useUpdateShares, type UserStockEntry } from '@/hooks/usePortfolio';
 import { useAuth } from '@/contexts/AuthContext';
@@ -69,7 +68,14 @@ import { DemoFeedbackModal } from '@/components/DemoFeedbackModal';
 import { supabase } from '@/integrations/supabase/client';
 
 
-const ALL_MARKET_TICKERS = mockMarketStocks.map((s) => s.ticker);
+// Built-in market list plus well-known high-yield stocks. Each is shown only
+// while its live data passes Yield Guardian's tests (see yieldTargetMatches).
+const ALL_MARKET_TICKERS = Array.from(
+  new Set([...mockMarketStocks.map((s) => s.ticker), ...HIGH_YIELD_CANDIDATE_TICKERS])
+);
+const sectorFor = (ticker: string) =>
+  mockMarketStocks.find((m) => m.ticker === ticker)?.sector ||
+  HIGH_YIELD_CANDIDATES.find((c) => c.ticker === ticker)?.sector;
 
 const Index = () => {
   const { user } = useAuth();
@@ -178,10 +184,9 @@ const Index = () => {
           // just-removed ticker still present in a cached quote response).
           .filter((live) => tickers.includes(live.ticker))
           .map((live) => {
-            const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
             return {
               ...live,
-              sector: live.sector || mock?.sector || 'Unknown',
+              sector: live.sector || sectorFor(live.ticker) || 'Unknown',
             };
           });
         return merged;
@@ -333,10 +338,9 @@ const Index = () => {
   const liveMarketStocks = useMemo(() => {
     if (!liveCandidates || liveCandidates.length === 0) return [];
     return liveCandidates.map((live) => {
-      const mock = mockMarketStocks.find((m) => m.ticker === live.ticker);
       return {
         ...live,
-        sector: live.sector || mock?.sector || 'Unknown',
+        sector: live.sector || sectorFor(live.ticker) || 'Unknown',
       };
     });
   }, [liveCandidates]);
@@ -364,37 +368,9 @@ const Index = () => {
         stocks.map((s) => s.ticker)
       );
     }
-    // Default suggestions: top-yield, stability-prioritized candidates
-    const scored = candidatePool
-      .map((s) => {
-        const stability = checkDividendStability(s, 2, targetYield);
-        const stabilityScore = stability.status === 'stable' ? 3 : stability.status === 'warning' ? 2 : 1;
-        const yieldVal = calculateDividendYield(s);
-        let matchReason = '';
-        if (stabilityScore === 3 && yieldVal >= targetYield) {
-          matchReason = 'Strong yield & stable history';
-        } else if (yieldVal >= targetYield) {
-          matchReason = 'Meets yield target';
-        } else {
-          matchReason = 'Popular dividend stock';
-        }
-        return {
-          stock: s,
-          yield: yieldVal,
-          stabilityScore,
-          matchReason,
-        };
-      })
-      // Order strictly by yield descending — highest-yield candidate first.
-      .sort((a, b) => b.yield - a.yield);
-
-    // In default mode (no underperformer), only show stocks above target yield
-    // AND that pass the 2-year stability + actively-paying (<=120 day) check.
-    // This prevents stocks like WBA (suspended dividend) from appearing as
-    // suggestions just because their trailing yield looks high.
-    return scored
-      .filter((c) => c.yield >= targetYield && c.stabilityScore === 3 && isEligibleAlternative(c.stock))
-      .slice(0, 5);
+    // Default suggestions: highest-yield candidates that pass every test
+    // (2-year stability, actively paying, fresh price, plausible yield).
+    return yieldTargetMatches(candidatePool, targetYield);
   }, [selectedUnderperformer, stocks, targetYield, liveMarketStocks, candidatePool]);
 
   const handleRemoveStock = (ticker: string) => {

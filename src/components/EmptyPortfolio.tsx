@@ -8,6 +8,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Stock } from '@/types/portfolio';
 import { marketStocks } from '@/data/mockData';
+import { HIGH_YIELD_CANDIDATES, HIGH_YIELD_CANDIDATE_TICKERS } from '@/data/highYieldCandidates';
+import { isEligibleAlternative } from '@/lib/alternativeSafeguards';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { useStockQuotes } from '@/hooks/useStockData';
 import { feedLabels } from '@/lib/feedLabels';
@@ -76,7 +78,10 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   const [submitted, setSubmitted] = useState(false);
   const step2Ref = useScrollToOnValue<HTMLDivElement>(step === 2 ? 'step2' : '');
 
-  const catalogTickers = useMemo(() => marketStocks.map((s) => s.ticker), []);
+  const catalogTickers = useMemo(
+    () => Array.from(new Set([...marketStocks.map((s) => s.ticker), ...HIGH_YIELD_CANDIDATE_TICKERS])),
+    []
+  );
   const { data: liveStocks, isLoading: livePricesLoading, feed } = useStockQuotes(catalogTickers);
 
   const matchingStocks = useMemo(() => {
@@ -87,8 +92,17 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
       }
       return { ...mock, computedYield: mock.currentYield } as EnrichedStock;
     });
+    // Well-known high-yield stocks join only with real prices and dividends.
+    HIGH_YIELD_CANDIDATES.forEach((c) => {
+      if (stocksToUse.some((s) => s.ticker === c.ticker)) return;
+      const live = liveStocks?.find((l) => l.ticker === c.ticker);
+      if (live && live.currentPrice > 0) {
+        stocksToUse.push({ ...live, sector: live.sector || c.sector, computedYield: live.currentYield } as EnrichedStock);
+      }
+    });
     return stocksToUse
       .filter((s) => s.computedYield >= localYield)
+      .filter((s) => isEligibleAlternative(s))
       .filter((s) => checkDividendStability(s, 2, localYield).status === 'stable')
       .sort((a, b) => b.computedYield - a.computedYield);
   }, [localYield, liveStocks]);
