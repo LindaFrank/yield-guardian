@@ -266,6 +266,27 @@ export type Database = {
         }
         Relationships: []
       }
+      free_trials: {
+        Row: {
+          created_at: string
+          ends_at: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          started_at: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       login_events: {
         Row: {
           id: string
@@ -608,6 +629,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      start_free_trial: { Args: { _started_at?: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"

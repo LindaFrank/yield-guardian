@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +13,16 @@ import { StripeEmbeddedCheckout } from './StripeEmbeddedCheckout';
 import { PaymentTestModeBanner } from './PaymentTestModeBanner';
 import { useInviteCodeRequired } from '@/hooks/useInviteCodeRequired';
 import { TermsAgreementCheckbox } from '@/components/TermsAgreementCheckbox';
-import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell, ArrowLeft } from 'lucide-react';
+import { Check, Loader2, Shield, TrendingUp, Zap, BarChart3, Bell, ArrowLeft, Gift } from 'lucide-react';
+import { startAccountFreeTrial, usePaidFeatures } from '@/hooks/usePaidFeatures';
+import {
+  FREE_TRIAL_DAYS,
+  formatTrialEnd,
+  hasActiveSubscription,
+  isNoCardPeriod,
+  trialGivesAccess,
+  trialStatus,
+} from '@/lib/freeTrial';
 
 interface SubscriptionModalProps {
   open: boolean;
@@ -70,6 +81,45 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
   const { required: inviteRequired } = useInviteCodeRequired();
+  const { trial } = usePaidFeatures();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const noCard = isNoCardPeriod();
+
+  // Which offer to show on the first step.
+  //  guest-free: guest, card-free months still open → free account, no card
+  //  card-trial: no free month used yet but a card is now required → card, first charge after 30 days
+  //  in-trial:   signed in during the free month → subscribe, first charge when the month ends
+  //  subscribe:  free month over → plain subscription
+  const offer: 'guest-free' | 'card-trial' | 'in-trial' | 'subscribe' = !currentUser
+    ? noCard
+      ? 'guest-free'
+      : 'card-trial'
+    : trial.state === 'active' || trial.state === 'ending-soon'
+      ? 'in-trial'
+      : trial.state === 'none' && !noCard
+        ? 'card-trial'
+        : 'subscribe';
+  // Checkout defers the first charge to the free month's end only when it's 2+ days away.
+  const deferredUntil = offer === 'in-trial' && trial.endsAt && trial.daysLeft > 2 ? trial.endsAt : null;
+
+  /** After signing up or in from the guest flow: save straight away if they have access, otherwise go to checkout. */
+  const finishGuestAuth = async (uid: string) => {
+    const [freeTrial, subs] = await Promise.all([
+      startAccountFreeTrial(),
+      supabase.from('subscriptions').select('status, current_period_end, cancel_at_period_end').eq('user_id', uid),
+    ]);
+    queryClient.invalidateQueries({ queryKey: ['free-trial'] });
+    queryClient.invalidateQueries({ queryKey: ['active-subscription'] });
+    const hasAccess = trialGivesAccess(trialStatus(freeTrial?.ends_at ?? null)) || hasActiveSubscription(subs.data);
+    if (hasAccess) {
+      reset();
+      onOpenChange(false);
+      navigate('/app?saved=guest', { replace: true });
+      return;
+    }
+    setStep('checkout');
+  };
 
   const reset = () => {
     setStep('pricing');
@@ -120,6 +170,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
             return;
           }
         }
+        savePendingGuestPortfolio(guestTickers, guestShares);
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -131,16 +182,15 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
         }
         if (data.user) {
           setUserId(data.user.id);
-          savePendingGuestPortfolio(guestTickers, guestShares);
-          setStep('checkout');
+          await finishGuestAuth(data.user.id);
         }
       } else {
+        savePendingGuestPortfolio(guestTickers, guestShares);
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         if (data.user) {
           setUserId(data.user.id);
-          savePendingGuestPortfolio(guestTickers, guestShares);
-          setStep('checkout');
+          await finishGuestAuth(data.user.id);
         }
       }
     } catch (err: any) {
@@ -185,12 +235,17 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
             </h2>
           </div>
           <DialogTitle className="text-xl">
-            {step === 'pricing' && 'Keep your portfolio working for you'}
+            {step === 'pricing' && offer === 'guest-free' && 'Save your portfolio'}
+            {step === 'pricing' && offer === 'card-trial' && 'Start your free month'}
+            {step === 'pricing' && (offer === 'in-trial' || offer === 'subscribe') && 'Keep your portfolio working for you'}
             {step === 'auth' && (authMode === 'signup' ? 'Create your account' : 'Sign in to save')}
-            {step === 'checkout' && 'Start your subscription'}
+            {step === 'checkout' && (offer === 'card-trial' ? 'Start your free month' : 'Start your subscription')}
           </DialogTitle>
           <DialogDescription>
-            {step === 'pricing' && 'Unlock continuous monitoring and improvement for your dividend portfolio.'}
+            {step === 'pricing' && offer === 'guest-free' && 'Create a free account to keep your portfolio. Your free month includes everything — no card needed.'}
+            {step === 'pricing' && offer === 'card-trial' && `Everything included for ${FREE_TRIAL_DAYS} days. A card is needed to start; you won't be charged until the ${FREE_TRIAL_DAYS} days are up. Cancel anytime.`}
+            {step === 'pricing' && offer === 'in-trial' && trial.endsAt && `Your free month runs until ${formatTrialEnd(trial.endsAt)}. Subscribe to keep full access after that.`}
+            {step === 'pricing' && offer === 'subscribe' && 'Unlock continuous monitoring and improvement for your dividend portfolio.'}
             {step === 'auth' && 'Your analysis is waiting. One more step to save it.'}
             {step === 'checkout' && 'Secure checkout powered by Stripe.'}
           </DialogDescription>
@@ -205,8 +260,17 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                   <p className="text-sm text-muted-foreground">Everything in your analysis, continuously.</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold">$29.95</div>
-                  <div className="text-sm text-muted-foreground">/ month</div>
+                  {offer === 'guest-free' || offer === 'card-trial' ? (
+                    <>
+                      <div className="text-3xl font-bold flex items-center gap-2 justify-end"><Gift className="w-6 h-6 text-primary" />Free</div>
+                      <div className="text-sm text-muted-foreground">first month, then $29.95/month</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-3xl font-bold">$29.95</div>
+                      <div className="text-sm text-muted-foreground">/ month</div>
+                    </>
+                  )}
                 </div>
               </div>
               <ul className="space-y-3">
@@ -235,11 +299,23 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                 }
               }}
             >
-              Start monitoring — $29.95/month
+              {offer === 'guest-free'
+                ? 'Create my free account'
+                : offer === 'card-trial'
+                  ? 'Start my free month'
+                  : deferredUntil
+                    ? `Subscribe — first charge ${formatTrialEnd(deferredUntil)}`
+                    : 'Start monitoring — $29.95/month'}
             </Button>
-            <p className="text-center text-xs text-muted-foreground">
-              Test mode: use card 4242 4242 4242 4242, any future expiry, any 3-digit CVC.
-            </p>
+            {offer === 'guest-free' ? (
+              <p className="text-center text-xs text-muted-foreground">
+                No card needed for trials started before February 1. You'll only pay if you choose to subscribe.
+              </p>
+            ) : (
+              <p className="text-center text-xs text-muted-foreground">
+                Test mode: use card 4242 4242 4242 4242, any future expiry, any 3-digit CVC.
+              </p>
+            )}
           </div>
         )}
 
@@ -283,7 +359,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
                 />
               )}
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (authMode === 'signup' ? 'Create account & continue' : 'Sign in & continue')}
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (authMode === 'signup' ? (offer === 'guest-free' ? 'Create account & save' : 'Create account & continue') : (offer === 'guest-free' ? 'Sign in & save' : 'Sign in & continue'))}
               </Button>
             </form>
             <Button variant="ghost" className="w-full" onClick={() => setStep('pricing')}>

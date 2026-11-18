@@ -10,6 +10,7 @@ import { HelpWizardProvider } from "@/contexts/HelpWizardContext";
 import { useKeepAlive } from "@/hooks/useKeepAlive";
 import { Footer } from "@/components/Footer";
 import Index from "./pages/Index";
+import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Admin from "./pages/Admin";
@@ -38,13 +39,17 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Checkout sessions started before the return address moved to /app still land on "/".
-// Keep their ?checkout=success query so the dashboard can confirm and restore the guest portfolio.
-function RootRedirect() {
+// "/" is the front page for visitors; signed-in people go straight to their portfolio.
+// Checkout sessions started before the return address moved to /app still land on "/" —
+// keep their ?checkout=success query so the dashboard can confirm and restore the guest portfolio.
+function RootRoute() {
   const { search } = useLocation();
+  const { session, loading } = useAuth();
   const params = new URLSearchParams(search);
   if (params.get('checkout')) return <Navigate to={`/app${search}`} replace />;
-  return <Navigate to="/auth" replace />;
+  if (loading) return null;
+  if (session) return <Navigate to="/app" replace />;
+  return <Landing />;
 }
 
 function PageViewTracker() {
@@ -59,10 +64,6 @@ function PageViewTracker() {
   return null;
 }
 
-function ConditionalFooter() {
-  const location = useLocation();
-  return location.pathname !== "/" ? <Footer /> : null;
-}
 
 const AppRoutes = () => {
   useKeepAlive();
@@ -70,7 +71,7 @@ const AppRoutes = () => {
     <BrowserRouter>
       <PageViewTracker />
       <Routes>
-        <Route path="/" element={<RootRedirect />} />
+        <Route path="/" element={<RootRoute />} />
         <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/try" element={<Index />} />
@@ -86,7 +87,7 @@ const AppRoutes = () => {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <ConditionalFooter />
+      <Footer />
     </BrowserRouter>
   );
 };

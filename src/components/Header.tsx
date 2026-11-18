@@ -63,7 +63,7 @@ export function Header({ onGuestReset }: HeaderProps) {
       return;
     }
 
-    navigate(user ? '/app' : '/auth');
+    navigate(user ? '/app' : '/');
   };
 
   return (

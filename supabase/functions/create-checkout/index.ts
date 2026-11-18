@@ -50,6 +50,29 @@ async function resolveOrCreateCustomer(
   return created.id;
 }
 
+// Free-month rules — keep in step with src/lib/freeTrial.ts and the start_free_trial database function.
+const FREE_TRIAL_DAYS = 30;
+const MIN_DEFERRAL_MS = 2 * 24 * 60 * 60 * 1000; // Stripe needs a trial end at least 2 days out
+
+/**
+ * Decides the free month a subscription checkout carries:
+ * - never subscribed and no free month yet (card-up-front period) → 30-day trial on the card
+ * - still inside a card-free month → first charge waits until that month ends
+ * - otherwise → charged now
+ */
+async function freeMonthForCheckout(userId: string): Promise<{ trial_period_days?: number; trial_end?: number }> {
+  const [trialRes, subRes] = await Promise.all([
+    supabase.from("free_trials").select("ends_at").eq("user_id", userId).maybeSingle(),
+    supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("user_id", userId),
+  ]);
+  if (trialRes.error || subRes.error) return {};
+  if ((subRes.count ?? 0) > 0) return {};
+  if (!trialRes.data) return { trial_period_days: FREE_TRIAL_DAYS };
+  const endsAt = new Date(trialRes.data.ends_at).getTime();
+  if (endsAt - Date.now() > MIN_DEFERRAL_MS) return { trial_end: Math.floor(endsAt / 1000) };
+  return {};
+}
+
 async function createCheckoutSession(options: {
   priceId: string;
   quantity?: number;
@@ -73,6 +96,8 @@ async function createCheckoutSession(options: {
       })
     : undefined;
 
+  const trial = isRecurring && options.userId ? await freeMonthForCheckout(options.userId) : {};
+
   const session = await stripe.checkout.sessions.create({
     line_items: [{ price: stripePrice.id, quantity: options.quantity || 1 }],
     mode: isRecurring ? "subscription" : "payment",
@@ -82,7 +107,7 @@ async function createCheckoutSession(options: {
     ...(customerId && { customer: customerId }),
     ...(options.userId && {
       metadata: { userId: options.userId },
-      ...(isRecurring && { subscription_data: { metadata: { userId: options.userId } } }),
+      ...(isRecurring && { subscription_data: { metadata: { userId: options.userId }, ...trial } }),
     }),
   } as Stripe.Checkout.SessionCreateParams);
 

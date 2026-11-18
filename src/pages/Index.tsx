@@ -63,6 +63,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { logPortfolioSnapshot, logReplacementEvent, markDailySnapshotLogged, trackEvent } from '@/lib/analytics';
 import { SubscriptionModal, loadPendingGuestPortfolio, clearPendingGuestPortfolio } from '@/components/SubscriptionModal';
+import { FreeTrialNotice } from '@/components/FreeTrialNotice';
 import { DemoFeedbackModal } from '@/components/DemoFeedbackModal';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -237,13 +238,15 @@ const Index = () => {
 
   // persist the guest portfolio to the newly-subscribed user's account.
   useEffect(() => {
-    const checkoutSuccess = searchParams.get('checkout') === 'success';
+    // Arrives either from checkout or straight from the free-month sign-up (no card).
+    const checkoutSuccess = searchParams.get('checkout') === 'success' || searchParams.get('saved') === 'guest';
     if (!checkoutSuccess || !user) return;
 
     const pending = loadPendingGuestPortfolio();
     if (!pending || pending.tickers.length === 0) {
       clearPendingGuestPortfolio();
       searchParams.delete('checkout');
+      searchParams.delete('saved');
       searchParams.delete('session_id');
       setSearchParams(searchParams, { replace: true });
       return;
@@ -260,6 +263,7 @@ const Index = () => {
       }
       clearPendingGuestPortfolio();
       searchParams.delete('checkout');
+      searchParams.delete('saved');
       searchParams.delete('session_id');
       setSearchParams(searchParams, { replace: true });
       toast({
@@ -695,6 +699,7 @@ const Index = () => {
           </div>
         </section>
 
+        <FreeTrialNotice isGuest={isGuest} />
 
         {/* Price feed status */}
         <div className="mb-4 flex items-center justify-between">
