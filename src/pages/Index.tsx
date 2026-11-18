@@ -262,6 +262,8 @@ const Index = () => {
         if (!error) saved++;
       }
       clearPendingGuestPortfolio();
+      queryClient.invalidateQueries({ queryKey: ['user-stocks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-stocks-shares'] });
       searchParams.delete('checkout');
       searchParams.delete('saved');
       searchParams.delete('session_id');
@@ -272,7 +274,7 @@ const Index = () => {
       });
     };
     save();
-  }, [searchParams, setSearchParams, user, toast]);
+  }, [searchParams, setSearchParams, user, toast, queryClient]);
 
   const stockAnalyses = useMemo(
     () => stocks.map((stock) => analyzeStock(stock, targetYield)),
