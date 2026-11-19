@@ -496,6 +496,61 @@ export function optimizeReplacement(input: OptimizerInput): OptimizerResult {
   };
 }
 
+/* ---------- funding labels for a solved trade ---------- */
+
+export interface TradeFunding {
+  /** the purchase that absorbs the bulk of the sale proceeds */
+  mainTicker: string | null;
+  /** shares bought in that main purchase */
+  mainShares: number;
+  /** tickers bought with the cash left over after the main purchase */
+  leftoverTickers: string[];
+  /** cash available after the main purchase (the other buys + any unspent cash) */
+  cashAfterMain: number;
+  /** true when the trade splits the proceeds across two or more purchases */
+  isSplit: boolean;
+}
+
+/**
+ * Work out which part of a solved trade is the "main" buy and which parts are
+ * paid for with the change left over from it.
+ *
+ * Because totalCost <= investmentY, the costs of every purchase other than the
+ * largest one always fit inside `investmentY - mainCost`. So anything that is
+ * not the largest purchase really was bought with the leftover money.
+ */
+export function describeTradeFunding(result: OptimizerResult): TradeFunding {
+  const picks = result.rows.filter((r) => r.shares > 0);
+
+  if (picks.length === 0) {
+    return { mainTicker: null, mainShares: 0, leftoverTickers: [], cashAfterMain: 0, isSplit: false };
+  }
+
+  if (picks.length === 1) {
+    return {
+      mainTicker: picks[0].stock.ticker,
+      mainShares: picks[0].shares,
+      leftoverTickers: [],
+      cashAfterMain: Math.max(0, result.investmentY - picks[0].cost),
+      isSplit: false,
+    };
+  }
+
+  let mainIdx = 0;
+  for (let i = 1; i < picks.length; i++) {
+    if (picks[i].cost > picks[mainIdx].cost) mainIdx = i;
+  }
+
+  const main = picks[mainIdx];
+  return {
+    mainTicker: main.stock.ticker,
+    mainShares: main.shares,
+    leftoverTickers: picks.filter((_, i) => i !== mainIdx).map((r) => r.stock.ticker),
+    cashAfterMain: Math.max(0, result.investmentY - main.cost),
+    isSplit: true,
+  };
+}
+
 /** Helper: turn a Stock[] candidate pool into OptimizerCandidate[]. */
 export function toOptimizerCandidates(stocks: Stock[]): OptimizerCandidate[] {
   return stocks

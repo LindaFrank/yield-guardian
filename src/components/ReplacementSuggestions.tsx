@@ -4,6 +4,7 @@ import { formatCurrency, formatPercentage } from '@/lib/portfolioUtils';
 import {
   optimizeReplacement,
   toOptimizerCandidates,
+  describeTradeFunding,
   OptimizerMode,
   OptimizerResult,
 } from '@/lib/optimizer';
@@ -299,6 +300,7 @@ export function ReplacementSuggestions({
   // - With optimizer result: use sorted rows; suppress n=0 unless diversify is on.
   // - Without (default mode / no underperformer): show candidates as-is (already sorted by yield desc).
   const displayRows = result?.rows ?? null;
+  const funding = result ? describeTradeFunding(result) : null;
 
   return (
     <div className="p-5 rounded-xl gradient-card shadow-card border-[2px] border-muted-foreground/50">
@@ -528,9 +530,21 @@ export function ReplacementSuggestions({
                   <div className="flex justify-between gap-3">
                     <span className="text-muted-foreground shrink-0">Allocation breakdown</span>
                     <span className={cn('font-mono text-right', !isPaid && 'blur-[4px] select-none opacity-70')}>
-                      {allocationPicks.map((r) => `Buy ${r.shares} ${r.stock.ticker}`).join(' + ')}
+                      {allocationPicks
+                        .map((r) =>
+                          `Buy ${r.shares} ${r.stock.ticker}` +
+                          (!isOverride && funding?.leftoverTickers.includes(r.stock.ticker)
+                            ? ' (leftover cash)'
+                            : ''),
+                        )
+                        .join(' + ')}
                     </span>
                   </div>
+                )}
+                {funding?.isSplit && !isOverride && (
+                  <p className="text-[12px] text-muted-foreground leading-snug">
+                    The smaller buy is paid for with the change left over from the main buy.
+                  </p>
                 )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
@@ -892,6 +906,19 @@ export function ReplacementSuggestions({
 
                   return (
                     <div className="text-[15px] text-muted-foreground mt-1 space-y-0.5">
+                      {row.shares > 0 && funding?.leftoverTickers.includes(row.stock.ticker) && (
+                        <p className="text-[13px] italic text-primary/80 leading-snug">
+                          {isPaid && funding.mainTicker ? (
+                            <>
+                              Bought with the {formatCurrency(funding.cashAfterMain)} left over after
+                              buying {funding.mainShares.toLocaleString()}{' '}
+                              <Teaser isPaid={isPaid}>{funding.mainTicker}</Teaser>.
+                            </>
+                          ) : (
+                            <>Bought with the cash left over after the main purchase.</>
+                          )}
+                        </p>
+                      )}
                       <p>
                         Buying{' '}
                         <Teaser isPaid={isPaid}>{projShares.toLocaleString()}</Teaser>{' '}
