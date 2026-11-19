@@ -88,8 +88,8 @@ export default function Contact() {
             <CardDescription>
               Have feedback or questions about Yield Guardian? We'd love to hear from you.
               You can also email us directly at{' '}
-              <a href="mailto:lindafrank@aol.com" className="text-primary hover:underline">
-                lindafrank@aol.com
+              <a href="mailto:linda@guardianyield.com" className="text-primary hover:underline">
+                linda@guardianyield.com
               </a>.
             </CardDescription>
           </CardHeader>
