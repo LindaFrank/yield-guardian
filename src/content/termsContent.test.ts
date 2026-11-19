@@ -31,3 +31,22 @@ describe('Terms free month section', () => {
     expect(text).toContain('$29.95 per month');
   });
 });
+
+describe('Terms supersede earlier versions', () => {
+  it('says this version replaces earlier ones and must be agreed to in order to keep using the app', async () => {
+    const t = await import('./termsContent');
+    expect(t.acceptanceSupersedes).toContain('supersedes and replaces all earlier versions');
+    expect(t.acceptanceSupersedes).toContain('must read and agree');
+    expect(t.acceptanceSupersedes).toContain(t.termsEffectiveDate);
+  });
+
+  it('section 8 covers contacting users at their account email', () => {
+    const privacy = sections.find((s) => s.title.startsWith('8.'))?.paragraphs.join(' ') ?? '';
+    expect(privacy).toContain('email address associated with a user');
+    expect(privacy).toContain('does not sell user email addresses');
+  });
+
+  it('section 13 points to the Cancel subscription button', () => {
+    expect(text).toContain('Cancel subscription button on the Profile page');
+  });
+});

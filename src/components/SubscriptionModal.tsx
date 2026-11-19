@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { termsVersion } from '@/content/termsContent';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -174,7 +175,7 @@ export function SubscriptionModal({ open, onOpenChange, guestTickers, guestShare
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin, data: { display_name: name.trim() } },
+          options: { emailRedirectTo: window.location.origin, data: { display_name: name.trim(), terms_version: termsVersion } },
         });
         if (error) throw error;
         if (data.user && name.trim()) {

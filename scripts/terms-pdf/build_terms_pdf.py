@@ -41,7 +41,7 @@ def p(text, style=body):
     return Paragraph(escape(text), style)
 
 
-story = [p(content["termsTitle"], title), p(content["acceptanceHeading"], heading), p(content["acceptanceIntro"])]
+story = [p(content["termsTitle"], title), p(content["effectiveDateLine"], ParagraphStyle("eff", parent=foot, fontSize=9, spaceAfter=10)), p(content["acceptanceHeading"], heading), p(content["acceptanceIntro"])]
 story.append(ListFlowable(
     [ListItem(p(item, ParagraphStyle("li", parent=body, spaceAfter=3)), leftIndent=14) for item in content["acknowledgments"]],
     bulletType="bullet", start="\u2022", bulletFontSize=8, leftIndent=14, bulletOffsetY=-1))
@@ -52,7 +52,7 @@ statement.setStyle(TableStyle([
     ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ("LEFTPADDING", (0, 0), (-1, -1), 6), ("RIGHTPADDING", (0, 0), (-1, -1), 6),
 ]))
-story += [Spacer(1, 4), statement, Spacer(1, 6), p(content["acceptanceRetention"])]
+story += [Spacer(1, 4), statement, Spacer(1, 6), p(content["acceptanceRetention"]), p(content["acceptanceSupersedes"])]
 
 for section in content["sections"]:
     paras = section["paragraphs"]

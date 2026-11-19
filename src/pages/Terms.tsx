@@ -6,6 +6,8 @@ import {
   acceptanceIntro,
   acceptanceRetention,
   acceptanceStatement,
+  acceptanceSupersedes,
+  effectiveDateLine,
   acknowledgments,
   disclosures,
   disclosuresTitle,
@@ -33,6 +35,7 @@ export default function Terms() {
           <header className="space-y-3 text-center">
             <p className="text-sm font-semibold text-primary">Yield Guardian</p>
             <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">{termsTitle}</h1>
+            <p className="text-xs text-muted-foreground">{effectiveDateLine}</p>
           </header>
 
           <section className="space-y-3">
@@ -43,6 +46,7 @@ export default function Terms() {
             </ul>
             <p className="border border-border bg-muted/40 px-4 py-3 font-medium text-foreground">{acceptanceStatement}</p>
             <p>{acceptanceRetention}</p>
+            <p className="font-medium text-foreground">{acceptanceSupersedes}</p>
           </section>
 
           {sections.map((section) => (

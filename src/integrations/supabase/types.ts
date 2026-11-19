@@ -518,6 +518,27 @@ export type Database = {
         }
         Relationships: []
       }
+      terms_acceptances: {
+        Row: {
+          accepted_at: string
+          id: string
+          terms_version: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          id?: string
+          terms_version: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          id?: string
+          terms_version?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ui_events: {
         Row: {
           category: string | null
@@ -607,6 +628,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_terms: { Args: { p_version: string }; Returns: string }
       check_invite_code: { Args: { _code: string }; Returns: boolean }
       claim_fmp_eod_download: { Args: never; Returns: boolean }
       consume_invite_code: { Args: { _code: string }; Returns: boolean }

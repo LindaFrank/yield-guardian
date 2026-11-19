@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { SubscriptionCard } from '@/components/SubscriptionCard';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -142,6 +143,8 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
+
+          <SubscriptionCard />
 
           {/* Preferences */}
           <Card>

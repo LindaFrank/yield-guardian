@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { termsVersion } from '@/content/termsContent';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
@@ -86,7 +87,7 @@ export default function Auth() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/auth`, data: { display_name: name.trim() } },
+          options: { emailRedirectTo: `${window.location.origin}/auth`, data: { display_name: name.trim(), terms_version: termsVersion } },
         });
         if (error) { toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' }); }
         else {

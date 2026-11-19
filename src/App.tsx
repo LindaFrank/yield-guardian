@@ -21,6 +21,7 @@ import Contact from "./pages/Contact";
 import DownloadReport from "./pages/DownloadReport";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import { TermsUpdateGate } from "@/components/TermsUpdateGate";
 
 
 const queryClient = new QueryClient();
@@ -29,7 +30,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth();
   if (loading) return null;
   if (!session) return <Navigate to="/auth" replace />;
-  return <>{children}</>;
+  return <>{children}<TermsUpdateGate /></>;
 }
 
 function AuthRoute({ children }: { children: React.ReactNode }) {

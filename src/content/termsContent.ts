@@ -11,10 +11,20 @@ export interface TermsSection {
 
 export const termsTitle = 'Terms, Privacy & Educational Platform Disclosures';
 
+/**
+ * Version of these Terms. Signed-in members who have not agreed to this version are
+ * asked to agree before they can keep using the app — change it whenever the wording
+ * materially changes (and update the effective date to match).
+ */
+export const termsVersion = '2026-11-18';
+export const termsEffectiveDate = 'November 18, 2026';
+export const effectiveDateLine = `Effective date: ${termsEffectiveDate}`;
+
 export const acceptanceHeading = '1. Acceptance of Terms and Privacy Policy: User Acknowledgment';
 export const acceptanceIntro = 'By checking the acknowledgment boxes on the sign-up page, I acknowledge that:';
 export const acceptanceStatement = 'I have read and agree to the Yield Guardian Terms & Conditions and acknowledge the Privacy Policy.';
 export const acceptanceRetention = 'Yield Guardian will retain the applicable terms version, privacy-policy version, and acceptance date/time and you will not be asked to accept them again unless the applicable terms or privacy policy materially change.';
+export const acceptanceSupersedes = `This version of the Yield Guardian Terms, Privacy & Educational Platform Disclosures, effective ${termsEffectiveDate}, supersedes and replaces all earlier versions of the Yield Guardian Terms & Conditions. Users who agreed to an earlier version must read and agree to the terms of this present agreement in order to continue using Yield Guardian. A user who does not wish to agree may stop using Yield Guardian at any time and may cancel a subscription as described in Section 13.`;
 
 export const acknowledgments: string[] = [
   'I have read and understand these Terms, Privacy & Educational Platform Disclosures.',
@@ -86,6 +96,7 @@ export const sections: TermsSection[] = [
       'Portfolio analysis does not require information such as a Social Security number, brokerage account number, or home address. Personal information may nevertheless be collected when necessary for account creation, authentication, communication, customer support, security, or payment processing.',
       "Payment information needed to purchase paid Yield Guardian services may be processed by a third-party payment service provider and will be covered by that third-party payment service provider's privacy policies.",
       'Yield Guardian may retain portfolio information, user-reported transactions, analysis history, and related data as necessary to provide portfolio tracking, historical analysis, calculations, and reporting. This Privacy Policy may be updated to describe the actual storage, retention, security, deletion, and sharing practices implemented by the application.',
+      "Yield Guardian's administrators may use the email address associated with a user's account to contact the user about the account and the service, including sign-in and security notices, replies to questions and support requests, reminders about the free month and the date it ends, subscription and billing matters, and changes to these Terms or the Privacy Policy. Yield Guardian may also send occasional news about Yield Guardian and its features to users who have turned on Email Updates on their Profile page; a user may turn Email Updates off at any time. Yield Guardian does not sell user email addresses and does not share them with other companies for those companies' own marketing.",
     ],
   },
   {
@@ -128,7 +139,7 @@ export const sections: TermsSection[] = [
       'During the last 3 days of the free month, Yield Guardian displays a notice in the app showing the date the free month ends.',
       'When the free month ends without a subscription, the names and share counts of Alternatives and the broker tools are hidden again until the user subscribes. Saved portfolios are kept and are not deleted.',
       'The free month is limited to one per person. Creating additional accounts or using additional email addresses to obtain additional free months is not permitted, and Yield Guardian may end any free month obtained this way.',
-      'A subscription may be canceled at any time by contacting Yield Guardian at linda@guardianyield.com. Yield Guardian may change or end the free month offer for free months not yet started; a free month that has already begun will not be shortened.',
+      'A subscription may be canceled at any time with the Cancel subscription button on the Profile page, or by contacting Yield Guardian at linda@guardianyield.com. When a subscription is canceled, no further charges are made, and full access continues until the end of the period already paid for, or until the end of the free month if the subscription is canceled during it. Yield Guardian may change or end the free month offer for free months not yet started; a free month that has already begun will not be shortened.',
     ],
   },
 ];
