@@ -15,6 +15,8 @@ import { useStockQuotes } from '@/hooks/useStockData';
 import { feedLabels } from '@/lib/feedLabels';
 import { useNavigate } from 'react-router-dom';
 import { checkDividendStability } from '@/lib/portfolioUtils';
+import { allocateBudget, BudgetMode } from '@/lib/budgetAllocator';
+import { BudgetPlannerCard } from '@/components/BudgetPlannerCard';
 import { cn } from '@/lib/utils';
 
 
@@ -76,6 +78,9 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [budgetInput, setBudgetInput] = useState('');
+  const [budgetMode, setBudgetMode] = useState<BudgetMode>('even');
+  const [portions, setPortions] = useState<number | null>(null);
   const step2Ref = useScrollToOnValue<HTMLDivElement>(step === 2 ? 'step2' : '');
 
   const catalogTickers = useMemo(
@@ -112,6 +117,73 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
     [matchingStocks, selectedTickers]
   );
 
+  const parsedBudget = budgetInput.trim() === '' ? 0 : parseFloat(budgetInput);
+  const hasBudget = Number.isFinite(parsedBudget) && parsedBudget > 0;
+  const effectivePortions = selectedStocks.length > 0
+    ? Math.max(1, Math.min(portions ?? selectedStocks.length, selectedStocks.length))
+    : 0;
+
+  const budgetResult = useMemo(
+    () => (hasBudget ? allocateBudget(selectedStocks, parsedBudget, budgetMode, effectivePortions, localYield) : null),
+    [hasBudget, selectedStocks, parsedBudget, budgetMode, effectivePortions, localYield]
+  );
+
+  const { liveTotalAllocated, liveWeightedYield, stocksWithSharesCount } = useMemo(() => {
+    let total = 0;
+    let weightedDiv = 0;
+    let count = 0;
+    for (const s of selectedStocks) {
+      const n = parseFloat(sharesMap[s.ticker] || '');
+      if (Number.isFinite(n) && n > 0) {
+        const cost = n * s.currentPrice;
+        total += cost;
+        weightedDiv += cost * (s.computedYield / 100);
+        count += 1;
+      }
+    }
+    return {
+      liveTotalAllocated: Math.round(total * 100) / 100,
+      liveWeightedYield: total > 0 ? (weightedDiv / total) * 100 : 0,
+      stocksWithSharesCount: count,
+    };
+  }, [selectedStocks, sharesMap]);
+
+  const applyBudgetToShares = (
+    nextBudgetStr: string,
+    nextMode: BudgetMode,
+    nextPortions: number | null,
+    stocks: EnrichedStock[]
+  ) => {
+    const amount = nextBudgetStr.trim() === '' ? 0 : parseFloat(nextBudgetStr);
+    if (!Number.isFinite(amount) || amount <= 0 || stocks.length === 0) return;
+    const count = Math.max(1, Math.min(nextPortions ?? stocks.length, stocks.length));
+    const res = allocateBudget(stocks, amount, nextMode, count, localYield);
+    const nextShares: Record<string, string> = {};
+    stocks.forEach((s) => {
+      const sh = res.allocations[s.ticker]?.shares ?? 0;
+      nextShares[s.ticker] = sh > 0 ? String(sh) : '';
+    });
+    setSharesMap(nextShares);
+  };
+
+  const handleBudgetChange = (val: string) => {
+    setBudgetInput(val);
+    setSubmitted(false);
+    applyBudgetToShares(val, budgetMode, portions, selectedStocks);
+  };
+
+  const handleBudgetModeChange = (nextMode: BudgetMode) => {
+    setBudgetMode(nextMode);
+    setSubmitted(false);
+    applyBudgetToShares(budgetInput, nextMode, portions, selectedStocks);
+  };
+
+  const handlePortionsChange = (nextPortions: number) => {
+    setPortions(nextPortions);
+    setSubmitted(false);
+    applyBudgetToShares(budgetInput, budgetMode, nextPortions, selectedStocks);
+  };
+
   const handleYieldConfirm = () => {
     onYieldChange?.(localYield);
     setStep(2);
@@ -122,15 +194,27 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
       const next = new Set(prev);
       if (next.has(ticker)) next.delete(ticker);
       else next.add(ticker);
+      if (step === 3 && hasBudget) {
+        const remainingStocks = matchingStocks.filter((s) => next.has(s.ticker));
+        const clamped = portions !== null ? Math.min(portions, Math.max(1, remainingStocks.length)) : null;
+        setPortions(clamped);
+        applyBudgetToShares(budgetInput, budgetMode, clamped, remainingStocks);
+      }
       return next;
     });
   };
 
   const handleProceedToShares = () => {
-    // Initialize shares inputs for selected stocks
-    const initial: Record<string, string> = {};
-    selectedTickers.forEach((t) => { initial[t] = sharesMap[t] || ''; });
-    setSharesMap(initial);
+    const nextStocks = matchingStocks.filter((s) => selectedTickers.has(s.ticker));
+    const clampedPortions = portions !== null ? Math.min(portions, Math.max(1, nextStocks.length)) : null;
+    setPortions(clampedPortions);
+    if (hasBudget) {
+      applyBudgetToShares(budgetInput, budgetMode, clampedPortions, nextStocks);
+    } else {
+      const initial: Record<string, string> = {};
+      selectedTickers.forEach((t) => { initial[t] = sharesMap[t] || ''; });
+      setSharesMap(initial);
+    }
     setStep(3);
     // Scroll to top so user sees the first stock in the shares list
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -138,6 +222,22 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
 
   const handleConfirmAll = () => {
     setSubmitted(true);
+    if (hasBudget) {
+      const stocksToAdd = selectedStocks.filter((s) => parseFloat(sharesMap[s.ticker] || '') > 0);
+      if (stocksToAdd.length === 0) {
+        toast.error('No shares to add yet', {
+          description: 'Increase your investment amount, adjust portions, or enter shares manually.',
+        });
+        return;
+      }
+      stocksToAdd.forEach((stock) => {
+        const shares = parseFloat(sharesMap[stock.ticker]);
+        onAddStock?.(stock, shares);
+      });
+      onDone?.();
+      return;
+    }
+
     // Find the first stock missing valid shares
     const firstInvalid = selectedStocks.find((s) => {
       const val = parseFloat(sharesMap[s.ticker] || '');
@@ -331,13 +431,38 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             </p>
           </div>
 
+          <BudgetPlannerCard
+            budgetInput={budgetInput}
+            onBudgetChange={handleBudgetChange}
+            mode={budgetMode}
+            onModeChange={handleBudgetModeChange}
+            portions={effectivePortions}
+            maxPortions={selectedStocks.length}
+            onPortionsChange={handlePortionsChange}
+            targetYield={localYield}
+            totalAllocated={liveTotalAllocated}
+            weightedYield={liveWeightedYield}
+          />
+
           <div className="space-y-3">
             {selectedStocks.map((stock) => {
               const val = sharesMap[stock.ticker] || '';
               const numVal = parseFloat(val);
-              const isInvalid = submitted && (!numVal || numVal <= 0);
+              const alloc = budgetResult?.allocations[stock.ticker];
+              const isNotBought = hasBudget && alloc?.status === 'not_bought' && !(numVal > 0);
+              const isCannotAfford = hasBudget && alloc?.status === 'cannot_afford' && !(numVal > 0);
+              const isInvalid = !hasBudget && submitted && (!numVal || numVal <= 0);
               return (
-                <Card key={stock.ticker} id={`shares-card-${stock.ticker}`} className={cn('p-4 border-[0.5px] border-muted-foreground/70', isInvalid && 'border-yield-negative')}>
+                <Card
+                  key={stock.ticker}
+                  id={`shares-card-${stock.ticker}`}
+                  className={cn(
+                    'p-4 border-[0.5px] border-muted-foreground/70',
+                    isInvalid && 'border-yield-negative',
+                    isCannotAfford && 'border-yield-warning',
+                    isNotBought && 'opacity-70'
+                  )}
+                >
                   <div className="flex items-center gap-4">
                     <Checkbox
                       checked={selectedTickers.has(stock.ticker)}
@@ -349,15 +474,16 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-semibold">{stock.ticker}</span>
                         <span className="text-xs text-muted-foreground">${stock.currentPrice.toFixed(2)}</span>
+                        <span className="text-xs text-primary font-medium">{stock.computedYield.toFixed(2)}%</span>
                       </div>
                       <p className="text-xs text-muted-foreground line-clamp-1">{stock.name}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <Input
                         type="number"
-                        min="1"
+                        min="0"
                         step="1"
-                        placeholder="Shares"
+                        placeholder={isNotBought ? '0' : 'Shares'}
                         value={val}
                         onChange={(e) => setSharesMap((prev) => ({ ...prev, [stock.ticker]: e.target.value }))}
                         className="w-24 bg-card border-primary/50 focus-visible:border-primary"
@@ -369,12 +495,22 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
                       {numVal} × ${stock.currentPrice.toFixed(2)} = <span className="text-primary font-medium">${(numVal * stock.currentPrice).toFixed(2)}</span>
                     </p>
                   )}
+                  {isNotBought && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Not bought — outside your top {effectivePortions} highest-yielding stock{effectivePortions !== 1 ? 's' : ''}.
+                    </p>
+                  )}
+                  {isCannotAfford && alloc && (
+                    <p className="text-xs text-yield-warning mt-2">
+                      Portion (${alloc.portionBudget.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}) can't afford 1 share (${stock.currentPrice.toFixed(2)}) — try fewer portions or enter shares manually.
+                    </p>
+                  )}
                 </Card>
               );
             })}
           </div>
 
-          {submitted && selectedStocks.some((s) => !(parseFloat(sharesMap[s.ticker] || '') > 0)) && (
+          {!hasBudget && submitted && selectedStocks.some((s) => !(parseFloat(sharesMap[s.ticker] || '') > 0)) && (
             <p className="text-sm text-destructive text-center">Please enter a valid number of shares for all stocks.</p>
           )}
 
@@ -387,7 +523,9 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             </Button>
             <Button className="gap-2" onClick={handleConfirmAll}>
               <Check className="w-4 h-4" />
-              Add {selectedStocks.length} Stock{selectedStocks.length !== 1 ? 's' : ''} to Portfolio
+              {hasBudget
+                ? `Add ${stocksWithSharesCount} Stock${stocksWithSharesCount !== 1 ? 's' : ''} to Portfolio`
+                : `Add ${selectedStocks.length} Stock${selectedStocks.length !== 1 ? 's' : ''} to Portfolio`}
             </Button>
           </div>
         </div>
