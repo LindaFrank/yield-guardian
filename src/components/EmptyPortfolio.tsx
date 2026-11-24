@@ -186,7 +186,9 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
 
   const handleYieldConfirm = () => {
     onYieldChange?.(localYield);
-    setStep(2);
+    if (!isValidBudgetInput(budgetInput)) setBudgetInput('');
+    setSubmitted(false);
+    setStep(3);
   };
 
   const toggleTicker = (ticker: string) => {
@@ -329,6 +331,21 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               <span>10% Aggressive</span>
             </div>
           </Card>
+          <div className="text-center space-y-1 pt-2">
+            <h2 className="text-xl font-semibold flex items-center justify-center gap-2">
+              <DollarSign className="w-5 h-5 text-primary" /> How Much Do You Have to Invest?
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Optional — tell us your budget and we'll pre-fill whole shares for the stocks you pick next. Leave it blank to enter shares yourself.
+            </p>
+          </div>
+          <BudgetSetupCard
+            budgetInput={budgetInput}
+            onBudgetChange={handleBudgetChange}
+            mode={budgetMode}
+            onModeChange={handleBudgetModeChange}
+            targetYield={localYield}
+          />
           <div className="flex flex-wrap gap-3 justify-center">
             {onAddStock && (
               <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
@@ -446,7 +463,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             )}
             <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
             <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
-            <Button variant="outline" onClick={() => setStep(2)}>Back</Button>
+            <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
             {selectedTickers.size > 0 && (
               <Button className="gap-2" onClick={handleProceedToShares}>
                 Enter Shares for {selectedTickers.size} Stock{selectedTickers.size !== 1 ? 's' : ''} <ChevronRight className="w-4 h-4" />
