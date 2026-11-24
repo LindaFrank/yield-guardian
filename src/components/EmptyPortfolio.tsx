@@ -16,7 +16,7 @@ import { feedLabels } from '@/lib/feedLabels';
 import { useNavigate } from 'react-router-dom';
 import { checkDividendStability } from '@/lib/portfolioUtils';
 import { allocateBudget, BudgetMode } from '@/lib/budgetAllocator';
-import { BudgetPlannerCard } from '@/components/BudgetPlannerCard';
+import { BudgetPlannerCard, BudgetSetupCard, isValidBudgetInput } from '@/components/BudgetPlannerCard';
 import { cn } from '@/lib/utils';
 
 
@@ -81,7 +81,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   const [budgetInput, setBudgetInput] = useState('');
   const [budgetMode, setBudgetMode] = useState<BudgetMode>('even');
   const [portions, setPortions] = useState<number | null>(null);
-  const step2Ref = useScrollToOnValue<HTMLDivElement>(step === 2 ? 'step2' : '');
+  const step2Ref = useScrollToOnValue<HTMLDivElement>(step === 3 ? 'step3' : '');
 
   const catalogTickers = useMemo(
     () => Array.from(new Set([...marketStocks.map((s) => s.ticker), ...HIGH_YIELD_CANDIDATE_TICKERS])),
@@ -194,7 +194,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
       const next = new Set(prev);
       if (next.has(ticker)) next.delete(ticker);
       else next.add(ticker);
-      if (step === 3 && hasBudget) {
+      if (step === 4 && hasBudget) {
         const remainingStocks = matchingStocks.filter((s) => next.has(s.ticker));
         const clamped = portions !== null ? Math.min(portions, Math.max(1, remainingStocks.length)) : null;
         setPortions(clamped);
@@ -215,7 +215,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
       selectedTickers.forEach((t) => { initial[t] = sharesMap[t] || ''; });
       setSharesMap(initial);
     }
-    setStep(3);
+    setStep(4);
     // Scroll to top so user sees the first stock in the shares list
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -341,8 +341,46 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
         </div>
       )}
 
-      {/* Step 2: Checkbox multi-select */}
+      {/* Step 2: Budget question — right after the yield slider */}
       {step === 2 && (
+        <div className="max-w-lg mx-auto space-y-6 py-4">
+          <div className="text-center space-y-2">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-1">
+              <DollarSign className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl font-semibold">How Much Do You Have to Invest?</h2>
+            <p className="text-sm text-muted-foreground">
+              Tell us your budget and we'll pre-fill whole shares for the stocks you pick next.
+            </p>
+          </div>
+          <BudgetSetupCard
+            budgetInput={budgetInput}
+            onBudgetChange={handleBudgetChange}
+            mode={budgetMode}
+            onModeChange={handleBudgetModeChange}
+            targetYield={localYield}
+          />
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
+            <Button
+              variant="outline"
+              onClick={() => { setBudgetInput(''); setSubmitted(false); setStep(3); }}
+            >
+              Skip — I'll enter shares myself
+            </Button>
+            <Button
+              className="gap-2"
+              disabled={!isValidBudgetInput(budgetInput)}
+              onClick={() => setStep(3)}
+            >
+              Find Matching Stocks <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Checkbox multi-select */}
+      {step === 3 && (
         <div ref={step2Ref} className="scroll-mt-64 space-y-6 py-4 px-4 sm:px-6 rounded-xl border-[4px] border-gray-400 bg-background">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-1">
@@ -408,7 +446,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             )}
             <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
             <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
-            <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
+            <Button variant="outline" onClick={() => setStep(2)}>Back</Button>
             {selectedTickers.size > 0 && (
               <Button className="gap-2" onClick={handleProceedToShares}>
                 Enter Shares for {selectedTickers.size} Stock{selectedTickers.size !== 1 ? 's' : ''} <ChevronRight className="w-4 h-4" />
@@ -418,8 +456,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
         </div>
       )}
 
-      {/* Step 3: Bulk shares entry */}
-      {step === 3 && (
+      {/* Step 4: Bulk shares entry */}
+      {step === 4 && (
         <div className="space-y-6 py-4 max-w-lg mx-auto">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-1">
@@ -431,18 +469,17 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             </p>
           </div>
 
-          <BudgetPlannerCard
-            budgetInput={budgetInput}
-            onBudgetChange={handleBudgetChange}
-            mode={budgetMode}
-            onModeChange={handleBudgetModeChange}
-            portions={effectivePortions}
-            maxPortions={selectedStocks.length}
-            onPortionsChange={handlePortionsChange}
-            targetYield={localYield}
-            totalAllocated={liveTotalAllocated}
-            weightedYield={liveWeightedYield}
-          />
+          {hasBudget && (
+            <BudgetPlannerCard
+              budget={parsedBudget}
+              mode={budgetMode}
+              portions={effectivePortions}
+              maxPortions={selectedStocks.length}
+              onPortionsChange={handlePortionsChange}
+              totalAllocated={liveTotalAllocated}
+              weightedYield={liveWeightedYield}
+            />
+          )}
 
           <div className="space-y-3">
             {selectedStocks.map((stock) => {
@@ -518,7 +555,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             {onAddStock && (
               <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
             )}
-            <Button variant="outline" onClick={() => { setSubmitted(false); setStep(2); }}>
+            <Button variant="outline" onClick={() => { setSubmitted(false); setStep(3); }}>
               Back to Selection
             </Button>
             <Button className="gap-2" onClick={handleConfirmAll}>
