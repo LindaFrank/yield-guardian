@@ -45,13 +45,18 @@ interface EmptyPortfolioProps {
   initialStep?: number;
   onCancel?: () => void;
   existingTickers?: string[];
+  /** Optional shared budget (set from the main page's money box). */
+  budgetInput?: string;
+  onBudgetInputChange?: (value: string) => void;
+  budgetMode?: BudgetMode;
+  onBudgetModeChange?: (mode: BudgetMode) => void;
 }
 
 interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel, existingTickers = [] }: EmptyPortfolioProps) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel, existingTickers = [], budgetInput: budgetInputProp, onBudgetInputChange, budgetMode: budgetModeProp, onBudgetModeChange }: EmptyPortfolioProps) {
   const [step, setStep] = useState(initialStep);
   const navigate = useNavigate();
 
@@ -78,8 +83,14 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
-  const [budgetInput, setBudgetInput] = useState('');
-  const [budgetMode, setBudgetMode] = useState<BudgetMode>('even');
+  const [localBudgetInput, setLocalBudgetInput] = useState('');
+  const [localBudgetMode, setLocalBudgetMode] = useState<BudgetMode>('even');
+  const budgetInput = budgetInputProp ?? localBudgetInput;
+  const budgetMode = budgetModeProp ?? localBudgetMode;
+  const setBudgetInput = (v: string) => { setLocalBudgetInput(v); onBudgetInputChange?.(v); };
+  const setBudgetMode = (m: BudgetMode) => { setLocalBudgetMode(m); onBudgetModeChange?.(m); };
+  // Keep the wizard's yield in step with the main page's yield slider.
+  useEffect(() => { setLocalYield(currentYield); }, [currentYield]);
   const [portions, setPortions] = useState<number | null>(null);
   const step2Ref = useScrollToOnValue<HTMLDivElement>(step === 3 ? 'step3' : '');
 

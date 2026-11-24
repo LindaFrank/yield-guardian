@@ -24,6 +24,8 @@ import { IncomeYTD } from '@/components/IncomeYTD';
 import { AddStockModal } from '@/components/AddStockModal';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
 import { EmptyPortfolio } from '@/components/EmptyPortfolio';
+import { BudgetSetupCard } from '@/components/BudgetPlannerCard';
+import type { BudgetMode } from '@/lib/budgetAllocator';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { HelpIconToggle } from '@/components/HelpIconToggle';
 import { PdfReportPreview } from '@/components/PdfReportPreview';
@@ -126,6 +128,15 @@ const Index = () => {
   const [addStockOpen, setAddStockOpen] = useState(false);
   const [findStocksStep, setFindStocksStep] = useState(0);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
+  const [budgetInput, setBudgetInput] = useState('');
+  const [budgetMode, setBudgetMode] = useState<BudgetMode>('even');
+  const parsedDashboardBudget = budgetInput.trim() === '' ? 0 : parseFloat(budgetInput);
+  const hasDashboardBudget = Number.isFinite(parsedDashboardBudget) && parsedDashboardBudget > 0;
+  const openBudgetStockPicker = () => {
+    setShowFindStocksFlow(true);
+    setFindStocksStep(3);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   const [reportGenerating, setReportGenerating] = useState(false);
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
   const [quickStartOpen, setQuickStartOpen] = useState(false);
@@ -637,6 +648,10 @@ const Index = () => {
                 variant="outline"
                 className="gap-1.5 border-[3px] border-muted-foreground/50"
                 onClick={() => {
+                  if (hasDashboardBudget) {
+                    openBudgetStockPicker();
+                    return;
+                  }
                   setSelectedUnderperformer(null);
                   setReplacementDialogOpen(true);
                 }}
@@ -751,6 +766,10 @@ const Index = () => {
               }}
               initialStep={showFindStocksFlow ? findStocksStep : 0}
               existingTickers={stocks.map((s) => s.ticker)}
+              budgetInput={budgetInput}
+              onBudgetInputChange={setBudgetInput}
+              budgetMode={budgetMode}
+              onBudgetModeChange={setBudgetMode}
             />
           </section>
         )}
@@ -781,6 +800,23 @@ const Index = () => {
               <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
             </section>
           </HelpTooltip>
+          <section id="dashboard-budget-section" className="animate-fade-in space-y-3" style={{ animationDelay: '150ms' }}>
+            <BudgetSetupCard
+              budgetInput={budgetInput}
+              onBudgetChange={setBudgetInput}
+              mode={budgetMode}
+              onModeChange={setBudgetMode}
+              targetYield={targetYield}
+            />
+            {hasDashboardBudget && (
+              <div className="flex justify-end">
+                <Button onClick={openBudgetStockPicker} className="gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Find stocks for this amount
+                </Button>
+              </div>
+            )}
+          </section>
         </div>
 
         {/* Combined Underperformers + Alternatives panel (above Income Impact) */}
