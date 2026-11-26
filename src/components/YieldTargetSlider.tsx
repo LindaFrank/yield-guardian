@@ -6,13 +6,14 @@ import { Input } from '@/components/ui/input';
 interface YieldTargetSliderProps {
   value: number;
   onChange: (value: number) => void;
+  inDialog?: boolean;
 }
 
 const MIN = 1;
 const MAX = 10;
 const STEP = 0.5;
 
-export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
+export function YieldTargetSlider({ value, onChange, inDialog = false }: YieldTargetSliderProps) {
   const [inputValue, setInputValue] = useState(value.toFixed(1));
   const isEditingRef = useRef(false);
 
@@ -40,7 +41,7 @@ export function YieldTargetSlider({ value, onChange }: YieldTargetSliderProps) {
   };
 
   return (
-    <div className="p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-elevated active:scale-[0.97]">
+    <div className={inDialog ? 'py-2' : 'p-5 rounded-xl gradient-card shadow-card border-[4px] border-muted-foreground/50 transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-elevated active:scale-[0.97]'}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5 text-primary" />

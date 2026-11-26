@@ -129,6 +129,7 @@ const Index = () => {
   const [findStocksStep, setFindStocksStep] = useState(3);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
   const [budgetStockPickerOpen, setBudgetStockPickerOpen] = useState(false);
+  const [yieldDialogOpen, setYieldDialogOpen] = useState(false);
   const [budgetInput, setBudgetInput] = useState('');
   const [budgetMode, setBudgetMode] = useState<BudgetMode>('even');
   const parsedDashboardBudget = budgetInput.trim() === '' ? 0 : parseFloat(budgetInput);
@@ -157,7 +158,6 @@ const Index = () => {
   const portfolioLoading = isGuest ? false : tickersLoading;
   const wizardDone = wizardDismissed || (!portfolioLoading && tickers.length > 0);
   const showStockFinder = !wizardDone || showFindStocksFlow;
-  const yieldSliderRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
 
   // Fetch live data for portfolio tickers
@@ -309,6 +309,7 @@ const Index = () => {
     addStockOpen ||
     replacementDialogOpen ||
     budgetStockPickerOpen ||
+    yieldDialogOpen ||
     quickStartOpen ||
     quickStartImportOpen ||
     feedbackOpen ||
@@ -639,7 +640,7 @@ const Index = () => {
               <Button
                 autoFocus
                 className="gap-1.5 border-[3px] border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow ring-1 ring-primary/40"
-                onClick={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                onClick={() => setYieldDialogOpen(true)}
               >
                 <Target className="w-3.5 h-3.5" />
                 Desired Dividend Yield
@@ -730,15 +731,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Yield target, directly under the action menu */}
-        <div className="mt-4 space-y-4">
-          <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
-            <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-              <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
-            </section>
-          </HelpTooltip>
-        </div>
-
         <FreeTrialNotice isGuest={isGuest} />
 
         {/* Price feed status */}
@@ -774,7 +766,7 @@ const Index = () => {
           <section className="mb-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
             <EmptyPortfolio
               onSelectStocks={() => setAddStockOpen(true)}
-              onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+              onSetYield={() => setYieldDialogOpen(true)}
               onAddStock={handleAddStock}
               currentYield={targetYield}
               onDone={() => {
@@ -979,6 +971,16 @@ const Index = () => {
             </DialogContent>
           </Dialog>
 
+          <Dialog open={yieldDialogOpen} onOpenChange={setYieldDialogOpen}>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto border-[4px] border-muted-foreground/50 pt-14" closeLabel="Back to Portfolio">
+              <DialogHeader className="sr-only">
+                <DialogTitle>Desired Dividend Yield</DialogTitle>
+                <DialogDescription>Choose your desired dividend yield.</DialogDescription>
+              </DialogHeader>
+              <YieldTargetSlider value={targetYield} onChange={setTargetYield} inDialog />
+            </DialogContent>
+          </Dialog>
+
           <Dialog open={budgetStockPickerOpen} onOpenChange={setBudgetStockPickerOpen}>
             <DialogContent
               className="max-w-3xl max-h-[90vh] overflow-y-auto border-[4px] border-gray-500 pb-8"
@@ -999,9 +1001,7 @@ const Index = () => {
                   }}
                   onSetYield={() => {
                     setBudgetStockPickerOpen(false);
-                    setTimeout(() => {
-                      yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 100);
+                    setYieldDialogOpen(true);
                   }}
                   onAddStock={handleAddStock}
                   currentYield={targetYield}
