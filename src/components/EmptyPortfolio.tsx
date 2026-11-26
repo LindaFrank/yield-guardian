@@ -1,11 +1,10 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-import { TrendingUp, DollarSign, Target, ChevronRight, Check, Hash, Loader2, Search } from 'lucide-react';
+import { TrendingUp, ChevronRight, Check, Hash, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
 import { Stock } from '@/types/portfolio';
 import { marketStocks } from '@/data/mockData';
 import { HIGH_YIELD_CANDIDATES, HIGH_YIELD_CANDIDATE_TICKERS } from '@/data/highYieldCandidates';
@@ -16,7 +15,7 @@ import { feedLabels } from '@/lib/feedLabels';
 import { useNavigate } from 'react-router-dom';
 import { checkDividendStability } from '@/lib/portfolioUtils';
 import { allocateBudget, BudgetMode } from '@/lib/budgetAllocator';
-import { BudgetPlannerCard, BudgetSetupCard, isValidBudgetInput } from '@/components/BudgetPlannerCard';
+import { BudgetPlannerCard } from '@/components/BudgetPlannerCard';
 import { cn } from '@/lib/utils';
 
 
@@ -39,24 +38,20 @@ interface EmptyPortfolioProps {
   onSelectStocks: () => void;
   onSetYield: () => void;
   onAddStock?: (stock: Stock, shares?: number) => void;
-  onYieldChange?: (value: number) => void;
   currentYield?: number;
   onDone?: () => void;
   initialStep?: number;
-  onCancel?: () => void;
   existingTickers?: string[];
   /** Optional shared budget (set from the main page's money box). */
   budgetInput?: string;
-  onBudgetInputChange?: (value: string) => void;
   budgetMode?: BudgetMode;
-  onBudgetModeChange?: (mode: BudgetMode) => void;
 }
 
 interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYieldChange, currentYield = 5.0, onDone, initialStep = 0, onCancel, existingTickers = [], budgetInput: budgetInputProp, onBudgetInputChange, budgetMode: budgetModeProp, onBudgetModeChange }: EmptyPortfolioProps) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, currentYield = 5.0, onDone, initialStep = 3, existingTickers = [], budgetInput = '', budgetMode = 'even' }: EmptyPortfolioProps) {
   const [step, setStep] = useState(initialStep);
   const navigate = useNavigate();
 
@@ -68,9 +63,9 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
     const handleGuestBack = (e: Event) => {
       e.preventDefault(); // tell the header the wizard handled it
       setStep((s) => {
-        if (s > 0) {
+        if (s === 4) {
           window.scrollTo({ top: 0, behavior: 'smooth' });
-          return s - 1;
+          return 3;
         }
         navigate('/auth');
         return s;
@@ -83,12 +78,6 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
-  const [localBudgetInput, setLocalBudgetInput] = useState('');
-  const [localBudgetMode, setLocalBudgetMode] = useState<BudgetMode>('even');
-  const budgetInput = budgetInputProp ?? localBudgetInput;
-  const budgetMode = budgetModeProp ?? localBudgetMode;
-  const setBudgetInput = (v: string) => { setLocalBudgetInput(v); onBudgetInputChange?.(v); };
-  const setBudgetMode = (m: BudgetMode) => { setLocalBudgetMode(m); onBudgetModeChange?.(m); };
   // Keep the wizard's yield in step with the main page's yield slider.
   useEffect(() => { setLocalYield(currentYield); }, [currentYield]);
   const [portions, setPortions] = useState<number | null>(null);
@@ -177,29 +166,10 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
     setSharesMap(nextShares);
   };
 
-  const handleBudgetChange = (val: string) => {
-    setBudgetInput(val);
-    setSubmitted(false);
-    applyBudgetToShares(val, budgetMode, portions, selectedStocks);
-  };
-
-  const handleBudgetModeChange = (nextMode: BudgetMode) => {
-    setBudgetMode(nextMode);
-    setSubmitted(false);
-    applyBudgetToShares(budgetInput, nextMode, portions, selectedStocks);
-  };
-
   const handlePortionsChange = (nextPortions: number) => {
     setPortions(nextPortions);
     setSubmitted(false);
     applyBudgetToShares(budgetInput, budgetMode, nextPortions, selectedStocks);
-  };
-
-  const handleYieldConfirm = () => {
-    onYieldChange?.(localYield);
-    if (!isValidBudgetInput(budgetInput)) setBudgetInput('');
-    setSubmitted(false);
-    setStep(3);
   };
 
   const toggleTicker = (ticker: string) => {
@@ -275,138 +245,6 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Step 0: Portfolio value = $0 */}
-      {step === 0 && (
-        <div className="text-center py-8 space-y-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-2">
-            <DollarSign className="w-8 h-8" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold mb-2">Your Portfolio Value</h2>
-            <p className="text-5xl font-mono font-bold text-primary">$0.00</p>
-          </div>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Let's build your dividend portfolio. We'll start by setting your desired yield target, then find stocks that match.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button onClick={() => setStep(1)} size="lg" className="gap-2" autoFocus>
-              <Target className="w-5 h-5" />
-              Desired Dividend Yield
-            </Button>
-            <Button size="lg" onClick={() => setStep(1)} className="gap-2">
-              Find Matching Stocks <ChevronRight className="w-4 h-4" />
-            </Button>
-            <Button size="lg" variant="outline" onClick={onSelectStocks} className="gap-2">
-              <Search className="w-5 h-5" />
-              General Stock Search
-            </Button>
-            {onAddStock && (
-              <ImportStocksModal
-                existingTickers={existingTickers}
-                onAddStock={onAddStock}
-              />
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Step 1: Set desired yield */}
-      {step === 1 && (
-        <div className="max-w-lg mx-auto space-y-6 py-4">
-          <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-1">
-              <Target className="w-6 h-6" />
-            </div>
-            <h2 className="text-xl font-semibold">Set Your Desired Yield</h2>
-            <p className="text-sm text-muted-foreground">
-              What minimum annual dividend yield are you looking for?
-            </p>
-          </div>
-          <Card className="p-6 border-border/50">
-            <div className="text-center mb-6">
-              <span className="text-4xl font-mono font-bold text-primary">
-                {localYield.toFixed(1)}%
-              </span>
-              <p className="text-xs text-muted-foreground mt-1">minimum annual yield</p>
-            </div>
-            <Slider
-              value={[localYield]}
-              onValueChange={([v]) => setLocalYield(v)}
-              min={1}
-              max={10}
-              step={0.5}
-              className="w-full"
-            />
-            <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-              <span>1% Conservative</span>
-              <span>10% Aggressive</span>
-            </div>
-          </Card>
-          <div className="text-center space-y-1 pt-2">
-            <h2 className="text-xl font-semibold flex items-center justify-center gap-2">
-              <DollarSign className="w-5 h-5 text-primary" /> How Much Do You Have to Invest?
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Optional — tell us your budget and we'll pre-fill whole shares for the stocks you pick next. Leave it blank to enter shares yourself.
-            </p>
-          </div>
-          <BudgetSetupCard
-            budgetInput={budgetInput}
-            onBudgetChange={handleBudgetChange}
-            mode={budgetMode}
-            onModeChange={handleBudgetModeChange}
-            targetYield={localYield}
-          />
-          <div className="flex flex-wrap gap-3 justify-center">
-            {onAddStock && (
-              <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
-            )}
-            <Button variant="outline" onClick={() => setStep(0)}>Back</Button>
-            <Button onClick={handleYieldConfirm} className="gap-2">
-              Find Matching Stocks <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Step 2: Budget question — right after the yield slider */}
-      {step === 2 && (
-        <div className="max-w-lg mx-auto space-y-6 py-4">
-          <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-1">
-              <DollarSign className="w-6 h-6" />
-            </div>
-            <h2 className="text-xl font-semibold">How Much Do You Have to Invest?</h2>
-            <p className="text-sm text-muted-foreground">
-              Tell us your budget and we'll pre-fill whole shares for the stocks you pick next.
-            </p>
-          </div>
-          <BudgetSetupCard
-            budgetInput={budgetInput}
-            onBudgetChange={handleBudgetChange}
-            mode={budgetMode}
-            onModeChange={handleBudgetModeChange}
-            targetYield={localYield}
-          />
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-            <Button
-              variant="outline"
-              onClick={() => { setBudgetInput(''); setSubmitted(false); setStep(3); }}
-            >
-              Skip — I'll enter shares myself
-            </Button>
-            <Button
-              className="gap-2"
-              disabled={!isValidBudgetInput(budgetInput)}
-              onClick={() => setStep(3)}
-            >
-              Find Matching Stocks <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* Step 3: Checkbox multi-select */}
       {step === 3 && (
         <div ref={step2Ref} className="scroll-mt-64 space-y-6 py-4 px-4 sm:px-6 rounded-xl border-[4px] border-gray-400 bg-background">
@@ -428,7 +266,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
               <p className="text-muted-foreground">
                 No stocks in our catalog match a {localYield.toFixed(1)}% yield. Try lowering your target.
               </p>
-              <Button variant="outline" onClick={() => setStep(1)} className="mt-4">Adjust Yield</Button>
+              <Button variant="outline" onClick={onSetYield} className="mt-4">Adjust Yield</Button>
             </Card>
           ) : (
             <div className="grid sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
@@ -472,9 +310,8 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, onYield
             {onAddStock && (
               <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
             )}
-            <Button variant="outline" onClick={() => setStep(1)}>Adjust Yield</Button>
+            <Button variant="outline" onClick={onSetYield}>Adjust Yield</Button>
             <Button variant="outline" onClick={onSelectStocks} className="gap-2">Search Other Stocks</Button>
-            <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
             {selectedTickers.size > 0 && (
               <Button className="gap-2" onClick={handleProceedToShares}>
                 Enter Shares for {selectedTickers.size} Stock{selectedTickers.size !== 1 ? 's' : ''} <ChevronRight className="w-4 h-4" />

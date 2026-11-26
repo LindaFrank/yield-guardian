@@ -126,7 +126,7 @@ const Index = () => {
   const [targetYield, setTargetYield] = useState(5.0);
   const [selectedUnderperformer, setSelectedUnderperformer] = useState<Stock | null>(null);
   const [addStockOpen, setAddStockOpen] = useState(false);
-  const [findStocksStep, setFindStocksStep] = useState(0);
+  const [findStocksStep, setFindStocksStep] = useState(3);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
   const [budgetInput, setBudgetInput] = useState('');
   const [budgetMode, setBudgetMode] = useState<BudgetMode>('even');
@@ -441,7 +441,7 @@ const Index = () => {
     setIncomeDeltaByTicker({});
     setWizardDismissed(false);
     setShowFindStocksFlow(false);
-    setFindStocksStep(0);
+    setFindStocksStep(3);
     setReportBytes(null);
     setReplacementDialogOpen(false);
     trackEvent('guest_portfolio_reset', {
@@ -779,23 +779,16 @@ const Index = () => {
               onSelectStocks={() => setAddStockOpen(true)}
               onSetYield={() => yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
               onAddStock={handleAddStock}
-              onYieldChange={setTargetYield}
               currentYield={targetYield}
               onDone={() => {
                 setWizardDismissed(true);
                 setShowFindStocksFlow(false);
-                setFindStocksStep(0);
+                setFindStocksStep(3);
               }}
-              onCancel={() => {
-                setShowFindStocksFlow(false);
-                setFindStocksStep(0);
-              }}
-              initialStep={showFindStocksFlow ? findStocksStep : 0}
+              initialStep={showFindStocksFlow ? findStocksStep : 3}
               existingTickers={stocks.map((s) => s.ticker)}
               budgetInput={budgetInput}
-              onBudgetInputChange={setBudgetInput}
               budgetMode={budgetMode}
-              onBudgetModeChange={setBudgetMode}
             />
           </section>
         )}
