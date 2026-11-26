@@ -648,10 +648,6 @@ const Index = () => {
                 variant="outline"
                 className="gap-1.5 border-[3px] border-muted-foreground/50"
                 onClick={() => {
-                  if (hasDashboardBudget) {
-                    openBudgetStockPicker();
-                    return;
-                  }
                   setSelectedUnderperformer(null);
                   setReplacementDialogOpen(true);
                 }}
@@ -788,8 +784,6 @@ const Index = () => {
               }}
               initialStep={showFindStocksFlow ? findStocksStep : 3}
               existingTickers={stocks.map((s) => s.ticker)}
-              budgetInput={budgetInput}
-              budgetMode={budgetMode}
             />
           </section>
         )}
