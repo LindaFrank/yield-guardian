@@ -22,6 +22,7 @@ interface BudgetSetupCardProps {
   mode: BudgetMode;
   onModeChange: (mode: BudgetMode) => void;
   targetYield: number;
+  embedded?: boolean;
 }
 
 /** Step right after the yield slider: ask the dollar amount and allocation style. */
@@ -31,6 +32,7 @@ export function BudgetSetupCard({
   mode,
   onModeChange,
   targetYield,
+  embedded = false,
 }: BudgetSetupCardProps) {
   const trimmed = budgetInput.trim();
   const parsed = trimmed === '' ? NaN : parseFloat(trimmed);
@@ -43,8 +45,10 @@ export function BudgetSetupCard({
     { id: 'conservative', label: 'Conservative', hint: `Near ${targetYield.toFixed(1)}% target` },
   ];
 
+  const Container = embedded ? 'div' : Card;
+
   return (
-    <Card className="p-4 border-primary/30 bg-card/80 space-y-4">
+    <Container className={cn('space-y-4', embedded ? 'border-t border-primary/30 pt-4' : 'p-4 border-primary/30 bg-card/80')}>
       <div className="space-y-1">
         <label htmlFor="invest-budget-input" className="text-sm font-semibold">
           How much money do you have to invest?
@@ -106,7 +110,7 @@ export function BudgetSetupCard({
           </div>
         </div>
       )}
-    </Card>
+    </Container>
   );
 }
 

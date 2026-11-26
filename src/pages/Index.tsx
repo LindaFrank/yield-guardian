@@ -713,33 +713,34 @@ const Index = () => {
                 </>
               )}
             </div>
+            <section id="dashboard-budget-section" className="mt-4 space-y-3">
+              <BudgetSetupCard
+                embedded
+                budgetInput={budgetInput}
+                onBudgetChange={setBudgetInput}
+                mode={budgetMode}
+                onModeChange={setBudgetMode}
+                targetYield={targetYield}
+              />
+              {hasDashboardBudget && (
+                <div className="flex justify-end">
+                  <Button onClick={openBudgetStockPicker} className="gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Find stocks for this amount
+                  </Button>
+                </div>
+              )}
+            </section>
           </div>
         </section>
 
-        {/* Yield target + budget question, directly under the action menu */}
+        {/* Yield target, directly under the action menu */}
         <div className="mt-4 space-y-4">
           <HelpTooltip text="This is the lowest acceptable yield set for investments in the portfolio. This value is adjustable with the slider." side="bottom">
             <section ref={yieldSliderRef} className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <YieldTargetSlider value={targetYield} onChange={setTargetYield} />
             </section>
           </HelpTooltip>
-          <section id="dashboard-budget-section" className="animate-fade-in space-y-3" style={{ animationDelay: '150ms' }}>
-            <BudgetSetupCard
-              budgetInput={budgetInput}
-              onBudgetChange={setBudgetInput}
-              mode={budgetMode}
-              onModeChange={setBudgetMode}
-              targetYield={targetYield}
-            />
-            {hasDashboardBudget && (
-              <div className="flex justify-end">
-                <Button onClick={openBudgetStockPicker} className="gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  Find stocks for this amount
-                </Button>
-              </div>
-            )}
-          </section>
         </div>
 
         <FreeTrialNotice isGuest={isGuest} />
