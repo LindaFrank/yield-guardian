@@ -128,14 +128,13 @@ const Index = () => {
   const [addStockOpen, setAddStockOpen] = useState(false);
   const [findStocksStep, setFindStocksStep] = useState(3);
   const [showFindStocksFlow, setShowFindStocksFlow] = useState(false);
+  const [budgetStockPickerOpen, setBudgetStockPickerOpen] = useState(false);
   const [budgetInput, setBudgetInput] = useState('');
   const [budgetMode, setBudgetMode] = useState<BudgetMode>('even');
   const parsedDashboardBudget = budgetInput.trim() === '' ? 0 : parseFloat(budgetInput);
   const hasDashboardBudget = Number.isFinite(parsedDashboardBudget) && parsedDashboardBudget > 0;
   const openBudgetStockPicker = () => {
-    setShowFindStocksFlow(true);
-    setFindStocksStep(3);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setBudgetStockPickerOpen(true);
   };
   const [reportGenerating, setReportGenerating] = useState(false);
   const [reportBytes, setReportBytes] = useState<Uint8Array | null>(null);
@@ -309,6 +308,7 @@ const Index = () => {
   const anyDialogOpen =
     addStockOpen ||
     replacementDialogOpen ||
+    budgetStockPickerOpen ||
     quickStartOpen ||
     quickStartImportOpen ||
     feedbackOpen ||
@@ -723,7 +723,7 @@ const Index = () => {
                 targetYield={targetYield}
               />
               {hasDashboardBudget && (
-                <div className="flex justify-end">
+                <div className="flex justify-center">
                   <Button onClick={openBudgetStockPicker} className="gap-2">
                     <Sparkles className="w-4 h-4" />
                     Find stocks for this amount
@@ -982,6 +982,47 @@ const Index = () => {
                   setReplacementDialogOpen(false);
                 }}
               />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={budgetStockPickerOpen} onOpenChange={setBudgetStockPickerOpen}>
+            <DialogContent
+              className="max-w-3xl max-h-[90vh] overflow-y-auto border-[4px] border-gray-500 pb-8"
+              closeLabel="Back to Portfolio"
+            >
+              <DialogHeader className="sr-only">
+                <DialogTitle>Matching Stocks for Your Investment</DialogTitle>
+                <DialogDescription>
+                  Select the stocks you want to include and review the suggested whole-share counts.
+                </DialogDescription>
+              </DialogHeader>
+              {budgetStockPickerOpen && (
+                <EmptyPortfolio
+                  inDialog
+                  onSelectStocks={() => {
+                    setBudgetStockPickerOpen(false);
+                    setAddStockOpen(true);
+                  }}
+                  onSetYield={() => {
+                    setBudgetStockPickerOpen(false);
+                    setTimeout(() => {
+                      yieldSliderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                  }}
+                  onAddStock={handleAddStock}
+                  currentYield={targetYield}
+                  onDone={() => {
+                    setBudgetStockPickerOpen(false);
+                    setWizardDismissed(true);
+                    setShowFindStocksFlow(false);
+                    setFindStocksStep(3);
+                  }}
+                  initialStep={3}
+                  existingTickers={stocks.map((s) => s.ticker)}
+                  budgetInput={budgetInput}
+                  budgetMode={budgetMode}
+                />
+              )}
             </DialogContent>
           </Dialog>
 

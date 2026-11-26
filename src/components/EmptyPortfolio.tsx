@@ -45,21 +45,25 @@ interface EmptyPortfolioProps {
   /** Optional shared budget (set from the main page's money box). */
   budgetInput?: string;
   budgetMode?: BudgetMode;
+  /** Render cleanly inside a modal dialog without outer border or window scrolling. */
+  inDialog?: boolean;
 }
 
 interface EnrichedStock extends Stock {
   computedYield: number;
 }
 
-export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, currentYield = 5.0, onDone, initialStep = 3, existingTickers = [], budgetInput = '', budgetMode = 'even' }: EmptyPortfolioProps) {
+export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, currentYield = 5.0, onDone, initialStep = 3, existingTickers = [], budgetInput = '', budgetMode = 'even', inDialog = false }: EmptyPortfolioProps) {
   const [step, setStep] = useState(initialStep);
   const navigate = useNavigate();
+  const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setStep(initialStep);
   }, [initialStep]);
 
   useEffect(() => {
+    if (inDialog) return;
     const handleGuestBack = (e: Event) => {
       e.preventDefault(); // tell the header the wizard handled it
       setStep((s) => {
@@ -73,7 +77,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
     };
     window.addEventListener('yg:guest-back', handleGuestBack);
     return () => window.removeEventListener('yg:guest-back', handleGuestBack);
-  }, [navigate]);
+  }, [navigate, inDialog]);
   const [localYield, setLocalYield] = useState(currentYield);
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
@@ -81,7 +85,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
   // Keep the wizard's yield in step with the main page's yield slider.
   useEffect(() => { setLocalYield(currentYield); }, [currentYield]);
   const [portions, setPortions] = useState<number | null>(null);
-  const step2Ref = useScrollToOnValue<HTMLDivElement>(step === 3 ? 'step3' : '');
+  const step2Ref = useScrollToOnValue<HTMLDivElement>(!inDialog && step === 3 ? 'step3' : '');
 
   const catalogTickers = useMemo(
     () => Array.from(new Set([...marketStocks.map((s) => s.ticker), ...HIGH_YIELD_CANDIDATE_TICKERS])),
@@ -200,7 +204,11 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
     }
     setStep(4);
     // Scroll to top so user sees the first stock in the shares list
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (inDialog) {
+      setTimeout(() => topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleConfirmAll = () => {
@@ -244,10 +252,16 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div ref={topRef} className="space-y-6 animate-fade-in">
       {/* Step 3: Checkbox multi-select */}
       {step === 3 && (
-        <div ref={step2Ref} className="scroll-mt-64 space-y-6 py-4 px-4 sm:px-6 rounded-xl border-[4px] border-gray-400 bg-background">
+        <div
+          ref={step2Ref}
+          className={cn(
+            'space-y-6',
+            inDialog ? 'pt-2' : 'scroll-mt-64 py-4 px-4 sm:px-6 rounded-xl border-[4px] border-gray-400 bg-background'
+          )}
+        >
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-1">
               <TrendingUp className="w-6 h-6" />
@@ -420,7 +434,16 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
             {onAddStock && (
               <ImportStocksModal existingTickers={existingTickers} onAddStock={onAddStock} />
             )}
-            <Button variant="outline" onClick={() => { setSubmitted(false); setStep(3); }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSubmitted(false);
+                setStep(3);
+                if (inDialog) {
+                  setTimeout(() => topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+                }
+              }}
+            >
               Back to Selection
             </Button>
             <Button className="gap-2" onClick={handleConfirmAll}>
