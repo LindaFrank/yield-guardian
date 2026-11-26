@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { LIVE_STOCK_DATA_ENABLED } from '@/lib/featureFlags';
 import type { FeedSource } from '@/lib/feedLabels';
+import type { PricePoint } from '@/lib/priceHistory';
 import { Stock, DividendPayment } from '@/types/portfolio';
 
 interface FMPQuote {
@@ -126,5 +127,20 @@ export function useStockSearch(query: string) {
     },
     enabled: query.length >= 1,
     staleTime: 30 * 1000,
+  });
+}
+
+export function useStockHistory(tickers: string[], enabled = true) {
+  const sortedKey = [...new Set(tickers)].sort().join(',');
+  return useQuery({
+    queryKey: ['stock-history-6m', sortedKey],
+    queryFn: async (): Promise<Record<string, PricePoint[]>> => {
+      const unique = sortedKey ? sortedKey.split(',') : [];
+      if (unique.length === 0) return {};
+      const { data } = await callStockFunction('history', unique);
+      return (data ?? {}) as Record<string, PricePoint[]>;
+    },
+    enabled: enabled && sortedKey.length > 0,
+    staleTime: 60 * 60 * 1000, // 1 hour client cache (daily closing prices)
   });
 }

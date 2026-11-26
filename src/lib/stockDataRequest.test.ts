@@ -7,7 +7,7 @@ describe('stock-data request validation', () => {
     expect(BodySchema.safeParse({ action: 'ping' }).success).toBe(true);
   });
 
-  for (const action of ['quote', 'dividends', 'search']) {
+  for (const action of ['quote', 'dividends', 'search', 'history']) {
     it(`${action} requires tickers and accepts a valid request`, () => {
       expect(BodySchema.safeParse({ action, tickers: [] }).success).toBe(false);
       expect(BodySchema.safeParse({ action }).success).toBe(false);

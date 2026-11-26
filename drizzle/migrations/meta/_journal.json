@@ -43,6 +43,13 @@
       "when": 1795048089097,
       "tag": "0005_terms_acceptances",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795715689638,
+      "tag": "0006_add_stock_cache_history_columns",
+      "breakpoints": true
     }
   ]
 }

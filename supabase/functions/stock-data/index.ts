@@ -11,6 +11,7 @@ const FMP_BASE = 'https://financialmodelingprep.com/stable';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (personal plan: live quotes)
 const COMMERCIAL_CACHE_TTL_MS = 20 * 60 * 60 * 1000; // 20 hours (Enterprise plan: once-a-day at market close)
 const DIVIDENDS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (dividend history rarely changes)
+const HISTORY_CACHE_TTL_MS = 20 * 60 * 60 * 1000; // 20 hours (daily closing prices update once per session)
 
 // The app reads x-fmp-source to describe its prices honestly (live vs closing).
 // Browsers hide custom response headers on cross-origin calls unless the
@@ -338,6 +339,78 @@ serve(async (req) => {
       });
     }
 
+    if (action === 'history') {
+      const { data: cached } = await sb
+        .from('stock_cache')
+        .select('ticker, history_data, history_cached_at')
+        .eq('source', source)
+        .in('ticker', cleanTickers);
+
+      const now = Date.now();
+      const toDate = source === 'commercial'
+        ? completedSessionDate(new Date(now))
+        : new Date(now).toISOString().slice(0, 10);
+      const fromMs = new Date(`${toDate}T12:00:00Z`).getTime() - 185 * 24 * 60 * 60 * 1000;
+      const fromDate = new Date(fromMs).toISOString().slice(0, 10);
+
+      const results: Record<string, Array<{ date: string; close: number }>> = {};
+      const stale: string[] = [];
+
+      for (const ticker of cleanTickers) {
+        const hit = cached?.find((c: any) => c.ticker === ticker);
+        if (
+          hit &&
+          Array.isArray(hit.history_data) &&
+          hit.history_data.length > 0 &&
+          (now - new Date(hit.history_cached_at ?? 0).getTime()) < HISTORY_CACHE_TTL_MS
+        ) {
+          results[ticker] = hit.history_data as Array<{ date: string; close: number }>;
+        } else {
+          stale.push(ticker);
+        }
+      }
+
+      if (stale.length > 0) {
+        const nowIso = new Date().toISOString();
+        await Promise.all(
+          stale.map(async (ticker: string) => {
+            try {
+              const res = await fetch(
+                `${FMP_BASE}/historical-price-eod/full?symbol=${encodeURIComponent(ticker)}&from=${fromDate}&to=${toDate}&apikey=${apiKey}`
+              );
+              const text = await res.text();
+              let data: any = null;
+              try { data = JSON.parse(text); } catch { /* non-JSON body */ }
+              const rows = Array.isArray(data) ? data : [];
+              const points = rows
+                .filter((r: any) => typeof r?.date === 'string' && r.date <= toDate && Number.isFinite(Number(r?.close)) && Number(r.close) > 0)
+                .map((r: any) => ({ date: r.date.slice(0, 10), close: Math.round(Number(r.close) * 10000) / 10000 }))
+                .sort((a: { date: string }, b: { date: string }) => a.date.localeCompare(b.date));
+              if (!res.ok || points.length === 0) {
+                console.error(
+                  `FMP history unusable for ${ticker} (${source}): status=${res.status} body=${redactKey(text).slice(0, 300)}`
+                );
+                results[ticker] = [];
+                return;
+              }
+              results[ticker] = points;
+              await sb.from('stock_cache').upsert(
+                { ticker, source, history_data: points, history_cached_at: nowIso },
+                { onConflict: 'ticker,source' }
+              );
+            } catch (e) {
+              console.error(`FMP history error for ${ticker}:`, e);
+              results[ticker] = [];
+            }
+          })
+        );
+      }
+
+      return new Response(JSON.stringify(results), {
+        headers: { ...corsExpose, 'Content-Type': 'application/json', 'x-fmp-source': source },
+      });
+    }
+
     if (action === 'search') {
       const rawQ = rawQuery || cleanTickers[0] || '';
       const sanitizedQ = rawQ.replace(/[^A-Za-z0-9.\-]/g, '').trim();
@@ -398,7 +471,7 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ error: 'Invalid action. Use: quote, dividends, search' }), {
+    return new Response(JSON.stringify({ error: 'Invalid action. Use: quote, dividends, search, history' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

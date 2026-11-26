@@ -22,6 +22,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { trackEvent } from '@/lib/analytics';
 import { usePaidFeatures } from '@/hooks/usePaidFeatures';
+import { useStockHistory } from '@/hooks/useStockData';
+import {
+  StockSparklineButton,
+  StockHistoryDialog,
+  type ChartStockInfo,
+} from '@/components/StockPriceChart';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -174,8 +180,18 @@ export function ReplacementSuggestions({
   const { isPaid } = usePaidFeatures();
   const [editingTickers, setEditingTickers] = useState<string[]>([]);
   const [sharesInputs, setSharesInputs] = useState<Record<string, string>>({});
+  const [chartStock, setChartStock] = useState<ChartStockInfo | null>(null);
 
   const [compareTicker, setCompareTicker] = useState<string | null>(null);
+
+  const candidateTickers = useMemo(
+    () => candidates.map((c) => c.stock.ticker),
+    [candidates],
+  );
+  const { data: historyMap, isLoading: historyLoading } = useStockHistory(
+    candidateTickers,
+    isPaid && candidateTickers.length > 0,
+  );
 
   // Per-card optimiser controls
   const [mode, setMode] = useState<OptimizerMode>('aggressive');
@@ -996,6 +1012,21 @@ export function ReplacementSuggestions({
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
+              ) : isPaid ? (
+                <StockSparklineButton
+                  ticker={row.stock.ticker}
+                  points={historyMap?.[row.stock.ticker]}
+                  isLoading={historyLoading}
+                  onClick={() =>
+                    setChartStock({
+                      ticker: row.stock.ticker,
+                      name: row.stock.name,
+                      currentPrice: row.stock.currentPrice,
+                      yieldPct: yieldVal,
+                    })
+                  }
+                  className="ml-3"
+                />
               ) : null}
 
             </div>
@@ -1011,6 +1042,16 @@ export function ReplacementSuggestions({
           </Button>
         </div>
       )}
+
+      <StockHistoryDialog
+        open={!!chartStock}
+        onOpenChange={(open) => {
+          if (!open) setChartStock(null);
+        }}
+        stock={chartStock}
+        points={chartStock ? historyMap?.[chartStock.ticker] : undefined}
+        isLoading={historyLoading}
+      />
     </div>
   );
 }

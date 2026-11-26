@@ -10,12 +10,17 @@ import { marketStocks } from '@/data/mockData';
 import { HIGH_YIELD_CANDIDATES, HIGH_YIELD_CANDIDATE_TICKERS } from '@/data/highYieldCandidates';
 import { isEligibleAlternative } from '@/lib/alternativeSafeguards';
 import { ImportStocksModal } from '@/components/ImportStocksModal';
-import { useStockQuotes } from '@/hooks/useStockData';
+import { useStockQuotes, useStockHistory } from '@/hooks/useStockData';
 import { feedLabels } from '@/lib/feedLabels';
 import { useNavigate } from 'react-router-dom';
 import { checkDividendStability } from '@/lib/portfolioUtils';
 import { allocateBudget, BudgetMode } from '@/lib/budgetAllocator';
 import { BudgetPlannerCard } from '@/components/BudgetPlannerCard';
+import {
+  StockSparklineButton,
+  StockHistoryDialog,
+  type ChartStockInfo,
+} from '@/components/StockPriceChart';
 import { cn } from '@/lib/utils';
 
 
@@ -82,6 +87,7 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [chartStock, setChartStock] = useState<ChartStockInfo | null>(null);
   // Keep the wizard's yield in step with the main page's yield slider.
   useEffect(() => { setLocalYield(currentYield); }, [currentYield]);
   const [portions, setPortions] = useState<number | null>(null);
@@ -115,6 +121,15 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
       .filter((s) => checkDividendStability(s, 2, localYield).status === 'stable')
       .sort((a, b) => b.computedYield - a.computedYield);
   }, [localYield, liveStocks]);
+
+  const matchingTickers = useMemo(
+    () => matchingStocks.map((s) => s.ticker),
+    [matchingStocks],
+  );
+  const { data: historyMap, isLoading: historyLoading } = useStockHistory(
+    matchingTickers,
+    step === 3 && matchingTickers.length > 0,
+  );
 
   const selectedStocks = useMemo(
     () => matchingStocks.filter((s) => selectedTickers.has(s.ticker)),
@@ -313,6 +328,20 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
                           {stock.computedYield.toFixed(2)}% yield · ${stock.currentPrice.toFixed(2)}
                         </p>
                       </div>
+                      <StockSparklineButton
+                        ticker={stock.ticker}
+                        points={historyMap?.[stock.ticker]}
+                        isLoading={historyLoading}
+                        onClick={() =>
+                          setChartStock({
+                            ticker: stock.ticker,
+                            name: stock.name,
+                            currentPrice: stock.currentPrice,
+                            yieldPct: stock.computedYield,
+                          })
+                        }
+                        className="w-[72px] h-8 sm:w-[80px] sm:h-9"
+                      />
                     </div>
                   </Card>
                 );
@@ -455,6 +484,16 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
           </div>
         </div>
       )}
+
+      <StockHistoryDialog
+        open={!!chartStock}
+        onOpenChange={(open) => {
+          if (!open) setChartStock(null);
+        }}
+        stock={chartStock}
+        points={chartStock ? historyMap?.[chartStock.ticker] : undefined}
+        isLoading={historyLoading}
+      />
     </div>
   );
 }

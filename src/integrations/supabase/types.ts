@@ -424,6 +424,8 @@ export type Database = {
           cached_at: string
           dividends_cached_at: string | null
           dividends_data: Json | null
+          history_cached_at: string | null
+          history_data: Json | null
           quote_data: Json | null
           source: string
           ticker: string
@@ -432,6 +434,8 @@ export type Database = {
           cached_at?: string
           dividends_cached_at?: string | null
           dividends_data?: Json | null
+          history_cached_at?: string | null
+          history_data?: Json | null
           quote_data?: Json | null
           source?: string
           ticker: string
@@ -440,6 +444,8 @@ export type Database = {
           cached_at?: string
           dividends_cached_at?: string | null
           dividends_data?: Json | null
+          history_cached_at?: string | null
+          history_data?: Json | null
           quote_data?: Json | null
           source?: string
           ticker?: string
