@@ -30,9 +30,14 @@ describe('yields above 50% are bad data', () => {
 });
 
 describe('NLY-PI case (redeemed, $0.106 price from Oct 26)', () => {
+  // suggestReplacements / toOptimizerCandidates read the real clock, so the
+  // "still tradable" comparators have to be priced within the last week of
+  // *now*, not of a fixed date — otherwise this test rots as time passes.
+  const daysAgo = (n: number) =>
+    new Date(Date.now() - n * 86_400_000).toISOString().slice(0, 10);
   const nlyPi = stock('NLY-PI', 0.10602, 2.28827, '2026-10-26');
-  const good = stock('NLY-PF', 25.41, 2.27, '2026-11-13');
-  const abbv = stock('ABBV', 295.03, 7.01, '2026-11-13');
+  const good = stock('NLY-PF', 25.41, 2.27, daysAgo(1));
+  const abbv = stock('ABBV', 295.03, 7.01, daysAgo(1));
 
   it('is never offered as an Alternative', () => {
     expect(isEligibleAlternative(nlyPi, NOW)).toBe(false);

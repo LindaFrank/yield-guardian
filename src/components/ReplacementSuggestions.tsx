@@ -319,7 +319,7 @@ export function ReplacementSuggestions({
   const funding = result ? describeTradeFunding(result) : null;
 
   return (
-    <div className="p-5 rounded-xl gradient-card shadow-card border-[2px] border-muted-foreground/50">
+    <div className="p-5 rounded-xl gradient-card shadow-card border-[2px] border-muted-foreground/50 min-w-0">
 
       {removedStock && (
         <>
