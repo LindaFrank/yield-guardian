@@ -626,6 +626,11 @@ export function ReplacementSuggestions({
       )}
 
       <div className="space-y-3">
+        {isPaid && (
+          <p className="text-xs text-muted-foreground">
+            Click any small graph to see 6-month price details.
+          </p>
+        )}
         {(() => {
           const baseRows = displayRows
             ? [...displayRows]

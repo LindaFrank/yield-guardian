@@ -305,20 +305,25 @@ export function StockHistoryDialog({
             </div>
 
             {summary && (
-              <div className="grid grid-cols-3 gap-2 pt-1 text-center">
-                <div className="rounded-md bg-secondary/30 p-2">
-                  <p className="text-[11px] text-muted-foreground">6M Start</p>
-                  <p className="text-sm font-mono font-medium">{formatCurrency(summary.startPrice)}</p>
+              <>
+                <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                  <div className="rounded-md bg-secondary/30 p-2">
+                    <p className="text-[11px] text-muted-foreground">6M Start</p>
+                    <p className="text-sm font-mono font-medium">{formatCurrency(summary.startPrice)}</p>
+                  </div>
+                  <div className="rounded-md bg-secondary/30 p-2">
+                    <p className="text-[11px] text-muted-foreground">6M Low</p>
+                    <p className="text-sm font-mono font-medium">{formatCurrency(summary.low)}</p>
+                  </div>
+                  <div className="rounded-md bg-secondary/30 p-2">
+                    <p className="text-[11px] text-muted-foreground">6M High</p>
+                    <p className="text-sm font-mono font-medium">{formatCurrency(summary.high)}</p>
+                  </div>
                 </div>
-                <div className="rounded-md bg-secondary/30 p-2">
-                  <p className="text-[11px] text-muted-foreground">6M Low</p>
-                  <p className="text-sm font-mono font-medium">{formatCurrency(summary.low)}</p>
-                </div>
-                <div className="rounded-md bg-secondary/30 p-2">
-                  <p className="text-[11px] text-muted-foreground">6M High</p>
-                  <p className="text-sm font-mono font-medium">{formatCurrency(summary.high)}</p>
-                </div>
-              </div>
+                <p className="text-xs text-muted-foreground leading-relaxed rounded-md bg-secondary/20 border border-border/40 px-3 py-2">
+                  6M Start is the closing price at the beginning of the six-month period, at the left end of the graph. The most recent closing price is at the right end; comparing those two prices determines whether the graph is green or red.
+                </p>
+              </>
             )}
           </div>
         )}

@@ -287,6 +287,11 @@ export function EmptyPortfolio({ onSelectStocks, onSetYield, onAddStock, current
                 ? feedLabels(feed).fetching
                 : `${matchingStocks.length} stock${matchingStocks.length !== 1 ? 's' : ''} found — check the ones you want to add`}
             </p>
+            {!livePricesLoading && matchingStocks.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Click any small graph to see 6-month price details.
+              </p>
+            )}
             {livePricesLoading && <Loader2 className="w-5 h-5 animate-spin text-primary mx-auto mt-2" />}
           </div>
 
