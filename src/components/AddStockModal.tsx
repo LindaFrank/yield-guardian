@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Stock } from '@/types/portfolio';
-import { useStockSearch, SearchResult } from '@/hooks/useStockData';
+import { useStockSearch, useStockHistory, SearchResult } from '@/hooks/useStockData';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Search, Loader2, ChevronRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MAX_PORTFOLIO_POSITIONS, remainingCapacity } from '@/lib/portfolioLimits';
 import { ownedStocksMessage } from '@/lib/ownedStockMessage';
+import { StockSparklineButton, StockHistoryDialog, ChartStockInfo } from '@/components/StockPriceChart';
 
 
 interface AddStockModalProps {
@@ -31,6 +32,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
   const [selected, setSelected] = useState<Map<string, SearchResult>>(new Map());
   const [sharesMap, setSharesMap] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [chartStock, setChartStock] = useState<ChartStockInfo | null>(null);
 
   const { data: results, isLoading, isError } = useStockSearch(search);
 
@@ -39,6 +41,10 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
   const filtered = matches.filter((r) => !isOwned(r.symbol));
   // Search did find these — they're just hidden because they're already held.
   const alreadyOwned = matches.filter((r) => isOwned(r.symbol));
+  const { data: history, isLoading: historyLoading } = useStockHistory(
+    filtered.map((result) => result.symbol),
+    open && phase === 'search',
+  );
 
   const capacity = remainingCapacity(existingTickers.length);
   const atLimit = capacity <= 0;
@@ -94,9 +100,11 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
     setSelected(new Map());
     setSharesMap({});
     setSubmitted(false);
+    setChartStock(null);
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={(v) => { if (!v) resetAndClose(); else setOpen(true); }}>
       {controlledOpen === undefined && (
         <DialogTrigger asChild>
@@ -144,6 +152,11 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
               />
             </div>
 
+            {filtered.length > 0 && !isLoading && (
+              <p className="text-xs text-muted-foreground">
+                Click any small graph for 6-month price details.
+              </p>
+            )}
             <div className="max-h-72 overflow-y-auto space-y-2 mt-2">
               {search.length === 0 && (
                 <p className="text-center text-muted-foreground py-8 text-sm">
@@ -199,7 +212,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                     onClick={() => toggleSelect(result)}
                     role="button"
                     className={cn(
-                      'w-full flex items-center gap-3 p-3 rounded-lg border-[4px] transition-colors text-left cursor-pointer',
+                      'w-full min-w-0 flex items-center gap-3 p-3 rounded-lg border-[4px] transition-colors text-left cursor-pointer',
                       isChecked
                         ? 'bg-primary/5 border-primary/40 ring-1 ring-primary/20'
                         : 'bg-secondary/30 border-muted-foreground/50 hover:border-primary/30 hover:bg-secondary/50'
@@ -212,7 +225,7 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                       className="shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono font-medium">{result.symbol}</span>
                         <span className="text-xs text-muted-foreground px-2 py-0.5 rounded bg-secondary">
                           {result.stockExchange}
@@ -220,6 +233,16 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
                       </div>
                       <p className="text-sm text-muted-foreground mt-0.5">{result.name}</p>
                     </div>
+                    <StockSparklineButton
+                      ticker={result.symbol}
+                      points={history?.[result.symbol]}
+                      isLoading={historyLoading}
+                      onClick={() => setChartStock({
+                        ticker: result.symbol,
+                        name: result.name,
+                        currentPrice: 0,
+                      })}
+                    />
                   </div>
                 );
               })}
@@ -296,5 +319,13 @@ export function AddStockModal({ existingTickers, onAddStock, open: controlledOpe
         )}
       </DialogContent>
     </Dialog>
+    <StockHistoryDialog
+      open={chartStock !== null}
+      onOpenChange={(nextOpen) => { if (!nextOpen) setChartStock(null); }}
+      stock={chartStock}
+      points={chartStock ? history?.[chartStock.ticker] : undefined}
+      isLoading={historyLoading}
+    />
+    </>
   );
 }
